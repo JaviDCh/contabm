@@ -1,0 +1,98 @@
+
+
+<div class="modal-header">
+    <h5 class="modal-title">
+        <span>Importar movimientos bancarios del banco desde Excel</span>
+    </h5>
+</div>
+
+<div class="modal-body">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-12 col-sm-offset-0">
+                <div class="col-sm-6 col-sm-offset-6" style="text-align: right; font-style: italic; ">
+                    <span style="color: dodgerblue">{{ companiaSeleccionada.nombre }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12 col-sm-offset-0">
+                <div class="col-sm-4 col-sm-offset-4" style="text-align: center; vertical-align: middle; ">
+                    <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12" style="font-size: small; ">
+                <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">
+                    <span ng-bind-html="alert.msg | unsafe"></span>
+                </alert>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" style="font-size: small; ">
+                <br />
+                <p>
+                    Esta función le permite registrar los movimientos bancarios recibidos desde el banco,
+                    para que puedan ser comparados con los movimientos bancarios propios.
+                </p>
+                <p>
+                    El <em>documento Excel</em> que Ud. proporcione, debe contener una linea para cada movimiento
+                    bancario registrado por el banco.
+                </p>
+                <p>
+                    La 1ra. linea del documento debe correponder a los encabezados de columna. En particular,
+                    las columnas que pueden estar presenten son:
+                </p>
+                <p>
+                    <ul>
+                        <li>número (opcional - número del cheque, depósito, transferencia, etc.)</li>
+                        <li>tipo (opcional - tipo del movimiento bancario: CH, DP, TR, etc.)</li>
+                        <li>fecha (<b>requerido</b> - fecha del movimiento bancario)</li>
+                        <li>beneficiario (opcional - beneficiario del movimiento bancario)</li>
+                        <li>concepto (opcional - concepto del movimiento bancario)</li>
+                        <li>monto (<b>requerido</b> - monto (positivo o negativo) del movimiento bancario)</li>
+                    </ul>
+                </p>
+                <p>
+                    <b>Nota importante:</b> el monto debe siempre venir así: 1000,75; o así: 1.000,75.
+                </p>
+
+                <form id="tratarFilesForm"
+                        name="tratarFilesForm"
+                        role="form"
+                        novalidate
+                        style="margin-top: 15px; "
+                        ng-submit="submit_TratarFilesForm()" >
+
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-0">
+                                    <div class="form-group form-group-sm">
+                                        <label  for="fileInputControl" class="control-label input-label pull-left">&nbsp;&nbsp;</label>
+                                        <br />
+                                        <input type="file"
+                                               id="fileInputControl"
+                                               name="fileInputControl"
+                                               accept="xlsx"
+                                               onchange="angular.element(this).scope().uploadFile(this.files)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-sm btn-primary" form="tratarFilesForm" style="min-width: 80px; ">2) Leer el documento Excel indicado</button>
+    <button ng-click="registrarMovimientosBanco()" class="btn btn-sm btn-primary" style="min-width: 80px; ">3) Registrar movimientos del banco</button>
+    <button ng-click="cancel()" class="btn btn-sm pull-right btn-warning" style="margin-right: 15px; min-width: 80px; ">Cerrar</button>
+</div>
