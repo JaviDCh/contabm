@@ -1,7 +1,5 @@
 .meteor
 node_modules/
-/run.bat
-/settings.json 
 pdfMake_from_bower/imports/build/pdfmake.min.js
 pdfMake_from_bower/imports/build/pdfmake.min.js.map
 pdfMake_from_bower/imports/build/vfs_fonts.js
