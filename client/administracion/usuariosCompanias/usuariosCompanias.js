@@ -4,8 +4,6 @@ AngularApp.controller("UsuariosCompaniasController",
  ['$scope', '$stateParams', '$meteor', '$modal',
   function ($scope, $stateParams, $meteor, $modal) {
 
-    //   debugger;
-
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...

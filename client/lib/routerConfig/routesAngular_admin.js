@@ -11,7 +11,8 @@ AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
         // ----------------------------------------------------------------
         .state('administracion', {
             url: '/administracion',
-            templateUrl: 'client/administracion/main.html'
+            templateUrl: 'client/administracion/main.html',
+            controller: 'Administracion_Main_Controller'
         })
         .state('administracion.roles', {
             url: '/roles',

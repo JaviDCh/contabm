@@ -4,7 +4,6 @@ AngularApp.controller("RolesController",
  ['$scope', '$stateParams', '$meteor',
   function ($scope, $stateParams, $meteor) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -105,8 +104,6 @@ AngularApp.controller("RolesController",
           let isValid = false;
           let errores = [];
 
-          // eliminamos la conexión entre angular y meteor
-          $scope.roles.stop();
           $scope.roles.length = 0;
 
           $meteor.call('rolesSave', editedItems).then(
@@ -118,9 +115,11 @@ AngularApp.controller("RolesController",
                     msg: data
                 });
 
-                // nótese como restablecemos el binding entre angular ($scope) y meteor (collection)
-                $scope.roles = $scope.$meteorCollection(
-                    function() { return Meteor.roles.find({}, { sort: { name: 1 } }); } , false);
+                $scope.helpers({
+                    roles: () => {
+                        return Meteor.roles.find({}, { sort: { name: 1 } });
+                    },
+                });
 
                 $scope.roles_ui_grid.data = $scope.roles;
                 $scope.showProgress = false;
@@ -135,26 +134,22 @@ AngularApp.controller("RolesController",
                     msg: errorMessage
                 });
 
-                // nótese como restablecemos el binding entre angular ($scope) y meteor (collection)
-                $scope.roles = $scope.$meteorCollection(
-                    function() { return Meteor.roles.find({}, { sort: { name: 1 } }); } , false);
-
-                editedItems.forEach(function (item) {
-                    itemFoundInScope = _.find($scope.roles, function (itemInScope) { return itemInScope._id == item._id; });
-
-                    // si el item no está en el $scope, es que, probablemente, no pasó la validación y lo agregamos nuevamente al $scope
-                    if (!itemFoundInScope) {
-                        $scope.roles.push(item);
-                    }
-
+                $scope.helpers({
+                    roles: () => {
+                        return Meteor.roles.find({}, { sort: { name: 1 } });
+                    },
                 });
 
+                $scope.roles_ui_grid.data = $scope.roles;
                 $scope.showProgress = false;
             });
       };
 
-      $scope.roles = $scope.$meteorCollection(
-          function() { return Meteor.roles.find({}, { sort: { name: 1 } }); } , false);
+      $scope.helpers({
+          roles: () => {
+              return Meteor.roles.find({}, { sort: { name: 1 } });
+          },
+      });
 
       $scope.roles_ui_grid.data = $scope.roles;
   }

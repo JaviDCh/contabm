@@ -1,4 +1,5 @@
 
+import moment from 'moment';
 
 AngularApp.controller('Pagos_MovimientoBancarioAsociado_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'pagoID', 'proveedorID', 'ciaSeleccionada', 'origen',
@@ -87,7 +88,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, 
                     $scope.showProgress = false;
                     return;
                 }
-                
+
                 $meteor.call('leerMovimientosBancariosAsociados', pagoID).then(
                     function (data) {
 

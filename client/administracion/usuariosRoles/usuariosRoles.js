@@ -4,8 +4,6 @@ AngularApp.controller("UsuariosRolesController",
  ['$scope', '$stateParams', '$meteor', '$modal',
   function ($scope, $stateParams, $meteor, $modal) {
 
-    //   debugger;
-
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -239,11 +237,8 @@ AngularApp.controller("UsuariosRolesController",
 
           $scope.showProgress = true;
 
-          // eliminamos los items eliminados; del $scope y del collection
           var editedItems = _.filter($scope.users, function (item) { return item.docState; });
 
-          // eliminamos la conexión entre angular y meteor
-          $scope.users.stop();
           $scope.users.length = 0;
 
           $meteor.call('usuariosRolesSave', editedItems).then(
@@ -257,8 +252,12 @@ AngularApp.controller("UsuariosRolesController",
 
                 $meteor.subscribe("allUsers").then(
                     function(subscriptionHandle) {
-                        // nótese como restablecemos el binding entre angular ($scope) y meteor (collection)
-                        $scope.users = $scope.$meteorCollection(function() { return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } }); } , false);
+
+                        $scope.helpers({
+                            users: () => {
+                                return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } });
+                            },
+                        });
 
                         // al volver a hacer el binding en los ui-grids, se eliminan cualquier selección que exista en algunos rows ...
                         $scope.usuarios_ui_grid.data = $scope.users;
@@ -285,18 +284,14 @@ AngularApp.controller("UsuariosRolesController",
                     msg: errorMessage
                 });
 
-                // nótese como restablecemos el binding entre angular ($scope) y meteor (collection)
-                $scope.users = $scope.$meteorCollection(
-                    function() { return Meteor.users.find({}, { sort: { _id: 1 } }); } , false);
-
-                editedItems.forEach(function (item) {
-                    itemFoundInScope = _.find($scope.users, function (itemInScope) { return itemInScope._id == item._id; });
-
-                    // si el item no está en el $scope, es que, probablemente, no pasó la validación y lo agregamos nuevamente al $scope
-                    if (!itemFoundInScope) {
-                        $scope.users.push(item);
-                    }
+                $scope.helpers({
+                    users: () => {
+                        return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } });
+                    },
                 });
+
+                // al volver a hacer el binding en los ui-grids, se eliminan cualquier selección que exista en algunos rows ...
+                $scope.usuarios_ui_grid.data = $scope.users;
 
                 $scope.showProgress = false;
             });
@@ -307,7 +302,12 @@ AngularApp.controller("UsuariosRolesController",
 
       $meteor.subscribe("allUsers").then(
           function(subscriptionHandle) {
-              $scope.users = $scope.$meteorCollection(function() { return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } }); } , false);
+              $scope.helpers({
+                  users: () => {
+                      return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } });
+                  },
+              });
+
               $scope.usuarios_ui_grid.data = $scope.users;
 
               $scope.showProgress = false;
@@ -319,7 +319,12 @@ AngularApp.controller("UsuariosRolesController",
 
 
       // Meteor.roles siempre existe en el cliente
-      $scope.roles = $scope.$meteorCollection(function() { return Meteor.roles.find({}, { sort: { name: 1 } }); } , false);
+      $scope.helpers({
+          roles: () => {
+              return Meteor.roles.find({}, { sort: { name: 1 } });
+          },
+      });
+
       $scope.roles_ui_grid.data = $scope.roles;
 
       $scope.rolesUsuarioSeleccionado = [];

@@ -1,4 +1,6 @@
 
+import moment from 'moment';
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 Meteor.methods({
    leerMovimientosBancariosAsociados: function (pagoID) {
@@ -15,7 +17,7 @@ Meteor.methods({
          // ahora que tenemos la chequera, leemos la cantidad de cheques usados para la misma
          query = `Select m.ClaveUnica as claveUnica, m.Tipo as tipo,
                   m.Fecha as fecha, m.Transaccion as transaccion,
-                  p.Abreviatura as nombreCompania, m.Beneficiario as beneficiario, 
+                  p.Abreviatura as nombreCompania, m.Beneficiario as beneficiario,
                   m.Concepto as concepto, m.Monto as monto, m.PagoID as pagoID
                   From MovimientosBancarios m Left Outer Join Proveedores p On m.ProvClte = p.Proveedor
                   Where m.PagoID = ?`;
