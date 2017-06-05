@@ -28,8 +28,11 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
         enableSorting: true,
         enableCellEdit: false,
         enableCellEditOnFocus: true,
+
+        showGridFooter: true,
+
         showColumnFooter: true,
-        enableFiltering: false,
+        enableFiltering: true,
         enableRowSelection: true,
         enableRowHeaderSelection: true,
         multiSelect: true,
@@ -73,7 +76,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
             field: 'numeroFactura',
             displayName: 'Factura',
             width: 80,
-            enableFiltering: false,
+            enableFiltering: true,
             headerCellClass: 'ui-grid-leftCell',
             cellClass: 'ui-grid-leftCell',
             enableColumnMenu: false,
@@ -86,7 +89,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
             field: 'ncNdFlag',
             displayName: 'Nc/Nd',
             width: 50,
-            enableFiltering: false,
+            enableFiltering: true,
             headerCellClass: 'ui-grid-centerCell',
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
@@ -317,47 +320,58 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
     $scope.facturas_ui_grid.data = [];
 
     $scope.leerFacturasPendientes = () => {
+
         $scope.showProgress = true;
-        $meteor.call('bancosPagosLeerFacturasPendientes',
+
+        Meteor.call('bancosPagosLeerFacturasPendientes',
                                   pago.proveedor,
                                   pago.moneda,
                                   pago.fecha,
                                   pago.anticipoFlag,
-                                  pago.cia).then(
-            function (data) {
+                                  pago.cia,
+             (err, result) => {
 
-                if (data.error) {
-                    // el método que intenta grabar los cambis puede regresar un error cuando,
-                    // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                    $scope.alerts.length = 0;
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data.message
-                    });
-                    $scope.showProgress = false;
-                } else {
-                    $scope.alerts.length = 0;
-                    $scope.alerts.push({
-                        type: 'info',
-                        msg: data.message
-                    });
+              if (err) {
+                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
-                    facturasPendientesArray = [];
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'danger',
+                      msg: errorMessage
+                  });
+                  $scope.showProgress = false;
+                  $scope.$apply();
 
-                    facturasPendientesArray = JSON.parse(data.facturasPendientes);
-                    $scope.facturas_ui_grid.data = facturasPendientesArray;
-                };
-            },
-            function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                  return;
+              }
 
-                $scope.alerts.length = 0;
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: errorMessage
-                });
-                $scope.showProgress = false;
-            });
+              if (result.error) {
+                  // el método que intenta grabar los cambis puede regresar un error cuando,
+                  // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'danger',
+                      msg: result.message
+                  });
+                  $scope.showProgress = false;
+                  $scope.$apply();
+
+              } else {
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'info',
+                      msg: result.message
+                  });
+
+                  facturasPendientesArray = [];
+
+                  facturasPendientesArray = JSON.parse(result.facturasPendientes);
+                  $scope.facturas_ui_grid.data = facturasPendientesArray;
+
+                  $scope.showProgress = false;
+                  $scope.$apply();
+              }
+            })
     }
 
     $scope.grabarPagos = () => {

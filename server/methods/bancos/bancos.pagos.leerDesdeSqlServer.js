@@ -6,7 +6,7 @@ import lodash from 'lodash';
 
 Meteor.methods(
 {
-    bancos_pagos_LeerDesdeSql: function (filtro, ciaContab) {
+    'bancos.pagos.leerDesdeSqlServer': function (filtro, ciaContab) {
 
         let filtro2 = JSON.parse(filtro);
 
@@ -147,6 +147,16 @@ Meteor.methods(
                     Inner Join Monedas m on p.Moneda = m.Moneda
                     Where ${where}
                     `;
+
+        if (filtro2.sinFacturasAsociadas) {
+          // para leer solo pagos *sin* facturas asociadas, agregamos un subquery al Select ...
+          query += ` And p.ClaveUnica Not In (Select ClaveUnicaPago From dPagos) `;
+        }
+
+        if (filtro2.conFacturasAsociadas) {
+          // para leer solo pagos *con* facturas asociadas, agregamos un subquery al Select ...
+          query += ` And p.ClaveUnica In (Select ClaveUnicaPago From dPagos) `;
+        }
 
         response = null;
         response = Async.runSync(function(done) {

@@ -505,14 +505,17 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                       rowEntity.referencia = rowAnterior.referencia;
 
                                   if (!rowEntity.debe && !rowEntity.haber) {
+                                      // intentamos cuadrar el asiento en la partida actual ...
+                                      let totalDebe = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.debe ? x.debe : 0; });
+                                      let totalHaber = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.haber ? x.haber : 0; });
 
-                                      let totalDebe = _.sum($scope.asientoContable.partidas, (x) => { return x.debe ? x.debe : 0; });
-                                      let totalHaber = _.sum($scope.asientoContable.partidas, (x) => { return x.haber ? x.haber : 0; });
+                                      if (totalDebe > totalHaber) {
+                                        rowEntity.haber = lodash.round(totalDebe - totalHaber, 2);
+                                      }
+                                      else {
+                                        rowEntity.debe = lodash.round(totalHaber - totalDebe, 2);
+                                      }
 
-                                      if (totalDebe > totalHaber)
-                                          rowEntity.haber = totalDebe - totalHaber;
-                                      else
-                                          rowEntity.debe = totalHaber - totalDebe;
                                   };
                               };
                           };

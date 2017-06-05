@@ -357,6 +357,124 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
         };
 
 
+
+        // para permirir anular o revertir una anulación ...
+        $scope.anularRevertirAnulacion = () => {
+
+          if ($scope.factura.docState) {
+            DialogModal($modal, "<em>Bancos - Facturas</em>",
+                                "Aparentemente, <em>se han efectuado cambios</em> en el registro. <br />" +
+                                "Ud. debe guardar los cambios antes de intentar continuar con esta función.",
+                                false).then();
+            return;
+          }
+
+          if ($scope.factura.estado != 1 && $scope.factura.estado != 4) {
+            // ésto nunca debería ocurrir, pues la opción solo se muestra en el tool bar si el estado de la factura es 1 o 4 ...
+            DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
+                                `
+                                  El estado de la factura no es <em><b>pendiente<b /><em /> o <em><b>anulado<b /><em />. <br /><br />
+                                  Esta opción solo puede ser ejecutada para facturas cuyo estado es pendiente o anulado.
+                                  Por favor revise.
+                                `,
+                                 false).then();
+             return;
+          }
+
+
+          if ($scope.factura.estado === 1) {
+            // factura pendiente; permitimos anular
+            DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
+                                `
+                                  Para anular la factura, este proceso pondrá su estado en <em><b>factura anulada</b></em>; pondrá todos sus montos
+                                  en cero; además, las partidas de algún asiento contable asociado, serán también puestas en cero, para que
+                                  el asiento contable sume cero. <br /><br />
+                                  Desea continuar y anular esta factura?
+                                `,
+                                 true).then(
+                                   (resolve) => {
+                                     anularRevertirAnulacion2();
+                                   },
+                                   (err) => {
+                                     return;
+                                   }
+                                 );
+          } else {
+            // factura anulada; permitimos revertir
+            DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
+                                `
+                                  Para revertir la anulación de una factura anulada, este proceso pondrá su estado, nuevamente, en
+                                  <em><b>pendiente</b></em>. <br /><br />
+                                  Desea continuar y revertir la anulación de esta factura?
+                                `,
+                                 true).then(
+                                   (resolve) => {
+                                     anularRevertirAnulacion2();
+                                   },
+                                   (err) => {
+                                     return;
+                                   }
+                                 );
+          }
+        }
+
+        let anularRevertirAnulacion2 = () => {
+
+          $scope.showProgress = true;
+
+          if ($scope.factura.estado === 4) {
+            // si la factura está anulada, es muy fácil revertirla; ponemos su estado en pendiente e indicamos que se debe grabar ...
+            $scope.factura.estado = 1;
+
+            if ($scope.factura.cuotasFactura) {
+              $scope.factura.cuotasFactura.forEach((x) => { return x.estadoCuota = 1; });
+            }
+
+
+            DialogModal($modal, "<em>Bancos - Facturas - Reversión de anulación</em>",
+                                `
+                                  Ok, el estado de la factura es, nuevamente, <em><b>pendiente</b></em>.<br /><br />
+                                  Ud. debe hacer un <em>click</em> en <em><b>Grabar</b></em> para guardar estos cambios.
+                                `,
+                                 false).then();
+
+            // el usuario debe grabar los cambios ...
+            $scope.factura.docState = 2;
+            $scope.showProgress = false;
+
+          } else {
+
+            Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, (err, result) => {
+
+                if (err) {
+                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
+                    });
+
+                    $scope.showProgress = false;
+                    $scope.$apply();
+
+                    return;
+                }
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: result.message,
+                });
+
+                // para leer la factura nuevamente desde sql server y mostrar en la página
+                $scope.id = $scope.factura.claveUnica;                        // para que inicializarItem() agregue un nuevo registro
+                inicializarItem();
+            })
+          }
+        }
+
+
         let impuestosRetenciones_ui_grid_api = null;
         let impuestoRetencionSeleccionado = [];
 

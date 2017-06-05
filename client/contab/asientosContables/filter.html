@@ -252,10 +252,13 @@
         <div class="row" style="text-align: left; ">
             <div class="col-sm-4 col-sm-offset-4">
                 <br /><br />
-                <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosNumeroNegativo"> Solo asientos con número negativo</label><br>
-                <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosTipoCierreAnual"> Solo asientos de tipo cierre anual</label><br>
-                <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.sinAsientosTipoCierreAnual"> Sin asientos de tipo cierre anual</label><br>
-                <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosDescuadrados"> Solo asientos descuadrados</label>
+                <fieldset class="scheduler-border" style="text-align: left; ">
+                    <legend class="scheduler-border">Mostrar: </legend>
+                    <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosNumeroNegativo"> Solo asientos con número negativo</label><br>
+                    <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosTipoCierreAnual"> Solo asientos de tipo cierre anual</label><br>
+                    <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.sinAsientosTipoCierreAnual"> Sin asientos de tipo cierre anual</label><br>
+                    <label style="font-weight: normal; "><input type="checkbox" ng-model="filtro.soloAsientosDescuadrados"> Solo asientos descuadrados</label>
+                </fieldset>
                 <br /><br />
             </div>
         </div>

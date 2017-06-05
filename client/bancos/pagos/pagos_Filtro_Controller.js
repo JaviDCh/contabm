@@ -76,7 +76,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
         $scope.showProgress = true;
 
-        Meteor.call('bancos_pagos_LeerDesdeSql', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
+        Meteor.call('bancos.pagos.leerDesdeSqlServer', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
             if (err) {
                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);

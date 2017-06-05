@@ -5,7 +5,7 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 Meteor.methods(
 {
-    asientosContables_LeerDesdeSql: function (filtro, ciaContab) {
+    'contab.asientosContables.LeerDesdeSqlServer': function (filtro, ciaContab) {
 
         let filtro2 = JSON.parse(filtro);
 
@@ -110,7 +110,6 @@ Meteor.methods(
             where += `(a.AsientoTipoCierreAnualFlag Is Null Or a.AsientoTipoCierreAnualFlag = 0)`;
         };
 
-
         if (filtro2.cuentasContables.length > 0) {
 
             if (where)
@@ -131,7 +130,6 @@ Meteor.methods(
             where += ` (d.CuentaContableID In ${cuentasContablesLista})`;
         };
 
-
         if (_.isArray(filtro2.tiposAsiento) && filtro2.tiposAsiento.length > 0) {
 
             if (where)
@@ -151,7 +149,6 @@ Meteor.methods(
             tiposAsientoLista += ")";
             where += ` (a.Tipo In ${tiposAsientoLista})`;
         };
-
 
         if (_.isArray(filtro2.monedas) && filtro2.monedas.length > 0) {
 
@@ -224,7 +221,6 @@ Meteor.methods(
 
         if (response.error)
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
 
         // eliminamos los asientos que el usuario pueda haber registrado antes ...
         Temp_Consulta_AsientosContables.remove({ user: this.userId });

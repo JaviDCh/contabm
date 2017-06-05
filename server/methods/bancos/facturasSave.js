@@ -413,6 +413,9 @@ Meteor.methods(
 
 // --------------------------------------------------------------------------------
 // para calcular las cuotas cada vez que el usuario hace un cambio en la factura
+
+// nota: cuando el usuario modifica la factura desde este method, la factura nunca tendrá pagos; esto quiere decir que sus cuotas
+// pueden ser reconstruidas, siempre, como si la factura fuera nueva ...
 function calcularCuotasFactura(factura) {
 
     // ----------------------------------------------------------------------------------
@@ -523,7 +526,8 @@ function calcularCuotasFactura(factura) {
         cuota.totalCuota = factura.totalAPagar;
         cuota.saldoCuota = factura.saldo;
 
-        if (factura.estado == 4) {
+        if (factura.estado == 4 || factura.estado == 1) {
+            // si la factura está anulada o totalmente pendiente, simplemente asumimos su estado en cada cuota ...
             cuota.estadoCuota = factura.estado;
         }
         else {
@@ -592,7 +596,8 @@ function calcularCuotasFactura(factura) {
             if (facturaMontoAnticipo != 0)
                 cuota.anticipo = facturaMontoAnticipo * d.proporcionCuota / 100;
 
-            if (factura.estado == 4) {
+            if (factura.estado == 4 || factura.estado == 1) {
+                // si la factura está anulada o totalmente pendiente, simplemente asumimos su estado en cada cuota ...
                 cuota.estadoCuota = factura.estado;
             }
             else {

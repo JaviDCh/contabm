@@ -18,6 +18,12 @@
                     <li ng-if="origen == 'edicion' && !vieneDeAfuera"><a href="#" ng-click="nuevo0()" class="navbar_custom_small_node">Nuevo&nbsp;&nbsp;<span class="fa fa-file-o"></span></a></li>
                     <li ng-if="origen == 'edicion'"><a href="#" ng-click="eliminar()" class="navbar_custom_small_node">Eliminar&nbsp;&nbsp;<span class="fa fa-times"></span></a></li>
 
+                    <!-- opción para anular o revertir anulación; solo para facturas pendientes o que ya están anuladas; mostramos Anular
+                    para facturas pendientes; mostramos Revertir anulación para facturas anuladas ...  -->
+                    <li ng-if="origen == 'edicion' && !vieneDeAfuera && (factura.estado === 1 || factura.estado === 4)" class="divider-vertical-small"></li>
+                    <li ng-if="origen == 'edicion' && !vieneDeAfuera && (factura.estado === 1)"><a href="#" ng-click="anularRevertirAnulacion()" class="navbar_custom_small_node">Anular&nbsp;&nbsp;<span class="fa fa-times"></span></a></li>
+                    <li ng-if="origen == 'edicion' && !vieneDeAfuera && (factura.estado === 4)"><a href="#" ng-click="anularRevertirAnulacion()" class="navbar_custom_small_node">Revertir anulación&nbsp;&nbsp;<span class="fa fa-undo"></span></a></li>
+
                     <li class="divider-vertical-small"></li>
                     <li><a href="#" class="navbar_custom_small_node" ng-click="mostrarCuotas()">Mostrar cuotas <span class="fa fa-desktop"></span></a></li>
                     <li><a href="#" ng-click="mostrarPagosAsociados()" class="navbar_custom_small_node">Mostrar pago <span class="fa fa-desktop"></span></a></li>

@@ -66,7 +66,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         cuentasContablesSeleccionadas.forEach((x) => { $scope.filtro.cuentasContables.push(x); });
 
-        Meteor.call('asientosContables_LeerDesdeSql', JSON.stringify($scope.filtro), companiaContab.numero, (err, result) => {
+        Meteor.call('contab.asientosContables.LeerDesdeSqlServer', JSON.stringify($scope.filtro), companiaContab.numero, (err, result) => {
 
             if (err) {
 
@@ -100,7 +100,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                 $scope.showProgress = false;
                 $scope.$apply();
                 return;
-            };
+            }
 
             // ------------------------------------------------------------------------------------------------------
             // guardamos el filtro indicado por el usuario

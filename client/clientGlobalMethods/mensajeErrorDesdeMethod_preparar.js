@@ -8,24 +8,17 @@ let mensajeErrorDesdeMethod_preparar = (errorFromMeteorMethod) => {
     let err = errorFromMeteorMethod;
 
     let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
-    if (err.errorType)
-        errorMessage += " (" + err.errorType + ")";
 
-    errorMessage += "<br />";
+    if (err.errorType && err.reason) {
+      errorMessage += `<br />(${err.errorType}) - ${err.reason}`;
+    } else if (err.reason){
+      errorMessage += `<br />${err.reason}`;
+    } else if (err.errorType) {
+      errorMessage += `<br />${err.errorType}`;
+    }
 
-    if (err.message)
-        // aparentemente, Meteor compone en message alguna literal que se regrese en err.reason ...
-        errorMessage += err.message + " ";
-    else {
-        if (err.reason)
-            errorMessage += err.reason + " ";
-
-        if (err.details)
-            errorMessage += "<br />" + err.details;
-    };
-
-    if (!err.message && !err.reason && !err.details)
-        errorMessage += err.toString();
+    if (err.details)
+        errorMessage += "<br />" + err.details;
 
     return errorMessage;
 };

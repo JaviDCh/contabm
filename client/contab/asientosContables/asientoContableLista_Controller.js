@@ -401,7 +401,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         $scope.alerts.length = 0;
         $scope.alerts.push({
             type: 'info',
-            msg: $scope.asientosContables.length.toString() + " registros han sido seleccionados ..."
+            msg: `<b>${$scope.asientosContables.length.toString()}</b> registros han sido seleccionados ...`
         });
 
         $scope.showProgress = false;
