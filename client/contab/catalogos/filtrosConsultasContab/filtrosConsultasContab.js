@@ -4,7 +4,6 @@
 AngularApp.controller("Catalogos_FiltrosConsultasContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = true;
 
       // ui-bootstrap alerts ...
@@ -57,7 +56,6 @@ AngularApp.controller("Catalogos_FiltrosConsultasContab_Controller",
               filtros_ui_grid_api = gridApi;
 
               gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                  //debugger;
                   filtroSeleccionada = {};
 
                   if (row.isSelected) {
@@ -182,7 +180,7 @@ AngularApp.controller("Catalogos_FiltrosConsultasContab_Controller",
 
       usersSubscriptionHandle = Meteor.subscribe("meteorUsers", {
           onReady: function () {
-              filtrosSubscriptioHandle = Meteor.subscribe("filtrosConsultasContab", {
+              filtrosSubscriptioHandle = Meteor.subscribe("contab.filtrosConsultaContab", $scope.companiaSeleccionada.numero, {
                   onReady: function () {
 
                       // preparamos una lista que sea más fácil de usar para el ddl del ui-grid
@@ -202,9 +200,7 @@ AngularApp.controller("Catalogos_FiltrosConsultasContab_Controller",
         });
 
 
-
         $scope.save = function () {
-            // debugger;
             $scope.showProgress = true;
 
             // eliminamos los items eliminados; del $scope y del collection
@@ -266,7 +262,7 @@ AngularApp.controller("Catalogos_FiltrosConsultasContab_Controller",
                   $scope.filtros = [];
                   $scope.filtros_ui_grid.data = [];
 
-                  filtrosSubscriptioHandle = Meteor.subscribe("filtrosConsultasContab", {
+                  filtrosSubscriptioHandle = Meteor.subscribe("contab.filtrosConsultaContab", $scope.companiaSeleccionada.numero, {
                       onReady: function () {
                           $scope.helpers({
                               filtros: () => {
