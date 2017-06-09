@@ -1,8 +1,9 @@
 
-
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import moment from 'moment';
 
 Meteor.methods({
-   pagosAgregarMovimientoBancario: function (pagoID) {
+   'bancos.pagos.agregarMovimientoBancario': function (pagoID) {
 
        // agregamos el asiento que corresponde al registro de una entidad, por ejemplo: factura, pago, nómina,
        // movimiento bancario, etc.
@@ -30,17 +31,18 @@ Meteor.methods({
                .then(function(result) { done(null, result); })
                .catch(function (err) { done(err, null); })
                .done();
-       });
+       })
 
-       if (response.error)
-           throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       if (response.error) {
+         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       }
 
        if (response.result.length == 0) {
            let message = `Error inesperado: no hemos podido leer, en la base de datos, la compañía que
                          corresponde al pago.`;
 
            return { error: true, message: message };
-       };
+       }
 
        let pago = response.result[0];
        pago.fecha = moment(pago.fecha).add(TimeOffset, 'hours').toDate();
@@ -57,7 +59,7 @@ Meteor.methods({
                error: true,
                message: message
            };
-       };
+       }
 
 
        // TODO: eer una chequera genérica activa para asociar al movimiento bancario
@@ -73,10 +75,11 @@ Meteor.methods({
                .then(function(result) { done(null, result); })
                .catch(function (err) { done(err, null); })
                .done();
-       });
+       })
 
-       if (response.error)
-           throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       if (response.error) {
+         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       }
 
        if (response.result.length == 0) {
            let message = `Error: no existe una chequera <em>genérica</em> para asignar al nuevo movimiento bancario.<br />
@@ -85,10 +88,9 @@ Meteor.methods({
                         `;
 
            return { error: true, message: message };
-       };
+       }
 
        let chequeraGenerica = response.result[0];
-
 
        // crear un registro para agregar el movimiento bancario
        // el signo y el monto dependen del tipo de pago: mi/su
@@ -119,10 +121,11 @@ Meteor.methods({
                .then(function(result) { done(null, result); })
                .catch(function (err) { done(err, null); })
                .done();
-       });
+       })
 
-       if (response.error)
-           throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       if (response.error) {
+         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+       }
 
        // el registro, luego de ser grabado en sql, es regresado en response.result.dataValues ...
        let savedItem = response.result.dataValues;

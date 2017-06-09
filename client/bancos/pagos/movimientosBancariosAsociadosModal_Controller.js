@@ -75,7 +75,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, 
 
     $scope.agregarMovimientoBancario = () => {
         $scope.showProgress = true;
-        $meteor.call('pagosAgregarMovimientoBancario', pagoID).then(
+        $meteor.call('bancos.pagos.agregarMovimientoBancario', pagoID).then(
             function (data0) {
 
                 if (data0.error) {
