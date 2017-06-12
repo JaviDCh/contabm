@@ -1,5 +1,4 @@
 
-
 import moment from 'moment';
 import lodash from 'lodash';
 import numeral from 'numeral';
@@ -51,7 +50,6 @@ Meteor.methods(
         let pagos_count = deleteFromSql_result.recordCount;
         // -------------------------------------------------------------------------------------------------------------
 
-
         // valores para reportar el progreso
         numberOfItems = 1;
         reportarCada = Math.floor(numberOfItems / 25);
@@ -76,15 +74,6 @@ Meteor.methods(
         }
 
         let facturas_count = deleteFromSql_result.recordCount;
-
-
-
-
-
-
-
-
-
 
         // -------------------------------------------------------------------------------------------------------------
         // *** dAsientos: ponemos en nulls ConciliacionMovimientoID ***
@@ -267,7 +256,6 @@ Meteor.methods(
         }
         // -------------------------------------------------------------------------------------------------------------
 
-
         // -------------------------------------------------------------------------------------------------------------
         // *** tEmpleados ***
         // -------------------------------------------------------------------------------------------------------------
@@ -333,7 +321,6 @@ Meteor.methods(
           }
         }
         // -------------------------------------------------------------------------------------------------------------
-
 
         // -------------------------------------------------------------------------------------------------------------
         // *** Asientos ***
@@ -492,8 +479,6 @@ Meteor.methods(
         }
         // -------------------------------------------------------------------------------------------------------------
 
-
-
         // -------------------------------------------------------------------------------------------------------------
         // *** CuentasContables ***
         // -------------------------------------------------------------------------------------------------------------
@@ -537,13 +522,12 @@ Meteor.methods(
     }
 });
 
-
-
 // --------------------------------------------------------------------------------------------------
 // para eliminar el contenido de una tabla sql, para una ciaContab determinada ...
 
 function eliminarRegistrosSql(tableName, ciaContabID, ciaColumnName = 'Cia') {
 
+  let errorMessage = "";
   let query = `Select Count(*) as recordCount From ${tableName} Where ${ciaColumnName} = ?`;
 
   let response = null;
@@ -560,7 +544,7 @@ function eliminarRegistrosSql(tableName, ciaContabID, ciaColumnName = 'Cia') {
   });
 
   if (response.error) {
-    let errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
+    errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
 
     return {
       error: true,
@@ -586,12 +570,14 @@ function eliminarRegistrosSql(tableName, ciaContabID, ciaColumnName = 'Cia') {
   });
 
   if (response.error) {
-    let errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
 
-    return {
-      error: true,
-      message: errorMessage,
+    if (response.error.message) {
+      errorMessage = response.error.message;
+    } else {
+      errorMessage = response.error.toString();
     }
+
+    return { error: true, errorMessage: errorMessage, };
   }
 
   return {

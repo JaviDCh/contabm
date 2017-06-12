@@ -6,6 +6,13 @@ AngularApp.controller("AdministracionUtilitarios_Controller",
 
       $scope.showProgress = true;
 
+      // ui-bootstrap alerts ...
+      $scope.alerts = [];
+
+      $scope.closeAlert = function (index) {
+          $scope.alerts.splice(index, 1);
+      };
+
       // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
