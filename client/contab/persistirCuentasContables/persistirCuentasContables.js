@@ -20,11 +20,11 @@ AngularApp.controller("Contab_PersistirCuentasContables_Controller",
         $meteor.call('contab.cloneCatalogoCuentasContables').then(
           function (data) {
 
-              // una vez que el (server) method clonea el collection en CuentasContables2,
+              // una vez que el (server) method clone el collection en CuentasContables2,
               // hacemos la sincronización ...
 
               // 1) en el servidor, simplemente, el método copia cada item en CuentasContables a CuentasContables2
-              // 2) en el cliente, al sincronizar, el collection llega al cliente y se queda allí ... 
+              // 2) en el cliente, al sincronizar, el collection llega al cliente y se queda allí ...
               CuentasContables2.clear();
               CuentasContables2.sync();
 

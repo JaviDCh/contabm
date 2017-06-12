@@ -179,6 +179,11 @@ Meteor.methods(
                             { current: currentProcess, max: numberOfProcess, progress: '0 %' });
         // -------------------------------------------------------------------------------------------------------------
 
+        // si el usuario eliminó items en sql server, la idea es que se eliminen también aquí; usamos el field existeEnOrigen
+        // para saber cuales items no existen y eliminarlos en mongo ...
+        CuentasContables.update({ }, { $set: { existeEnOrigen: false }}, { multi: true, });
+
+
         response.result.rows.forEach((item) => {
             // para cada catálogos, hacemos un 'upsert'; primero leemos a ver si existe; de ser así, usamos el _id del doc que existe ...
 
@@ -206,6 +211,7 @@ Meteor.methods(
                 cuentaEditada: item.cuentaEditada,
                 grupo: item.grupo,
                 cia: item.cia,
+                existeEnOrigen: true,
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
@@ -238,6 +244,9 @@ Meteor.methods(
             };
             // -------------------------------------------------------------------------------------------------------
         });
+
+        // al final, los registros que no existen en sql server son eliminados en mongo ...
+        CuentasContables.remove({ existeEnOrigen: false });
 
 
         // ---------------------------------------------------------------------------------------------------
