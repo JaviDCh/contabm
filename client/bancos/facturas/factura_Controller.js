@@ -384,21 +384,25 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
           if ($scope.factura.estado === 1) {
             // factura pendiente; permitimos anular
-            DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
-                                `
-                                  Para anular la factura, este proceso pondrá su estado en <em><b>factura anulada</b></em>; pondrá todos sus montos
-                                  en cero; además, las partidas de algún asiento contable asociado, serán también puestas en cero, para que
-                                  el asiento contable sume cero. <br /><br />
-                                  Desea continuar y anular esta factura?
-                                `,
-                                 true).then(
-                                   (resolve) => {
-                                     anularRevertirAnulacion2();
-                                   },
-                                   (err) => {
-                                     return;
-                                   }
-                                 );
+             // permitimos al usuario indicar que no quiere modificar el asiento
+             var modalInstance = $modal.open({
+                 templateUrl: 'client/bancos/facturas/facturasAnular_Modal.html',
+                 controller: 'FacturasAnular_Controller',
+                 size: 'md',
+                 resolve: {
+                     ciaSeleccionada: () => {
+                         return $scope.companiaSeleccionada;
+                     },
+                 },
+             }).result.then(
+                   function (resolve) {
+                       // si el usuario hace un click en Ok, continuamos e intentamos anular la factura ...
+                       let noModificarAsientoContableAsociado = resolve;
+                       anularRevertirAnulacion2(noModificarAsientoContableAsociado);
+                   },
+                   function (cancel) {
+                       return true;
+                   })
           } else {
             // factura anulada; permitimos revertir
             DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
@@ -418,8 +422,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
           }
         }
 
-        let anularRevertirAnulacion2 = () => {
+        let anularRevertirAnulacion2 = (noModificarAsientoContableAsociado = false) => {
 
+          // nota: el parámetro 'noModificarAsientoContableAsociado' solo tiene sentido en anulación y no en reversión ...
           $scope.showProgress = true;
 
           if ($scope.factura.estado === 4) {
@@ -444,7 +449,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
           } else {
 
-            Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, (err, result) => {
+            Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, noModificarAsientoContableAsociado, (err, result) => {
 
                 if (err) {
                     let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);

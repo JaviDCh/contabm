@@ -1,4 +1,5 @@
 
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 let  determinarDiasVacacionesYBono = (empleadoID, anoVacaciones) => {
 

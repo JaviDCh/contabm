@@ -5,7 +5,7 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 Meteor.methods(
 {
-    'bancos.facturas.anular': function (facturaID) {
+    'bancos.facturas.anular': function (facturaID, noModificarAsientoContableAsociado) {
 
         new SimpleSchema({
             facturaID: { type: Number, decimal: false, optional: false, },
@@ -71,47 +71,54 @@ Meteor.methods(
                                   validarUMCBancos.message);
         }
 
-        // solo si la factura tiene un asiento, validamos el último mes cerrado en Contab ...
-        let query = `Select Fecha as fecha From Asientos Where ProvieneDe = 'Facturas' And ProvieneDe_ID = ? And Cia = ?`;
 
-        response = null;
-        response = Async.runSync(function(done) {
-            sequelize.query(query, { replacements: [ facturaID, factura.cia ],
-                                     type: sequelize.QueryTypes.SELECT
-                                   })
-                .then(function(result) { done(null, result); })
-                .catch(function (err) { done(err, null); })
-                .done();
-        });
 
-        if (response.error)
-            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        if (!noModificarAsientoContableAsociado) {
+          // solo si la factura tiene un asiento, validamos el último mes cerrado en Contab ...
+          let query = `Select Fecha as fecha From Asientos Where ProvieneDe = 'Facturas' And ProvieneDe_ID = ? And Cia = ?`;
 
-        if (response.result.length) {
-            // ok, hay un asiento asociado; validamos el umc en contab ...
-            let fechaAsiento = response.result[0].fecha;
-            // ajustamos la fecha pues siempre viene 'globalized' ...
-            fechaAsiento = fechaAsiento ? moment(fechaAsiento).add(TimeOffset, 'hours').toDate() : null;
+          response = null;
+          response = Async.runSync(function(done) {
+              sequelize.query(query, { replacements: [ facturaID, factura.cia ],
+                                       type: sequelize.QueryTypes.SELECT
+                                     })
+                  .then(function(result) { done(null, result); })
+                  .catch(function (err) { done(err, null); })
+                  .done();
+          });
 
-            let validarMesCerradoEnContab = ContabFunctions.validarMesCerradoEnContab(fechaAsiento,
-                                                                                      factura.cia,
-                                                                                      false   // si es del tipo cierre anual; asumimos que no
-                                                                                    );
+          if (response.error)
+              throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
 
-            if (validarMesCerradoEnContab.error) {
-              throw new Meteor.Error('bancos.facturas.anular.MesCerradoEnContab',
-                                     `Error al validar el mes cerrado en Contab.`,
-                                      validarMesCerradoEnContab.errMessage);
-            }
+          if (response.result.length) {
+              // ok, hay un asiento asociado; validamos el umc en contab ...
+              let fechaAsiento = response.result[0].fecha;
+              // ajustamos la fecha pues siempre viene 'globalized' ...
+              fechaAsiento = fechaAsiento ? moment(fechaAsiento).add(TimeOffset, 'hours').toDate() : null;
+
+              let validarMesCerradoEnContab = ContabFunctions.validarMesCerradoEnContab(fechaAsiento,
+                                                                                        factura.cia,
+                                                                                        false   // si es del tipo cierre anual; asumimos que no
+                                                                                      );
+
+              if (validarMesCerradoEnContab.error) {
+                throw new Meteor.Error('bancos.facturas.anular.MesCerradoEnContab',
+                                       `Error al validar el mes cerrado en Contab.`,
+                                        validarMesCerradoEnContab.errMessage);
+              }
+          }
         }
-
+        
 
         // ponemos todos los montos en cero
         anularFactura(factura.claveUnica);
 
+
         // si la factura tiene un asiento, lo modificamos para poner sus montos en cero ...
-        let usuario = Meteor.users.findOne(this.userId);
-        anularAsientoContable(factura.claveUnica, factura.cia, usuario);
+        if (!noModificarAsientoContableAsociado) {
+          let usuario = Meteor.users.findOne(this.userId);
+          anularAsientoContable(factura.claveUnica, factura.cia, usuario);
+        }
 
 
         return {

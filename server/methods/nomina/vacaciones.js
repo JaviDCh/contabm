@@ -1,5 +1,6 @@
 
-
+import moment from 'moment';
+import numeral from 'numeral'; 
 
 Meteor.methods(
 {
@@ -116,7 +117,7 @@ Meteor.methods(
             vacacionItem.vacacionID = vacacion._id;
             vacacionItem.nombreEmpleado = _.find(empleados, (x) => { return x.empleado === vacacion.empleado; }).alias;
             vacacionItem.nombreGrupoNomina = _.find(gruposEmpleados, (x) => { return x.grupo === vacacion.grupoNomina; }).descripcion;
-            vacacionItem.fechaIngreso = vacacion.fechaIngreso ? vacacion.fechaIngreso : null; 
+            vacacionItem.fechaIngreso = vacacion.fechaIngreso ? vacacion.fechaIngreso : null;
             vacacionItem.salida = vacacion.salida;
             vacacionItem.regreso = vacacion.regreso;
             vacacionItem.fechaReintegro = vacacion.fechaReintegro;

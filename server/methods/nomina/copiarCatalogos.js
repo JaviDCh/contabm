@@ -1,10 +1,10 @@
 
+import numeral from 'numeral';
 
 Meteor.methods(
 {
     nomina_CopiarCatalogos: function () {
 
-        // debugger;
         let response = null;
 
         // ---------------------------------------------------------------------------------------------------

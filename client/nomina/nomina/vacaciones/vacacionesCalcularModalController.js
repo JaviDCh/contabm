@@ -1,4 +1,6 @@
 
+import moment from 'moment';
+
 AngularApp.controller('VacacionesCalcularModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'vacacion', 'companiaContabSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, $state, vacacion, companiaContabSeleccionada) {
@@ -40,7 +42,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, vacacion, companiaCon
                 // simpre los actualizamos y no solo cuando el usuario los pone en blanco ...
                 vacacion.sueldo = result.vacacion.sueldo;
                 // al serializar y descerializar el object, las fechas quedan como strings ...
-                vacacion.fechaIngreso = moment(result.vacacion.fechaIngreso).toDate(); 
+                vacacion.fechaIngreso = moment(result.vacacion.fechaIngreso).toDate();
 
                 if (typeof vacacion.grupoNomina == 'undefined' || !keep)
                     vacacion.grupoNomina = result.vacacion.grupoNomina;

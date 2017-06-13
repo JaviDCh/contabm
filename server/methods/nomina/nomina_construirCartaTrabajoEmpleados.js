@@ -1,5 +1,9 @@
 
 
+import lodash from 'lodash';
+import moment from 'moment';
+import numeral from 'numeral';
+
 Meteor.methods(
 {
     nomina_construirCartaTrabajoEmpleados: function (fileID,

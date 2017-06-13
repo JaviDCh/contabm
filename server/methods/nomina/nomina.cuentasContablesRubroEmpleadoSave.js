@@ -1,4 +1,6 @@
 
+import lodash from 'lodash'; 
+
 Meteor.methods(
 {
     'nomina.cuentasContablesEmpleadoRubroSave': function (items) {

@@ -1,3 +1,8 @@
+
+
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import lodash from 'lodash';
+import moment from 'moment';
 ﻿
 Meteor.methods(
 {
@@ -32,7 +37,6 @@ Meteor.methods(
 
         if (!vacacion.cia)
             throw new Meteor.Error("error-validacion", "La vacación debe corresponder a una <em>Cia Contab</em>.");
-
 
 
         vacacion.salida = moment(vacacion.salida).toDate();
@@ -71,7 +75,7 @@ Meteor.methods(
         });
 
         // regresamos no solo el sueldo, también la fecha de ingreso del empleado ...
-        vacacion.fechaIngreso = empleado.fechaIngreso; 
+        vacacion.fechaIngreso = empleado.fechaIngreso;
 
         let sueldo = lodash(empleado.sueldos).
                      orderBy([ 'desde' ], [ 'desc' ]).
@@ -154,8 +158,6 @@ Meteor.methods(
         vacacion.cantDiasDisfrute_SabDom = result.cantSabDom;
         // -----------------------------------------------------------------------------------------------
 
-
-
         // -----------------------------------------------------------------------------------------------
         // calculamos la cantidad de días del período de pago (si existe uno!)
         if (vacacion.periodoPagoDesde) {
@@ -194,8 +196,6 @@ Meteor.methods(
              anoVacacionesHasta = moment(anoVacacionesDesde).add(1, 'years').subtract(1, 'days').toDate();
          };
 
-
-
          // -------------------------------------------------------------------------------------------------------
          // determinamos si existen vacaciones para el mismo año; de haberlas, se deben reflejar en el campo Número
          // el año actual de vacaciones va desde el añoVacacionesHasta hasta Salida ...
@@ -212,7 +212,6 @@ Meteor.methods(
 
          vacacion.numeroVacaciones = 1;
          vacacion.numeroVacaciones += cantVacacionesMismoAno;
-
 
          // -------------------------------------------------------------------------------------------------------
          // determinamos la cantidad de días de bono y de vacaciones (disfrute) que se han definido en las
@@ -241,7 +240,6 @@ Meteor.methods(
          // la base para el calculo del bono del empleado es su sueldo más cestatickets y un monto adicional; todo ésto,
          // se parametriza en la maestra de empleados ...
          vacacion.baseBonoVacacional = result.baseBonoVacacional;
-
 
          // ---------------------------------------------------------------------------------------------------------------
          // calculamos la fecha de la próxima nómina y la cantidad de días que se deben descontar de anticipo en esa nómina

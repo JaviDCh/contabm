@@ -1,4 +1,6 @@
 
+import moment from 'moment';
+
 AngularApp.controller("Nomina_Empleado_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {

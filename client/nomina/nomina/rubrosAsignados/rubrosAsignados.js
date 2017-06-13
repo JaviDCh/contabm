@@ -1,4 +1,6 @@
 
+import numeral from 'numeral'; 
+
 // Este controller (angular) se carga con la página primera del programa
 AngularApp.controller("RubrosAsignados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

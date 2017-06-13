@@ -3,4 +3,5 @@ pdfMake_from_bower/imports/build/pdfmake.min.js
 pdfMake_from_bower/imports/build/pdfmake.min.js.map
 pdfMake_from_bower/imports/build/vfs_fonts.js
 run.bat
-setting.json
+settings.json
+run.bat

@@ -1,7 +1,9 @@
 
-let  fechaEsDiaFeriado = (fecha) => {
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import lodash from 'lodash';
+import moment from 'moment'; 
 
-    // debugger;
+let  fechaEsDiaFeriado = (fecha) => {
 
     if (!lodash.isDate(fecha)) {
         return {
@@ -40,7 +42,7 @@ let  fechaEsDiaFeriado = (fecha) => {
 
     return {
         error: false,
-        esFeriado: cantDiasFeriados > 0 ? true : false, 
+        esFeriado: cantDiasFeriados > 0 ? true : false,
     };
 };
 

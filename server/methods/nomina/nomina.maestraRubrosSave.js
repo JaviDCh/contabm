@@ -1,4 +1,6 @@
 
+import lodash from 'lodash'; 
+
 Meteor.methods(
 {
     'nomina.maestraRubrosSave': function (items) {
@@ -55,7 +57,7 @@ Meteor.methods(
             let item_sql = lodash.clone(item.object);
             delete item_sql._id;
 
-            // actualizamos el registro en sql ... 
+            // actualizamos el registro en sql ...
             response = Async.runSync(function(done) {
                 MaestraRubros_sql.update(item_sql, { where: { rubro: item_sql.rubro }})
                     .then(function(result) { done(null, result); })

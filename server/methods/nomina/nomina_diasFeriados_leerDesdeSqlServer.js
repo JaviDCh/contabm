@@ -1,4 +1,7 @@
 
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import moment from 'moment';
+import numeral from 'numeral';
 
 Meteor.methods(
 {
@@ -94,7 +97,6 @@ Meteor.methods(
         // -------------------------------------------------------------------------------------------------------------
 
         response.result.forEach((item) => {
-
             item._id = new Mongo.ObjectID()._str,
             item.fecha = item.fecha ? moment(item.fecha).add(TimeOffset, 'hours').toDate() : null;
 

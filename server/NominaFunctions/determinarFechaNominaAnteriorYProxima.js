@@ -1,5 +1,7 @@
 
 
+import moment from 'moment'; 
+
 let determinarFechaProximaNomina = function (tipoNomina, fecha) {
     // esta función recibe una fecha y determina la fecha de la próxima nómina; nota: la función debe saber
     // el tipo de nómina (mensual/quincenal) para determinar ésto ...
