@@ -1,6 +1,6 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import numeral from 'numeral'; 
+import numeral from 'numeral';
 
 Meteor.methods(
 {
@@ -403,7 +403,7 @@ Meteor.methods(
                         chequeras: [],
                     };
 
-                    agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo)
+                    agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo); 
                 });
 
                 document.agencias.push(agenciaMongo);

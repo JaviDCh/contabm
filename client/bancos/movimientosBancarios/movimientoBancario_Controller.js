@@ -64,21 +64,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               };
           };
 
-          if (value == 'monto' || value == 'signo' || value == 'montoBase' || value == 'comision' || value == 'impuestos' || value == 'provClte') {
-              let montoBase = $scope.movimientoBancario.montoBase ? $scope.movimientoBancario.montoBase : 0;
-              let comision = $scope.movimientoBancario.comision ? $scope.movimientoBancario.comision : 0;
-              let impuestos = $scope.movimientoBancario.impuestos ? $scope.movimientoBancario.impuestos : 0;
-
-              $scope.movimientoBancario.monto = montoBase - comision - impuestos;
-
-              if ($scope.movimientoBancario.signo === true || $scope.movimientoBancario.signo === false) {
-                  if ($scope.movimientoBancario.signo && $scope.movimientoBancario.monto < 0) {
-                      $scope.movimientoBancario.monto *= -1;
-                  } else if (!$scope.movimientoBancario.signo && $scope.movimientoBancario.monto > 0) {
-                      $scope.movimientoBancario.monto *= -1;
-                  };
-              };
-          };
 
           // cuando el usuario cambia el tipo, debemos reconstruir la lista de chequeras;
           // normalmente, el usuario cambiará el tipo *solo* cuando está agregando un movimiento;
@@ -124,9 +109,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       $scope.movimientoBancario.signo = true;
                       break;
                   default:
-
               }
-          };
+          }
 
           if (value == 'claveUnicaChequera' && $scope.movimientoBancario && $scope.movimientoBancario.claveUnicaChequera ) {
               if ($scope.movimientoBancario.tipo && $scope.movimientoBancario.tipo === 'CH') {
@@ -145,8 +129,35 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       };
                   };
               };
-          };
+          }
 
+
+          if (value == 'monto' || value == 'signo' || value == 'montoBase' || value == 'comision' || value == 'impuestos' || value == 'provClte' || value == 'tipo') {
+
+              // los costos son siempre negativos ...
+              if ($scope.movimientoBancario.comision && $scope.movimientoBancario.comision  > 0) {
+                  $scope.movimientoBancario.comision *= -1;
+              }
+
+              if ($scope.movimientoBancario.impuestos && $scope.movimientoBancario.impuestos  > 0) {
+                  $scope.movimientoBancario.impuestos *= -1;
+              }
+
+              // siempre revisamos el monto base para asignarles el signo correcto ...
+              if ($scope.movimientoBancario.signo === true && $scope.movimientoBancario.montoBase && $scope.movimientoBancario.montoBase < 0) {
+                  $scope.movimientoBancario.montoBase *= -1;
+              }
+
+              if ($scope.movimientoBancario.signo === false && $scope.movimientoBancario.montoBase && $scope.movimientoBancario.montoBase > 0) {
+                  $scope.movimientoBancario.montoBase *= -1;
+              }
+
+              let montoBase = $scope.movimientoBancario.montoBase ? $scope.movimientoBancario.montoBase : 0;
+              let comision = $scope.movimientoBancario.comision ? $scope.movimientoBancario.comision : 0;
+              let impuestos = $scope.movimientoBancario.impuestos ? $scope.movimientoBancario.impuestos : 0;
+
+              $scope.movimientoBancario.monto = montoBase + comision + impuestos;
+          }
 
 
           if ($scope.movimientoBancario.docState)

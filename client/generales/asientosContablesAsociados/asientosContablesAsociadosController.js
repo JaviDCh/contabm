@@ -51,37 +51,41 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
     $scope.asientosContablesAsociadosList = [];
 
     $scope.showProgress = true;
-    $meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero).then(
-        function (data) {
 
-            let asientosContablesAsociadosList = JSON.parse(data);
+    Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) =>  {
 
-            // las fechas siempre quedan como strings luego de serializadas
-            asientosContablesAsociadosList.forEach((x) => {
-                x.fecha = moment(x.fecha).format('DD-MMM-YYYY');
-            });
-
-            $scope.asientosContablesAsociadosList = asientosContablesAsociadosList;
-
-            $scope.alerts.length = 0;
-            $scope.alerts.push({
-                type: 'info',
-                msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido
-                      leídos para esta entidad.<br />
-                      Haga un <em>click</em> en alguno de ellos para mostrarlo en forma separada.`,
-            });
-
-            $scope.showProgress = false;
-        },
-        function (err) {
-
+        if (err) {
             let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({ type: 'danger', msg: errorMessage });
 
             $scope.showProgress = false;
+            $scope.$apply();
+
+            return;
+        }
+
+        let asientosContablesAsociadosList = JSON.parse(result);
+
+        // las fechas siempre quedan como strings luego de serializadas
+        asientosContablesAsociadosList.forEach((x) => {
+            x.fecha = moment(x.fecha).format('DD-MMM-YYYY');
+        })
+
+        $scope.asientosContablesAsociadosList = asientosContablesAsociadosList;
+
+        $scope.alerts.length = 0;
+        $scope.alerts.push({
+            type: 'info',
+            msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido
+                  leídos para esta entidad.<br />
+                  Haga un <em>click</em> en alguno de ellos para mostrarlo en forma separada.`,
         });
+
+        $scope.showProgress = false;
+        $scope.$apply();
+    })
 
 
     $scope.mostrarAsientoSeleccionado = (asientoContableID) => {
@@ -134,60 +138,73 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
         $scope.showProgress = true;
         // ejecutamos un método en el servidor que lee la 'entidad' (factura, mov banc, pago, etc.) y
         // agrega un asiento contable para la mismo ...
-        $meteor.call('agregarAsientoContableAsociadoAEntidad', provieneDe, entidadID, ciaSeleccionada.numero).then(
-            function (data0) {
+        Meteor.call('generales.agregarAsientoContableAEntidad', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
 
-                // luego de agregado el asiento para la entidad, leemos y mostramos en la lista ...
-                $meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero).then(
-                    function (data) {
-
-                        let asientosContablesAsociadosList = JSON.parse(data);
-
-                        // las fechas siempre quedan como strings luego de serializadas
-                        asientosContablesAsociadosList.forEach((x) => {
-                            x.fecha = moment(x.fecha).format('DD-MMM-YYYY');
-                        });
-
-                        $scope.asientosContablesAsociadosList = asientosContablesAsociadosList;
-
-                        $scope.alerts.length = 0;
-
-                        if (data0.error) {
-                            // se produjo un error al intentar construir y grabar el asiento contable asociado
-                            $scope.alerts.push({
-                                type: 'danger',
-                                msg: data0.message,
-                            });
-                        } else {
-                            $scope.alerts.push({
-                                type: 'info',
-                                msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido leídos para
-                                      esta entidad.<br />
-                                      Haga un <em>click</em> en alguno de ellos para mostrarlo en forma separada.`,
-                            });
-                        };
-
-                        $scope.showProgress = false;
-                    },
-                    function (err) {
-
-                        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
-
-                        $scope.alerts.length = 0;
-                        $scope.alerts.push({ type: 'danger', msg: errorMessage });
-
-                        $scope.showProgress = false;
-                    });
-            },
-            function (err) {
-
+            if (err) {
                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
-                $scope.alerts.push({ type: 'danger', msg: errorMessage });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage,
+                });
 
                 $scope.showProgress = false;
-            });
-    };
+                $scope.$apply();
+
+                return;
+            }
+
+            if (result.error) {
+                // se produjo un error al intentar construir y grabar el asiento contable asociado
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: result.message,
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+            // luego de agregado el asiento para la entidad, leemos y mostramos en la lista ...
+            Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
+
+                if (err) {
+                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({ type: 'danger', msg: errorMessage });
+
+                    $scope.showProgress = false;
+                    $scope.$apply();
+
+                    return;
+                }
+
+                let asientosContablesAsociadosList = JSON.parse(result);
+
+                // las fechas siempre quedan como strings luego de serializadas
+                asientosContablesAsociadosList.forEach((x) => {
+                    x.fecha = moment(x.fecha).format('DD-MMM-YYYY');
+                });
+
+                $scope.asientosContablesAsociadosList = asientosContablesAsociadosList;
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido leídos para
+                          esta entidad.<br />
+                          Haga un <em>click</em> en alguno de ellos para mostrarlo en forma separada.`,
+                })
+
+                $scope.showProgress = false;
+                $scope.$apply();
+            })
+        })
+    }
 }
 ]);

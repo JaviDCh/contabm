@@ -53,6 +53,8 @@ AngularApp.controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
           { id: 12, descripcion: "Anticipo en pago de facturas" },
           { id: 13, descripcion: "Impuestos y retenciones varias (CxP)" },
           { id: 14, descripcion: "Impuestos y retenciones varias (CxC)" },
+          { id: 15, descripcion: "Movimientos bancarios - comisiones" },
+          { id: 16, descripcion: "Movimientos bancarios - impuestos" },
       ];
 
       $scope.helpers({
@@ -116,7 +118,7 @@ AngularApp.controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
       $scope.cuentasContablesLista = CuentasContables2.find({ cia: $scope.companiaSeleccionada.numero, totDet: 'D', actSusp: 'A' },
                                                             { sort: { cuenta: true }}).fetch();
@@ -203,7 +205,7 @@ AngularApp.controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
               name: 'concepto',
               field: 'concepto',
               displayName: 'Concepto',
-              width: 160,
+              width: 200,
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
               cellFilter: 'mapDropdown:row.grid.appScope.conceptosArray:"id":"descripcion"',
@@ -334,7 +336,7 @@ AngularApp.controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
                   $scope.showProgress = false;
                   $scope.$apply();
                   return;
-              };
+              }
 
               // ------------------------------------------------------------------------------------------------------
               // guardamos el filtro indicado por el usuario
@@ -358,7 +360,7 @@ AngularApp.controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
               // usamos jquery para hacer un click en el link que collapsa el filtro (bootstrap collapse);
               $("#collapseLink").click();
           });
-      };
+      }
 
 
       // ------------------------------------------------------------------------------------------------------

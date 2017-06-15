@@ -4,7 +4,7 @@ import moment from 'moment';
 import lodash from 'lodash';
 
 Meteor.methods({
-   agregarAsientoContableAsociadoAEntidad: function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {
+   'generales.agregarAsientoContableAEntidad': function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {
 
        // agregamos el asiento que corresponde al registro de una entidad, por ejemplo: factura, pago, nómina,
        // movimiento bancario, etc.
@@ -43,7 +43,7 @@ Meteor.methods({
                    message: `Error: el valor pasado a esta función para 'provieneDe' (${provieneDe}) no es válido.
                              Por favor revise.`
                };
-       };
+       }
 
 
        // ----------------------------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ Meteor.methods({
                message: `Error: no existe un registro, o sus datos no se han definido,
                          en la tabla <em>parámetros global bancos</em>.`
            };
-       };
+       }
 
        if (!parametrosGlobalBancos.agregarAsientosContables) {
            return {
@@ -64,7 +64,7 @@ Meteor.methods({
                message: `Error: en la tabla <em>parámetros global bancos</em> se debe indicar que se
                          desea agregar asientos en <em>Contab</em>.`
            };
-       };
+       }
 
        if (!parametrosGlobalBancos.tipoAsientoDefault) {
            return {
@@ -72,7 +72,7 @@ Meteor.methods({
                message: `Error: en la tabla <em>parámetros global bancos</em> se debe indicar un
                          tipo de asientos a usar <em>por defecto</em>.`
            };
-       };
+       }
 
        let tipoAsientoDefault = parametrosGlobalBancos.tipoAsientoDefault;
 
@@ -85,7 +85,7 @@ Meteor.methods({
                error: true,
                message: `Error inesperado: no hemos podido leer la compañía <em>Contab</em> que se ha seleccionado`
            };
-       };
+       }
 
 
        let fechaAsiento = null;
@@ -116,7 +116,7 @@ Meteor.methods({
                error: true,
                message: mesFiscal.errorMessage ? mesFiscal.errorMessage : "Error: mensaje de error indefinido."
            };
-       };
+       }
 
        let factorCambio = ContabFunctions.leerCambioMonedaMasReciente(fechaAsiento);
 
@@ -125,12 +125,12 @@ Meteor.methods({
                error: true,
                message: factorCambio.errorMessage ? factorCambio.errorMessage : "Error: mensaje de error indefinido."
            };
-       };
+       }
 
        // validamos el mes cerrado en Contab
        let validarMesCerradoContab = ContabFunctions.validarMesCerradoEnContab(fechaAsiento, companiaContab.numero);
 
-       if (validarMesCerradoContab && validarMesCerradoContab.error)
+       if (validarMesCerradoContab && validarMesCerradoContab.error) {
            if (validarMesCerradoContab.errMessage) {
                return {
                    error: true,
@@ -138,7 +138,8 @@ Meteor.methods({
                };
            } else {
                throw new Meteor.Error("error-validacion", "Error: mensaje de error indefinido (?!?).");
-           };
+           }
+       }
 
 
        // --------------------------------------------------------------------------------------
@@ -150,7 +151,7 @@ Meteor.methods({
                error: true,
                message: numeroNegativoAsiento.errorMessage ? numeroNegativoAsiento.errorMessage : "Error: mensaje de error indefinido."
            };
-       };
+       }
 
 
        let agregarAsientoContable = null;
@@ -179,7 +180,7 @@ Meteor.methods({
                                                                        currentUser);
 
                break;
-       };
+       }
 
        // regresamos un un objeto que contiene un probable error,
        // o el pk del asiento contable recién agregado
@@ -361,7 +362,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             Debe existir una cuenta bancaria para el movimiento en <em>Catálogos</em>. Nota: probablemente Ud. deba
             ejecutar la opción <em>Copiar catálogos</em> en el menú <em>Generales</em>.`
         };
-    };
+    }
 
     if (!cuentaBancaria.cuentaContable) {
         return {
@@ -370,7 +371,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             definida en el <em>catálogo de cuentas contables</em>.<br />
             Por favor, revise la cuenta bancaria y defina una cuenta contable para la misma.`
         };
-    };
+    }
 
     let moneda = Monedas.findOne({ moneda: cuentaBancaria.moneda });
 
@@ -398,7 +399,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                 cuentaBancaria.moneda,
                 companiaContab.numero,
                 null);
-        };
+        }
 
         if (leerCuentaContableDefinida.error) {
             return {
@@ -409,10 +410,73 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                 <em>Definición de cuentas contables</em> (<em>Bancos / Catálogos</em>).<br />
                 Por favor, defina una cuenta contable para la compañía asociada al movimiento bancario.`
             };
-        };
+        }
 
         cuentaContableCompaniaID = leerCuentaContableDefinida.cuentaContableID;
-    };
+    }
+    // ------------------------------------------------------------------------------
+
+    let cuentaContable_movBancos_impuestos = null;
+    let cuentaContable_movBancos_comision = null;
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // intentamos obtener una cuenta contable para contabilizar la comisión que cobra el banco (si existe una)
+    leerCuentaContableDefinida = null;
+
+    if (entidadOriginal.comision) {
+
+        // cuentas de proveedores (CxP) ...
+        leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(
+            15,
+            entidadOriginal.provClte,
+            0,
+            cuentaBancaria.moneda,
+            companiaContab.numero,
+            null);
+
+        if (leerCuentaContableDefinida.error) {
+            return {
+                error: true,
+                message: `Error: no hemos podido leer una cuenta contable para contabilizar el monto de comisión
+                indicado para el movimiento bancario.
+                La cuenta contable definida para contabilizar las comisiones que cobra el banco, debe estar definida en
+                <em>Definición de cuentas contables</em> (<em>Bancos / Catálogos</em>).<br />
+                Por favor, defina esta cuenta contable como se indica y luego regrese e intente completar, nuevamente, este proceso.`
+            };
+        }
+
+        cuentaContable_movBancos_comision = leerCuentaContableDefinida.cuentaContableID;
+    }
+    // ------------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // intentamos obtener una cuenta contable para contabilizar la comisión que cobra el banco (si existe una)
+    leerCuentaContableDefinida = null;
+
+    if (entidadOriginal.impuestos) {
+
+        // cuentas de proveedores (CxP) ...
+        leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(
+            16,
+            entidadOriginal.provClte,
+            0,
+            cuentaBancaria.moneda,
+            companiaContab.numero,
+            null);
+
+        if (leerCuentaContableDefinida.error) {
+            return {
+                error: true,
+                message: `Error: no hemos podido leer una cuenta contable para contabilizar el monto de impuesto
+                indicado para el movimiento bancario.
+                La cuenta contable definida para contabilizar el impuesto que cobra el banco, debe estar definida en
+                <em>Definición de cuentas contables</em> (<em>Bancos / Catálogos</em>).<br />
+                Por favor, defina esta cuenta contable como se indica y luego regrese e intente completar, nuevamente, este proceso.`
+            };
+        }
+
+        cuentaContable_movBancos_impuestos = leerCuentaContableDefinida.cuentaContableID;
+    }
     // ------------------------------------------------------------------------------
 
 
@@ -452,6 +516,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
     asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'h').toDate();
     asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'h').toDate();
 
+    let response = null;
     response = Async.runSync(function(done) {
         AsientosContables_sql.create(asientoContable_sql)
             .then(function(result) { done(null, result); })
@@ -463,6 +528,8 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
 
     let asientoAgregado = response.result.dataValues;
+
+    let partidasAsientoContable = [];
 
 
     // ya grabamos el asiento; ahora vamos a grabar las partidas ...
@@ -483,15 +550,8 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
           haber: entidadOriginal.monto < 0 ? Math.abs(entidadOriginal.monto) : 0,
       };
 
-      response = Async.runSync(function(done) {
-          dAsientosContables_sql.create(partidaAsiento)
-              .then(function(result) { done(null, result); })
-              .catch(function (err) { done(err, null); })
-              .done();
-      });
-
-      if (response.error)
-          throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+      // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+      partidasAsientoContable.push(partidaAsiento);
 
 
       // agregamos la partida que corresponde a la compañía (proveedor o cliente)
@@ -508,20 +568,81 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                              entidadOriginal.concepto.substr(0, 75) :
                              entidadOriginal.concepto,
                 referencia: entidadOriginal.transaccion,
-                debe: entidadOriginal.monto < 0 ? Math.abs(entidadOriginal.monto) : 0,
-                haber: entidadOriginal.monto >= 0 ? entidadOriginal.monto : 0,
+                debe: entidadOriginal.montoBase < 0 ? Math.abs(entidadOriginal.montoBase) : 0,
+                haber: entidadOriginal.montoBase >= 0 ? entidadOriginal.montoBase : 0,
             };
 
-            response = Async.runSync(function(done) {
-                dAsientosContables_sql.create(partidaAsiento)
-                    .then(function(result) { done(null, result); })
-                    .catch(function (err) { done(err, null); })
-                    .done();
-            });
+            // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+            partidasAsientoContable.push(partidaAsiento);
+      }
 
-            if (response.error)
-                throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-      };
+
+      // agregamos la partida que corresponde al monto de comisión (si existe una)
+      if (entidadOriginal.comision) {
+          numeroPartida += 10;
+
+            partidaAsiento = {};
+
+            partidaAsiento = {
+                numeroAutomatico: asientoAgregado.numeroAutomatico,
+                partida: numeroPartida,
+                cuentaContableID: cuentaContable_movBancos_comision,
+                descripcion: entidadOriginal.concepto.length > 75 ?
+                             entidadOriginal.concepto.substr(0, 75) :
+                             entidadOriginal.concepto,
+                referencia: entidadOriginal.transaccion,
+                debe: entidadOriginal.comision < 0 ? Math.abs(entidadOriginal.comision) : 0,
+                haber: entidadOriginal.comision >= 0 ? entidadOriginal.comision : 0,
+            };
+
+            // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+            partidasAsientoContable.push(partidaAsiento);
+      }
+
+
+      // agregamos la partida que corresponde al monto de impuestos (si existe uno)
+      if (entidadOriginal.impuestos) {
+          numeroPartida += 10;
+
+            partidaAsiento = {};
+
+            partidaAsiento = {
+                numeroAutomatico: asientoAgregado.numeroAutomatico,
+                partida: numeroPartida,
+                cuentaContableID: cuentaContable_movBancos_impuestos,
+                descripcion: entidadOriginal.concepto.length > 75 ?
+                             entidadOriginal.concepto.substr(0, 75) :
+                             entidadOriginal.concepto,
+                referencia: entidadOriginal.transaccion,
+                debe: entidadOriginal.impuestos < 0 ? Math.abs(entidadOriginal.impuestos) : 0,
+                haber: entidadOriginal.impuestos >= 0 ? entidadOriginal.impuestos : 0,
+            };
+
+            // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+            partidasAsientoContable.push(partidaAsiento);
+      }
+
+      // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
+      // que las de mayor monto vayan primero
+
+      numeroPartida = 0;
+      lodash(partidasAsientoContable).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
+
+          // renumeramos la partida ... 
+          numeroPartida += 10;
+          partida.partida = numeroPartida;
+
+          response = Async.runSync(function(done) {
+              dAsientosContables_sql.create(partida)
+                  .then(function(result) { done(null, result); })
+                  .catch(function (err) { done(err, null); })
+                  .done();
+          })
+
+          if (response.error) {
+              throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+          }
+      })
 
       return {
           asientoContableAgregadoID: asientoAgregado.numeroAutomatico

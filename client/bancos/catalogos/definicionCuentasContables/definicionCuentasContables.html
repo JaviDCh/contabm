@@ -73,7 +73,7 @@
                           <label class="myinput-xsm">Concepto: </label>
                           <select class="myinput-xsm"
                                   ng-model="filtro.concepto"
-                                  ng-options="item.id as item.descripcion for item in conceptosArray | orderBy:'descripcion'"
+                                  ng-options="item.id as item.descripcion for item in conceptosArray | orderBy:'id'"
                                   style="width: 100%; min-height: 20px; "
                                   ng-model-options="{ updateOn: 'blur' }">
                           </select>
