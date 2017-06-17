@@ -1,4 +1,6 @@
-﻿
+
+import lodash from 'lodash';
+
 AngularApp.controller('empleadosSueldos_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', 'empleado', 'companiaSeleccionadaDoc', 'origen',
 function ($scope, $modalInstance, $modal, empleado, companiaSeleccionadaDoc, origen) {
@@ -37,7 +39,7 @@ function ($scope, $modalInstance, $modal, empleado, companiaSeleccionadaDoc, ori
         multiSelect: false,
         enableSelectAll: false,
         selectionRowHeaderWidth: 0,
-        minRowsToShow: 5, 
+        minRowsToShow: 5,
         rowHeight: 25,
 
         onRegisterApi: function (gridApi) {

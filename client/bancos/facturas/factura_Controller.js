@@ -9,7 +9,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
       // nótese como injectamos el resolve del parent state y de éste state; la idea es que el resolve del parent
       // state se ejecute (resuelva) en forma completa y anterior, y *solo luego* se resuelva el resolve del child state
-
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -315,6 +314,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                   },
                   origen: () => {
                       return $scope.origen;
+                  },
+                  docState: () => {
+                      return $scope.factura.docState ? $scope.factura.docState : "";
                   },
               },
           }).result.then(

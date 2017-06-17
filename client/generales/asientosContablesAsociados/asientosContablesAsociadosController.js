@@ -2,8 +2,8 @@
 import moment from 'moment';
 
 AngularApp.controller('AsientosContablesAsociados_Controller',
-['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen',
-function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID, ciaSeleccionada, origen) {
+['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
+function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID, ciaSeleccionada, origen, docState) {
 
     // abrimos un modal para mostrar los asientos contables asociados a alguna entidad; ejemplos de
     // entidades son: bancos, facturas, nomina, pagos, etc.
@@ -135,6 +135,19 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
     };
 
     $scope.agregarAsientoContable = () => {
+
+        // el usuario modificó la entidad (mov bancario / factura / ...); indicamos que debe grabar ...
+        if (docState) {
+            DialogModal($modal,
+                        "<em>Generación de asientos contables - Los datos no se han guardado</em>",
+                        `Aparentemente, Ud. ha efectuado cambios en el registro.<br />
+                         Por favor cierre este diálogo y grabe sus cambios.<br />
+                         Ud. debe hacer un <em>click</em> en <em>Grabar</em> para registrar los cambios,
+                         luego regrese e intente agregar el asiento contable.
+                        `, false);
+            return;
+        }
+
         $scope.showProgress = true;
         // ejecutamos un método en el servidor que lee la 'entidad' (factura, mov banc, pago, etc.) y
         // agrega un asiento contable para la mismo ...

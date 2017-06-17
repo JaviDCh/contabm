@@ -546,12 +546,89 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                        entidadOriginal.concepto.substr(0, 75) :
                        entidadOriginal.concepto,
           referencia: entidadOriginal.transaccion,
-          debe: entidadOriginal.monto >= 0 ? entidadOriginal.monto : 0,
-          haber: entidadOriginal.monto < 0 ? Math.abs(entidadOriginal.monto) : 0,
+          debe: entidadOriginal.montoBase >= 0 ? entidadOriginal.montoBase : 0,
+          haber: entidadOriginal.montoBase < 0 ? Math.abs(entidadOriginal.montoBase) : 0,
       };
 
       // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
       partidasAsientoContable.push(partidaAsiento);
+
+
+
+
+
+
+
+
+
+      // agregamos un monto de comisión, si existe
+      if (entidadOriginal.comision) {
+
+          numeroPartida += 10;
+
+          partidaAsiento = {};
+
+          let partidaAsiento = {
+              numeroAutomatico: asientoAgregado.numeroAutomatico,
+              partida: numeroPartida,
+              cuentaContableID: cuentaBancaria.cuentaContable,
+              descripcion: entidadOriginal.concepto.length > 75 ?
+                           entidadOriginal.concepto.substr(0, 75) :
+                           entidadOriginal.concepto,
+              referencia: entidadOriginal.transaccion,
+              debe: entidadOriginal.comision >= 0 ? entidadOriginal.comision : 0,
+              haber: entidadOriginal.comision < 0 ? Math.abs(entidadOriginal.comision) : 0,
+          };
+
+          // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+          partidasAsientoContable.push(partidaAsiento);
+      }
+
+
+      // agregamos un monto de impuestos, si existe
+      if (entidadOriginal.impuestos) {
+
+          numeroPartida += 10;
+
+          partidaAsiento = {};
+
+          let partidaAsiento = {
+              numeroAutomatico: asientoAgregado.numeroAutomatico,
+              partida: numeroPartida,
+              cuentaContableID: cuentaBancaria.cuentaContable,
+              descripcion: entidadOriginal.concepto.length > 75 ?
+                           entidadOriginal.concepto.substr(0, 75) :
+                           entidadOriginal.concepto,
+              referencia: entidadOriginal.transaccion,
+              debe: entidadOriginal.impuestos >= 0 ? entidadOriginal.impuestos : 0,
+              haber: entidadOriginal.impuestos < 0 ? Math.abs(entidadOriginal.impuestos) : 0,
+          };
+
+          // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+          partidasAsientoContable.push(partidaAsiento);
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       // agregamos la partida que corresponde a la compañía (proveedor o cliente)
@@ -628,7 +705,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
       numeroPartida = 0;
       lodash(partidasAsientoContable).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
 
-          // renumeramos la partida ... 
+          // renumeramos la partida ...
           numeroPartida += 10;
           partida.partida = numeroPartida;
 
