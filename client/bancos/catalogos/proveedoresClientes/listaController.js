@@ -377,7 +377,7 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
       $scope.aplicarFiltro = function () {
           $scope.showProgress = true;
 
-          Meteor.call('bancos_proveedores_LeerDesdeSql', JSON.stringify($scope.filtro), (err, result) => {
+          Meteor.call('bancos.proveedores.LeerDesdeSql', JSON.stringify($scope.filtro), (err, result) => {
 
               if (err) {
                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -497,18 +497,47 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
               $scope.showProgress = false;
               $scope.$apply();
           });
-      };
+      }
 
       $scope.leerMasRegistros = function () {
           limit += 50;    // la próxima vez, se leerán 50 más ...
           $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
-      };
+      }
 
       $scope.leerTodosLosRegistros = function () {
           // simplemente, leemos la cantidad total de registros en el collection (en el server y para el user)
           limit = recordCount;
           $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
-      };
+      }
+
+
+      $scope.exportarExcel = function() {
+
+          // aunque este proceso (compañías) no se corresponde a  una cia Contab seleccionada, la leemos para el usuario pues
+          // el proceso que prepara el documento Excel usa la cia seleccionada para grabar el registro (collectionFS) en mongo
+          let companiaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
+          let companiaContab = {};
+
+          if (companiaContabSeleccionada)
+              companiaContab = Companias.findOne(companiaContabSeleccionada.companiaID);
+
+          let modalInstance = $modal.open({
+              templateUrl: 'client/bancos/catalogos/proveedoresClientes/exportarExcelModal.html',
+              controller: 'BancosProveedoresClientes_ExportarExcel_Controller',
+              size: 'md',
+              resolve: {
+                  ciaSeleccionada: () => {
+                      return companiaContab;
+                  },
+              },
+          }).result.then(
+                function (resolve) {
+                    return true;
+                },
+                function (cancel) {
+                    return true;
+                });
+      }
 
 
       // solo para eliminar los registros que el usuario 'marca' en la lista
@@ -547,17 +576,29 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
             return;
           }
 
-          // TODO: eliminar los items de la lista ... (o se eliminan con reactivity???)
-
           $scope.alerts.length = 0;
           $scope.alerts.push({
               type: 'info',
               msg: resolve
           });
 
-          $scope.showProgress = false;
           $scope.proveedor = {};            // este es el proveedor que se muestra cuando el usuario selecciona; el usuario pudo haberlo eliminado
-          $scope.$apply();           
+
+          let meteorUserId = Meteor.userId();
+          $scope.proveedores_ui_grid.data = [];
+
+          // refrescamos el helper; nótese que al eliminar el proveedor desde sql, también lo eliminamos desde la tabla mongo desde el server
+          // por reactivity debería reflejarse en la minimongo y dejar de existir allí
+          $scope.helpers({
+              proveedores: () => {
+                return Temp_Consulta_Bancos_Proveedores.find({ user: meteorUserId }, { sort: { nombre: 1 }});
+              }
+          });
+
+          $scope.proveedores_ui_grid.data = $scope.proveedores;
+
+          $scope.showProgress = false;
+          $scope.$apply();
       })
     }
 

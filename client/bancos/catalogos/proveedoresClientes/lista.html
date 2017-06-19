@@ -1,22 +1,4 @@
 
-<div class="row">
-    <nav class="navbar navbar-inverse navbar_custom_small_fullWidth" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li ng-if="proveedor.docState"><a href="#" class="navbar_custom_small_header"><em>Proveedores y clientes</em> (<span class="fa fa-asterisk"></span>)</a></li>
-                    <li ng-if="!proveedor.docState"><a href="#" class="navbar_custom_small_header"><em>Proveedores y clientes</em></a></li>
-
-                    <li><a href="#" ng-click="grabar()" class="navbar_custom_small_node">Grabar&nbsp;&nbsp;<span class="fa fa-floppy-o"></span></a></li>
-                    <li><a href="#" ng-click="refresh0()" class="navbar_custom_small_node">Refresh&nbsp;&nbsp;<span class="fa fa-refresh"></span></a></li>
-                    <li class="divider-vertical-small"></li>
-                    <li><a href="#" ng-click="nuevo()" class="navbar_custom_small_node">Nuevo&nbsp;&nbsp;<span class="fa fa-file-o"></span></a></li>
-                    <li><a href="#" ng-click="eliminar()" class="navbar_custom_small_node">Eliminar&nbsp;&nbsp;<span class="fa fa-times"></span></a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</div>
 
 <div class="row">
     <div class="col-sm-6 col-sm-offset-3" style="text-align: center; vertical-align: middle; ">
@@ -41,26 +23,41 @@
     <tabset style="text-align: left;">
 
         <tab heading="Filtro" active="activeTab.tab1">
-            <div class="row">
-                <form role="form" novalidate style="margin-top: 15px; ">
-                    <div class="container-fluid">
 
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <!-- numeroFactura -->
-                                <div class="col-sm-12 col-sm-offset-0">
-                                    <div class="form-group">
-                                        <label class="control-label input-label">Nombre: </label>
-                                        <input type="text"
-                                               class="form-control input-sm myinput-sm"
-                                               ng-model="filtro.nombreProveedor" />
+            <div class="row" style="margin-top: 15px; ">
+                <div class="col-sm-6">
+                    <div class="row">
+                        <form role="form" novalidate>
+                            <div class="container-fluid">
+
+                                <div class="row">
+                                    <!-- numeroFactura -->
+                                    <div class="col-sm-8 col-sm-offset-2">
+                                        <div class="form-group">
+                                            <label class="control-label input-label">Nombre: </label>
+                                            <input type="text"
+                                                   class="form-control input-sm myinput-sm"
+                                                   ng-model="filtro.nombreProveedor" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="row" style="text-align: left; ">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <fieldset class="scheduler-border" style="text-align: left; ">
+                                <legend class="scheduler-border">Mostrar solo: </legend>
+                                <label style="font-size: small; font-weight: normal; "><input type="checkbox" ng-model="filtro.companiasSinDatosAsociados"> Compañías sin datos asociados</label><br>
+                            </fieldset>
+                            <br />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
@@ -86,6 +83,8 @@
                                 <ul class="nav navbar-nav">
                                     <li><a class="navbar_custom_small_header">&nbsp;&nbsp;&nbsp;</a></li>
                                     <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="grabarEliminaciones()">Grabar <span class="fa fa-save"></span></a></li>
+                                    <li class="divider-vertical-small"></li>
+                                    <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="exportarExcel()" >Exportar&nbsp;&nbsp;<span class="fa fa-file-excel-o"></span></a></li>
                                 </ul>
 
                                 <ul class="nav navbar-nav navbar-right">
@@ -108,6 +107,28 @@
             </div>
         </tab>
         <tab heading="Detalles" active="activeTab.tab3">
+
+            <br />
+            <div class="row row-centered">
+                <div class="col-sm-9 col-centered">
+                    <nav class="navbar navbar-inverse navbar_custom_small_fullWidth" role="navigation">
+                        <div class="container-fluid">
+                            <div class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li ng-if="proveedor.docState"><a href="#" class="navbar_custom_small_header"><em>Proveedores y clientes</em> (<span class="fa fa-asterisk"></span>)</a></li>
+                                    <li ng-if="!proveedor.docState"><a href="#" class="navbar_custom_small_header"><em>Proveedores y clientes</em></a></li>
+
+                                    <li><a href="#" ng-click="grabar()" class="navbar_custom_small_node">Grabar&nbsp;&nbsp;<span class="fa fa-floppy-o"></span></a></li>
+                                    <li><a href="#" ng-click="refresh0()" class="navbar_custom_small_node">Refresh&nbsp;&nbsp;<span class="fa fa-refresh"></span></a></li>
+                                    <li class="divider-vertical-small"></li>
+                                    <li><a href="#" ng-click="nuevo()" class="navbar_custom_small_node">Nuevo&nbsp;&nbsp;<span class="fa fa-file-o"></span></a></li>
+                                    <li><a href="#" ng-click="eliminar()" class="navbar_custom_small_node">Eliminar&nbsp;&nbsp;<span class="fa fa-times"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
 
             <form
                   role="form"

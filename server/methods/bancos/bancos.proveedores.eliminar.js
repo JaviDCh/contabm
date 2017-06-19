@@ -1,5 +1,5 @@
 
-import lodash from 'lodash'; 
+import lodash from 'lodash';
 
 Meteor.methods(
 {
@@ -29,8 +29,9 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) {
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
 
             // eliminamos el item de la tabla en mongo ...
             Temp_Consulta_Bancos_Proveedores.remove({ _id: item._id });

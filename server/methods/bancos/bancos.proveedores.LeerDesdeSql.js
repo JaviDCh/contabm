@@ -2,11 +2,11 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import numeral from 'numeral';
 import lodash from 'lodash';
-import moment from 'moment'; 
+import moment from 'moment';
 
 Meteor.methods(
 {
-    bancos_proveedores_LeerDesdeSql: function (filtro) {
+    'bancos.proveedores.LeerDesdeSql': function (filtro) {
 
         let filtro2 = JSON.parse(filtro);
 
@@ -30,10 +30,8 @@ Meteor.methods(
             where += `(p.Nombre Like '${criteria}')`;
         };
 
-        // where += `(e.Cia = ${ciaContab.toString()})`;
-
         if (!where)
-            where = "1 = 1";            // esto nunca va a ocurrir aquí ...
+            where = "1 = 1";
 
         // ---------------------------------------------------------------------------------------------------
         // leemos los pagos desde sql server, que cumplan el criterio indicado
@@ -50,6 +48,16 @@ Meteor.methods(
                      Where ${where}
                     `;
 
+        if (filtro2.companiasSinDatosAsociados) {
+            // intentamos leer solo proveedores sin datos asociados: facturas, pagos, etc. Para hacerlo, agregamos 'subqueries' al select ...
+            query += ` And p.Proveedor Not In (Select Proveedor From OrdenesPago)
+                       And p.Proveedor Not In (Select ProvClte From MovimientosBancarios)
+                       And p.Proveedor Not In (Select Proveedor From Pagos)
+                       And p.Proveedor Not In (Select Proveedor From Facturas)
+                       And p.Proveedor Not In (Select Proveedor From InventarioActivosFijos)
+                     `;
+        }
+
         response = null;
         response = Async.runSync(function(done) {
             sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
@@ -58,8 +66,9 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) {
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
 
 
         // eliminamos los registros que el usuario pueda haber registrado antes (en mongo) ...
@@ -118,10 +127,10 @@ Meteor.methods(
                                         { current: currentProcess, max: numberOfProcess,
                                           progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
         return "Ok, los proveedores y clientes han sido leídos desde sql server.";
     }
