@@ -3,7 +3,7 @@ import moment from 'moment';
 import lodash from 'lodash';
 
 AngularApp.controller("ProveedoresClientes_Lista_Controller",
-['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
+['$stateParams', '$scope', '$meteor', '$modal', function ($stateParams, $scope, $meteor, $modal) {
 
       $scope.showProgress = false;
 
@@ -62,7 +62,14 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
           monedas: () => {
             return Monedas.find({}, { sort: { descripcion: 1 } });
           },
+          cargos: () => {
+            return Cargos.find({}, { sort: { descripcion: 1 } });
+          },
+          departamentos: () => {
+            return Departamentos.find({}, { sort: { descripcion: 1 } });
+          },
       });
+
 
       $scope.refresh0 = function () {
           if ($scope.proveedor && $scope.proveedor.docState) {
@@ -359,20 +366,20 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
 
           itemSeleccionadoParaSerEliminado = true;
         }
-      };
+      }
 
       $scope.eliminar = function () {
           $scope.proveedor.docState = 3;
-      };
+      }
 
       $scope.nuevo = function () {
           inicializarItem(0, $scope);
-      };
+      }
 
       // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
       $scope.limpiarFiltro = function () {
           $scope.filtro = {};
-      };
+      }
 
       $scope.aplicarFiltro = function () {
           $scope.showProgress = true;
@@ -414,8 +421,8 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
 
               // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
               $scope.activeTab = { tab1: false, tab2: true, tab3: false, };
-          });
-      };
+          })
+      }
 
 
       // ------------------------------------------------------------------------------------------------------
@@ -540,6 +547,36 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
       }
 
 
+      $scope.mostrarPersonas = function() {
+
+          let modalInstance = $modal.open({
+              templateUrl: 'client/bancos/catalogos/proveedoresClientes/proveedoresMostrarPersonasModal.html',
+              controller: 'BancosProveedores_MostrarPersonas_Controller',
+              size: 'lg',
+              resolve: {
+                  proveedor: () => {
+                      return $scope.proveedor;
+                  },
+                  cargos: () => {
+                      return $scope.cargos;
+                  },
+                  departamentos: () => {
+                      return $scope.departamentos;
+                  },
+                  titulos: () => {
+                      return $scope.titulos;
+                  },
+              },
+          }).result.then(
+                function (resolve) {
+                    return true;
+                },
+                function (cancel) {
+                    return true;
+                });
+      }
+
+
       // solo para eliminar los registros que el usuario 'marca' en la lista
       $scope.grabarEliminaciones = () => {
 
@@ -638,8 +675,8 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
                   Proveedores_SimpleSchema.namedContext().invalidKeys().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Proveedores_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
-              };
-          };
+              }
+          }
 
           if (errores && errores.length) {
 
@@ -659,37 +696,11 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
 
               $scope.showProgress = false;
               return;
-          };
+          }
 
-          $meteor.call('proveedoresSave', editedItem).then(
-              function (data) {
+          Meteor.call('proveedoresSave', editedItem, (err, result) => {
 
-                  if (data.error) {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: data.message
-                      });
-                      $scope.showProgress = false;
-                  } else {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'info',
-                          msg: data.message
-                      });
-
-                      // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
-                      let claveUnicaRegistro = data.id;
-
-                      // nótese que siempre, al registrar cambios, leemos el registro desde sql server; la idea es
-                      // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
-                      // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
-                      // encontrar nada ...
-                      inicializarItem(claveUnicaRegistro, $scope);
-                  };
-              },
-              function (err) {
-
+              if (err) {
                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
@@ -697,58 +708,91 @@ AngularApp.controller("ProveedoresClientes_Lista_Controller",
                       type: 'danger',
                       msg: errorMessage
                   });
+
                   $scope.showProgress = false;
-              });
-      };
+                  $scope.$apply();
+
+                  return;
+              }
+
+              if (result.error) {
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'danger',
+                      msg: result.message
+                  });
+                  $scope.showProgress = false;
+                  $scope.$apply();
+              } else {
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'info',
+                      msg: result.message
+                  });
+
+                  // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
+                  let claveUnicaRegistro = result.id;
+
+                  // nótese que siempre, al registrar cambios, leemos el registro desde sql server; la idea es
+                  // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
+                  // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
+                  // encontrar nada ...
+                  inicializarItem(claveUnicaRegistro, $scope);
+              }
+          })
+      }
 
 
-         // ------------------------------------------------------------------------------------------------------
-         // para recibir los eventos desde la tarea en el servidor ...
-         EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'leerBancosProveedoresDesdeSqlServer' });
-         EventDDP.addListener('bancos_proveedores_reportProgressDesdeSqlServer', function(process) {
+     // ------------------------------------------------------------------------------------------------------
+     // para recibir los eventos desde la tarea en el servidor ...
+     EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'leerBancosProveedoresDesdeSqlServer' });
+     EventDDP.addListener('bancos_proveedores_reportProgressDesdeSqlServer', function(process) {
 
-             $scope.processProgress.current = process.current;
-             $scope.processProgress.max = process.max;
-             $scope.processProgress.progress = process.progress;
-             // if we don't call this method, angular wont refresh the view each time the progress changes ...
-             // until, of course, the above process ends ...
-             $scope.$apply();
-         });
-         // ------------------------------------------------------------------------------------------------------
+         $scope.processProgress.current = process.current;
+         $scope.processProgress.max = process.max;
+         $scope.processProgress.progress = process.progress;
+         // if we don't call this method, angular wont refresh the view each time the progress changes ...
+         // until, of course, the above process ends ...
+         $scope.$apply();
+     });
+     // ------------------------------------------------------------------------------------------------------
 
-         Meteor.call('bancos_leerCatalogosProveedoresDesdeSql', (err, result) => {
+     $scope.showProgress = true;
+     Meteor.call('bancos.proveedores.leerTablasCatalogosDesdeSqlServer', (err, result) => {
 
-             if (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+         if (err) {
+             let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
-                 $scope.alerts.length = 0;
-                 $scope.alerts.push({
-                     type: 'danger',
-                     msg: errorMessage
-                 });
-
-                 $scope.showProgress = false;
-                 $scope.$apply();
-                 return;
-             };
-
-             let catalogos = JSON.parse(result);
-
-             $scope.categoriasRetencion = catalogos.categoriasRetencion;
-             $scope.ciudades = catalogos.ciudades;
+             $scope.alerts.length = 0;
+             $scope.alerts.push({
+                 type: 'danger',
+                 msg: errorMessage
+             });
 
              $scope.showProgress = false;
              $scope.$apply();
-         });
+             return;
+         };
 
-         // ------------------------------------------------------------------------------------------------
-         // cuando el usuario sale de la página, nos aseguramos de detener (ie: stop) el subscription,
-         // para limpiar los items en minimongo ...
-         $scope.$on('$destroy', function() {
-             if (subscriptionHandle && subscriptionHandle.stop) {
-                 subscriptionHandle.stop();
-             };
-         });
+         let catalogos = JSON.parse(result);
+
+         $scope.categoriasRetencion = catalogos.categoriasRetencion;
+         $scope.ciudades = catalogos.ciudades;
+         $scope.atributos = catalogos.atributos;
+         $scope.titulos = catalogos.titulos;
+
+         $scope.showProgress = false;
+         $scope.$apply();
+     })
+
+     // ------------------------------------------------------------------------------------------------
+     // cuando el usuario sale de la página, nos aseguramos de detener (ie: stop) el subscription,
+     // para limpiar los items en minimongo ...
+     $scope.$on('$destroy', function() {
+         if (subscriptionHandle && subscriptionHandle.stop) {
+             subscriptionHandle.stop();
+         };
+     })
 }
 ]);
 
@@ -763,12 +807,14 @@ function inicializarItem(proveedorID, $scope) {
                 proveedor: 0,
                 ingreso: new Date(),
                 ultAct: new Date(),
+                personas: [],
                 usuario: usuario ? usuario.emails[0].address : null,
                 docState: 1
             };
 
           $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
           $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
+
           $scope.showProgress = false;
     }
     else {
@@ -792,6 +838,7 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
             });
 
             $scope.showProgress = false;
+
             $scope.$apply();
             return;
         };
@@ -799,7 +846,7 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
         $scope.proveedor = {};
         $scope.proveedor = JSON.parse(result);
 
-        if ($scope.proveedor == null) {
+        if (!$scope.proveedor || ($scope.proveedor && lodash.isEmpty($scope.proveedor))) {
             // el usuario eliminó el empleado y, por eso, no pudo se leído desde sql
             $scope.proveedor = {};
             $scope.showProgress = false;
@@ -812,8 +859,16 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
         $scope.proveedor.ingreso = $scope.proveedor.ingreso ? moment($scope.proveedor.ingreso).toDate() : null;
         $scope.proveedor.ultAct = $scope.proveedor.ultAct ? moment($scope.proveedor.ultAct).toDate() : null;
 
+        if ($scope.proveedor.personas) {
+            $scope.proveedor.personas.forEach((x) => {
+                x.ingreso = x.ingreso ? moment(x.ingreso).toDate() : null;
+                x.ultAct = x.ultAct ? moment(x.ultAct).toDate() : null;
+            })
+        }
+        
         // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
         $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
+
         $scope.showProgress = false;
         $scope.$apply();
     });

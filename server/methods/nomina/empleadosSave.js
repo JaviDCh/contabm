@@ -1,6 +1,6 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import lodash from 'lodash'; 
+import lodash from 'lodash';
 import moment from 'moment';
 
 Meteor.methods(
@@ -18,7 +18,6 @@ Meteor.methods(
             delete empleado.docState;
 
             // debemos asignar algunos valores antes de agregar el asiento a mongo y a sql server
-
             empleado.sueldos.forEach((x) => { delete x.docState; });
             empleado.faltas.forEach((x) => { delete x.docState; });
 
@@ -129,7 +128,6 @@ Meteor.methods(
             // ---------------------------------------------------------------------
             // recorremos los items que el usuario editó en el array; agregamos de
             // acuerdo a 'docState' ...
-
             if (!_.isArray(empleado_sql.sueldos))
                 empleado_sql.sueldos = [];
 

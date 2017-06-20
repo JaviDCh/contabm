@@ -10,7 +10,11 @@ Meteor.methods(
         let response = null;
         response = Async.runSync(function(done) {
             Proveedores_sql.findAll({ where: { proveedor: pk },
-                    raw: true,
+                include: [
+                    { model: Personas_sql,
+                      as: 'personas', },
+                ],
+                    // raw: true,       // aparentemente, cuando hay Includes, el 'raw' no funciona del todo bien ...
                 })
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
@@ -20,15 +24,22 @@ Meteor.methods(
         if (response.error)
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
 
-        let proveedor = response.result[0];
+        let proveedor = {};
 
-        // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
-        if (!proveedor)
-            return null;
+        if (response && response.result && response.result.length) {
+            proveedor = response.result[0].dataValues;
 
-        // ajustamos las fechas para revertir la conversión que ocurre, para intentar convertir desde utc a local
-        proveedor.ingreso = proveedor.ingreso ? moment(proveedor.ingreso).add(TimeOffset, 'hours').toDate() : null;
-        proveedor.ultAct = proveedor.ultAct ? moment(proveedor.ultAct).add(TimeOffset, 'hours').toDate() : null;
+            // ajustamos las fechas para revertir la conversión que ocurre, para intentar convertir desde utc a local
+            proveedor.ingreso = proveedor.ingreso ? moment(proveedor.ingreso).add(TimeOffset, 'hours').toDate() : null;
+            proveedor.ultAct = proveedor.ultAct ? moment(proveedor.ultAct).add(TimeOffset, 'hours').toDate() : null;
+
+            if (proveedor.personas) {
+                proveedor.personas.forEach((p) => {
+                    p.ingreso = p.ingreso ? moment(p.ingreso).add(TimeOffset, 'hours').toDate() : null;
+                    p.ultAct = p.ultAct ? moment(p.ultAct).add(TimeOffset, 'hours').toDate() : null;
+                });
+            }
+        }
 
         return JSON.stringify(proveedor);
     }

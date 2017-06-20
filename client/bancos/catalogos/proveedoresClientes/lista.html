@@ -1,5 +1,4 @@
 
-
 <div class="row">
     <div class="col-sm-6 col-sm-offset-3" style="text-align: center; vertical-align: middle; ">
         <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
@@ -70,6 +69,10 @@
                 <a href="#" ng-click="aplicarFiltro()" class="btn btn-primary btn-sm pull-right" style="min-width: 80px; margin-left: 20px; ">
                     Aplicar filtro
                 </a>
+
+                <a href="#" ng-click="nuevo()" class="btn btn-default btn-sm pull-right" style="min-width: 80px; margin-right: 20px; ">
+                    Nuevo
+                </a>
             </div>
         </tab>
 
@@ -105,6 +108,15 @@
                     </div>
                 </div>
             </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-12 col-sm-offset-0" style="text-align: right; ">
+                    <button class="btn btn-default btn-sm" style="min-width: 80px; " ng-click="nuevo()">
+                        Nuevo
+                    </button>
+                </div>
+            </div>
         </tab>
         <tab heading="Detalles" active="activeTab.tab3">
 
@@ -123,6 +135,8 @@
                                     <li class="divider-vertical-small"></li>
                                     <li><a href="#" ng-click="nuevo()" class="navbar_custom_small_node">Nuevo&nbsp;&nbsp;<span class="fa fa-file-o"></span></a></li>
                                     <li><a href="#" ng-click="eliminar()" class="navbar_custom_small_node">Eliminar&nbsp;&nbsp;<span class="fa fa-times"></span></a></li>
+                                    <li class="divider-vertical-small"></li>
+                                    <li><a href="#" ng-click="mostrarPersonas()" class="navbar_custom_small_node">Personas&nbsp;&nbsp;<span class="fa fa-users"></span></a></li>
                                 </ul>
                             </div>
                         </div>

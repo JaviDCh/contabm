@@ -28,6 +28,34 @@ if (Meteor.isServer) {
 // en algún momento tenemos que unificar y tener *un solo schema* y, tal vez, dejar de leer
 // proveedores como un catálogo, en copiar catálogos, pues siempre resulta demasiado costoso ...
 // ---------------------------------------------------------------------------------------------------
+
+Personas_SimpleSchema = new SimpleSchema({
+    persona: { type: Number, label: 'Persona', optional: false, },
+    compania: { type: Number, label: 'Compania', optional: false, },
+    nombre: { type: String, label: 'Nombre', optional: false, min: 1, max: 50, },
+    apellido: { type: String, label: 'Apellido', optional: false, min: 1, max: 50, },
+    cargo: { type: Number, label: 'Cargo', optional: false, },
+    titulo: { type: String, label: 'Titulo', optional: false, min: 1, max: 10, },
+    rif: { type: String, label: 'Rif', optional: true, min: 0, max: 20, },
+    diaCumpleAnos: { type: Number, label: 'Día cumple años', optional: true },
+    mesCumpleAnos: { type: Number, label: 'Mes cumple años', optional: true },
+
+    telefono: { type: String, label: 'Teléfono', optional: true, min: 0, max: 25,  },
+    departamento: { type: Number, label: 'Departamento', optional: true },
+    fax: { type: String, label: 'Fax', optional: true, min: 0, max: 25,  },
+    celular: { type: String, label: 'Celular', optional: true, min: 0, max: 25, },
+    email: { type: String, label: 'Email', optional: true, min: 0, max: 50, },
+    atributo: { type: Number, label: 'Atributo', optional: true },
+    notas: { type: String, label: 'Notas', optional: true, min: 0, max: 250, },
+    defaultFlag: { type: Boolean, label: 'Default??', optional: true, },
+
+    ingreso: { type: Date, label: 'Ingreso', optional: false },
+    ultAct: { type: Date, label: 'Ult act', optional: false },
+    usuario: { type: String, label: 'Usuario', optional: false, min: 0, max: 125, },
+    docState: { type: Number, optional: true, },
+});
+
+
 Proveedores_SimpleSchema = new SimpleSchema({
     proveedor: { type: Number, label: 'Proveedor', optional: false },
     nombre: { type: String, label: 'Nombre', optional: false, min: 1, max: 70, },
@@ -67,6 +95,11 @@ Proveedores_SimpleSchema = new SimpleSchema({
     ingreso: { type: Date, label: 'Ingreso', optional: false },
     ultAct: { type: Date, label: 'UltAct', optional: false },
     usuario: { type: String, label: 'Usuario', optional: false, min: 1, max: 125, },
+
+    personas: {
+        type: [Personas_SimpleSchema],
+        minCount: 0,
+    },
 
     docState: { type: Number, optional: true, },
 });

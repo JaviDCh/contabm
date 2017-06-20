@@ -132,24 +132,6 @@ function ($scope, $modalInstance, $modal, empleado, companiaSeleccionadaDoc, ori
     ];
 
 
-
-
-    //
-    //
-    // let empleadoSueldos_simpleSchema = new SimpleSchema({
-    //     id: { type: Number, label: "ID", optional: false, },
-    //     empleadoID: { type: Number, label: "EmpleadoID", optional: false, },
-    //     desde: { type: Date, label: "Desde", optional: false, },
-    //     sueldo: { type: Number, label: "Sueldo", optional: false, decimal: true, },
-    //     docState: { type: Number, optional: true },
-    // });
-    //
-    //
-    //
-
-
-
-
     $scope.deleteItem = function (item) {
         if (item.docState && item.docState === 1)
             // si el item es nuevo, simplemente lo eliminamos del array

@@ -44,3 +44,35 @@ Proveedores_sql = sequelize.define('proveedores_sql', {
 }, {
      tableName: 'Proveedores'
 });
+
+
+Personas_sql = sequelize.define('personas_sql', {
+    persona: { type: Sequelize.INTEGER, field: 'Persona', primaryKey: true, autoIncrement: true, allowNull: false },
+    compania: { type: Sequelize.INTEGER, field: 'Compania', allowNull: false, },
+    nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, validate: { len: [1, 50] }, },
+    apellido: { type: Sequelize.STRING, field: 'Apellido', allowNull: false, validate: { len: [1, 50] }, },
+    cargo: { type: Sequelize.INTEGER, field: 'Cargo', allowNull: false, },
+    titulo: { type: Sequelize.STRING, field: 'Titulo', allowNull: false, validate: { len: [1, 10] }, },
+    rif: { type: Sequelize.STRING, field: 'Rif', allowNull: true, validate: { len: [1, 20] }, },
+    diaCumpleAnos: { type: Sequelize.INTEGER, field: 'DiaCumpleAnos', allowNull: true },
+    mesCumpleAnos: { type: Sequelize.INTEGER, field: 'MesCumpleAnos', allowNull: true },
+
+    telefono: { type: Sequelize.STRING, field: 'Telefono', allowNull: true, validate: { len: [1, 25] },  },
+    departamento: { type: Sequelize.INTEGER, field: 'Departamento', allowNull: true },
+    fax: { type: Sequelize.STRING, field: 'Fax', allowNull: true, validate: { len: [1, 25] },  },
+    celular: { type: Sequelize.STRING, field: 'Celular', allowNull: true, validate: { len: [1, 25] }, },
+    email: { type: Sequelize.STRING, field: 'Email', allowNull: true, validate: { len: [1, 50] }, },
+    atributo: { type: Sequelize.INTEGER, field: 'Atributo', allowNull: true },
+    notas: { type: Sequelize.STRING, field: 'Notas', allowNull: true, validate: { len: [1, 250] }, },
+    defaultFlag: { type: Sequelize.BOOLEAN, field: 'DefaultFlag', allowNull: true, },
+
+    ingreso: { type: Sequelize.DATE, field: 'Ingreso', allowNull: false },
+    ultAct: { type: Sequelize.DATE, field: 'UltAct', allowNull: false },
+    usuario: { type: Sequelize.STRING, field: 'Usuario', allowNull: false, validate: { len: [1, 125] }, },
+}, {
+     tableName: 'Personas'
+});
+
+
+Proveedores_sql.hasMany(Personas_sql, { as: 'personas', foreignKey: 'compania' } );
+Personas_sql.belongsTo(Proveedores_sql, { as: 'proveedor', foreignKey: 'compania' } );
