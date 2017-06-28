@@ -149,8 +149,7 @@ textarea.form-control {
     font-weight: bold !important;
 }
 
-/* fieldset: b�sicamente, para revertir el fieldset a su dise�o original (en vez de bootstrap) */
-
+/* fieldset: básicamente, para revertir el fieldset a su diseño original (en vez de bootstrap) */
 fieldset.scheduler-border {
     border: 1px groove #BEE0F3 !important;
     padding: 0 1.4em 0.5em 1.4em !important;

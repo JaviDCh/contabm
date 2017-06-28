@@ -108,6 +108,7 @@ nav {
 
 .validation-message {
     color: red;
+    font-size: x-small;
 }
 
 hr.blueLine {

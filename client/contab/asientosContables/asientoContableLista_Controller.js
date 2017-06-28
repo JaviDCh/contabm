@@ -61,9 +61,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             controller: 'ImprimirListadoAsientosContablesModalController',
             size: 'md',
             resolve: {
-                // riesgo: function () {
-                //     return $scope.riesgo;
-                // },
+                ciaSeleccionada: function () {
+                    return companiaContab;
+                },
             }
         }).result.then(
               function (resolve) {

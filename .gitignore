@@ -2,5 +2,10 @@ node_modules/
 pdfMake_from_bower/imports/build/pdfmake.min.js
 pdfMake_from_bower/imports/build/pdfmake.min.js.map
 pdfMake_from_bower/imports/build/vfs_fonts.js
+
+pdfMake_from_bower/build/pdfmake.min.js
+pdfMake_from_bower/build/pdfmake.min.js.map
+pdfMake_from_bower/build/vfs_fonts.js
+
 run.bat
 settings.json

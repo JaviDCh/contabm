@@ -104,7 +104,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
             // ------------------------------------------------------------------------------------------------------
             // guardamos el filtro indicado por el usuario
-
             if (Filtros.findOne({ nombre: 'asientosContables', userId: Meteor.userId() }))
                 // el filtro existía antes; lo actualizamos
                 // validate false: como el filtro puede ser vacío (ie: {}), simple schema no permitiría eso; por eso saltamos la validación
@@ -259,8 +258,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         // if we don't call this method, angular wont refresh the view each time the progress changes ...
         // until, of course, the above process ends ...
         $scope.$apply();
-
-        // debugger;
     });
 }
 ]);
