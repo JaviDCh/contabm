@@ -1,14 +1,24 @@
 
-AngularApp.controller('BancosConciliacionBancariaImportarDesdeExcel_Controller',
-['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancariaID', 'companiaSeleccionada',
-function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, companiaSeleccionada) {
+import XLSX from "XLSX";
+import lodash from "lodash";
+import moment from "moment";
 
-    // debugger;
+AngularApp.controller('BancosConciliacionBancariaImportarDesdeExcel_Controller',
+['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancaria', 'companiaSeleccionada',
+function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, companiaSeleccionada) {
+
     // ui-bootstrap alerts ...
     $scope.alerts = [];
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
+    };
+
+    // para reportar el progreso de la tarea en la página
+    $scope.processProgress = {
+        current: 0,
+        max: 0,
+        progress: 0
     };
 
     $scope.ok = function () {
@@ -32,6 +42,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
 
     // para cargar el array de lineas desde el documento Excel
     let lineasLeidasDesdeExcel = [];
+    $scope.form = {};
 
     $scope.submit_TratarFilesForm = function () {
 
@@ -50,9 +61,9 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
               return;
           };
 
-          if ($scope.tratarFilesForm.$valid) {
+          if ($scope.form.tratarFilesForm.$valid) {
               $scope.submitted = false;
-              $scope.tratarFilesForm.$setPristine();    // para que la clase 'ng-submitted deje de aplicarse a la forma ... button
+              $scope.form.tratarFilesForm.$setPristine();    // para que la clase 'ng-submitted deje de aplicarse a la forma ... button
 
               $scope.showProgress = true;
 
@@ -63,6 +74,10 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
 
               let lineasExcelLeidas = 0;
               let lineasExcelObviadas = 0;
+
+              // si en el documento Excel viene el día y no la fecha, usamos el mes y año de esta fecha para construir la fecha de
+              // cada movimiento que viene del banco ...
+              let desde = conciliacionBancaria.desde;
 
               reader.onload = function(e) {
                     let data = e.target.result;
@@ -80,13 +95,15 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
 
                     lineasEnDocumentoExcel.forEach((linea) => {
 
-                        let numero = linea['numero'] ? linea['numero'].toString() : "";
-                        numero = linea['número'] ? linea['número'].toString() : "";
+                        let numero = linea['número'] ? linea['número'].toString() : "";
                         let tipo = linea['tipo'] ? linea['tipo'] : null;
                         let fecha = linea['fecha'] ? linea['fecha'] : null;
                         let beneficiario = linea['beneficiario'] ? linea['beneficiario'] : null;
                         let concepto = linea['concepto'] ? linea['concepto'] : null;
                         let monto = linea['monto'] ? linea['monto'] : null;
+                        let dia = linea['día'] ? linea['día'] : null;
+                        let creditos = linea['créditos'] ? linea['créditos'] : null;
+                        let debitos = linea['débitos'] ? linea['débitos'] : null;
 
                         // intentamos convertir el monto y la fecha a valores adecuados
                         // Excel regresa un entero, cantidad de días desde 1.900, para las fechas
@@ -94,29 +111,93 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                             fecha = FuncionesGlobales.getJsDateFromExcel(fecha);
                             // aparentemte, si quitamos la hora a la fecha anterior, queda la fecha
                             // del día en forma adecuada; lo hacemos con moment
-                            fecha = moment(moment(fecha).format("YYYY-MM-DD"), "YYYY-MM-DD").toDate(); 
-                        };
+                            fecha = moment(moment(fecha).format("YYYY-MM-DD"), "YYYY-MM-DD").toDate();
+                        }
 
                         // si la fecha no vino como un entero (ej: 40603), tal vez sea un verdadero date
                         // pero como un string ...
                         if (!_.isDate(fecha) && moment(fecha, ValidDateFormats, true).isValid()) {
                             // la fecha no es válida pero es un string válido
                             fecha = moment(fecha).toDate();
-                        };
+                        }
+
+                        // si el campo fecha no vino en el doc Excel, pero si un campo Día, construimos la fecha a partir
+                        // de él
+                        if (!fecha && dia) {
+                            // día debe ser un entero de 1 a 30
+                            if (dia && lodash.isInteger(dia) && dia >= 1 && dia <= 31 ) {
+                                try {
+                                    fecha = new Date(desde.getFullYear(), desde.getMonth(), dia);
+                                } catch (ex) {
+                                    $scope.alerts.length = 0;
+                                    $scope.alerts.push({
+                                        type: 'danger',
+                                        msg: `Error al intentar construir una fecha usando el día ${dia.toString()} y la fecha
+                                              de inicio de la conciliación.<br /><br />
+                                              Probablemente el día no corresponde en forma adecuada al mes en la
+                                              fecha ${moment(desde).format("DD-MM-YYYY")}.<br />
+                                              Por favor revise esta situación en el documento Excel que contiene los movimientos bancarios
+                                              registrados por el banco.
+                                              `
+                                    });
+
+                                    return;
+                                }
+                            }
+                        }
 
                         // por ahora, el monto debe siempre venir en español: 1000,75 o 1.000,75 ...
                         // pero lo convertimos a un Number válido en JS ...
                         if (monto) {
                             if (!lodash.isFinite(monto)) {
                                 monto = monto.toString().trim();
-                                monto = monto.replace(".", "");
+                                monto = monto.replace(/\./gi, "");
                                 monto = monto.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
                                 // validamos que el string sea un Number
                                 if (!isNaN(parseFloat(monto)) && isFinite(monto)) {
                                     monto = parseFloat(monto);
-                                };
-                            };
-                        };
+                                }
+                            }
+                        }
+
+                        // nótese como también hacemos un parsing a los campos créditos y débitos; la idea es usar estos montos solo
+                        // si vienen y no viene el monto
+                        if (creditos) {
+                            if (!lodash.isFinite(creditos)) {
+                                creditos = creditos.toString().trim();
+                                creditos = creditos.replace("â€", "");
+                                creditos = creditos.replace(/\./gi, "");
+                                creditos = creditos.replace("-", "");
+                                creditos = creditos.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
+                                // validamos que el string sea un Number
+                                if (!isNaN(parseFloat(creditos)) && isFinite(creditos)) {
+                                    creditos = parseFloat(creditos);
+                                }
+                            }
+                        }
+
+                        if (debitos) {
+                            if (!lodash.isFinite(debitos)) {
+                                debitos = debitos.toString().trim();
+                                debitos = debitos.replace("â€", "");
+                                debitos = debitos.replace(/\./gi, "");
+                                debitos = debitos.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
+                                // validamos que el string sea un Number
+                                if (!isNaN(parseFloat(debitos)) && isFinite(debitos)) {
+                                    debitos = parseFloat(debitos);
+                                    debitos *= -1;         // siempre asumimos que un crédito es un monto negativo ...
+                                }
+                            }
+                        }
+
+                        // solo intentamos usar los campos créditos/débitos si no viene un monto y vienen éstos ...
+                        if (!monto && creditos) {
+                            monto = creditos;
+                        }
+
+                        if (!monto && debitos) {
+                            monto = debitos;
+                        }
 
                         // isFinite valida que el valor corresponda a un Number, pero no NaN or Infinity
                         if (fecha && lodash.isDate(fecha) && monto && lodash.isFinite(monto)) {
@@ -134,7 +215,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                             lineasExcelLeidas++;
                         } else {
                             lineasExcelObviadas++;
-                        };
+                        }
                     });
 
 
@@ -158,7 +239,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
 
               reader.readAsBinaryString(f);
         };
-    };
+    }
 
 
     $scope.registrarMovimientosBanco = () => {
@@ -166,7 +247,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
         $scope.showProgress = true;
 
         $meteor.call('bancos_conciliacion_GrabarMovtosBanco',
-                     conciliacionBancariaID,
+                     conciliacionBancaria._id,
                      JSON.stringify(lineasLeidasDesdeExcel)).then(
             function (data) {
 
@@ -187,7 +268,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                     });
 
                     $scope.showProgress = false;
-                };
+                }
             },
             function (err) {
                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -213,6 +294,20 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
         $(":file").filestyle({iconName: "glyphicon-file"});
         $(":file").filestyle('size', 'sm');
         // $(":file").filestyle({input: false});
+    })
+
+
+    // ------------------------------------------------------------------------------------------------------
+    // para recibir los eventos desde la tarea en el servidor ...
+    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'conciliacionesBancarias' });
+    EventDDP.addListener('bancos_conciliacionBancaria_reportProgress', function(process) {
+
+        $scope.processProgress.current = process.current;
+        $scope.processProgress.max = process.max;
+        $scope.processProgress.progress = process.progress;
+        // if we don't call this method, angular wont refresh the view each time the progress changes ...
+        // until, of course, the above process ends ...
+        $scope.$apply();
     });
 }
 ]);

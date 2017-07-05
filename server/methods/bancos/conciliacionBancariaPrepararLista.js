@@ -1,9 +1,11 @@
 
+import numeral from 'numeral';
+import moment from 'moment';
+
 Meteor.methods(
 {
     conciliacionBancariaPrepararLista: function (filtro, ciaContab) {
 
-        // debugger;
         let filtro2 = JSON.parse(filtro);
 
         new SimpleSchema({

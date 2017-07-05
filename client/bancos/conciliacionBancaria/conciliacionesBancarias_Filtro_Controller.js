@@ -1,9 +1,10 @@
 
+import lodash from 'lodash';
+
 AngularApp.controller("Bancos_ConciliacionesBancarias_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 
-    // debugger;
     $scope.showProgress = false;
 
     // para reportar el progreso de la tarea en la página
@@ -27,9 +28,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
     // -------------------------------------------------------------------------------------------
     // leemos los catálogos en el $scope
-
     $scope.helpers({
-
         bancos: () => {
             return Bancos.find( {}, { fields: { banco: 1, nombre: 1 }} );
         },
@@ -37,15 +36,12 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         monedas: () => {
             return Monedas.find( {}, { fields: { moneda: 1, descripcion: 1, simbolo: 1 }} );
         },
-
     });
-
 
     // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
     $scope.limpiarFiltro = function () {
         $scope.filtro = {};
     };
-
 
     $scope.nuevo = function () {
         $state.go('bancos.conciliacionesBancarias.conciliacionBancaria', {
@@ -59,7 +55,6 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
     $scope.limpiarFiltro = function () {
         $scope.filtro = {};
     };
-
 
     $scope.aplicarFiltroYAbrirLista = function () {
 
@@ -159,7 +154,6 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         // if we don't call this method, angular wont refresh the view each time the progress changes ...
         // until, of course, the above process ends ...
         $scope.$apply();
-        // debugger;
     });
 }
 ]);

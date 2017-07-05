@@ -10,6 +10,13 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
         $scope.alerts.splice(index, 1);
     };
 
+    // para reportar el progreso de la tarea en la página
+    $scope.processProgress = {
+        current: 0,
+        max: 0,
+        progress: 0
+    };
+
     $scope.ok = function () {
         $modalInstance.close("Ok");
     };
@@ -92,6 +99,8 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
 
 
     $scope.submit_CompararMovimientosForm = function () {
+        $scope.showProgress = true;
+
           $scope.submitted = true;
           $scope.alerts.length = 0;
 
@@ -104,8 +113,9 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                         Ud. debe seleccionar al menos uno de los criterios de comparación mostrados.`
               });
 
+              $scope.showProgress = false;
               return;
-          };
+          }
 
           if ($scope.compararMovimientosForm.$valid) {
               $scope.submitted = false;
@@ -114,7 +124,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
               let mantenerComparacionesAnteriores = $scope.criterio.mantenerComparacionesAnteriores;
               if (!mantenerComparacionesAnteriores) {
                   mantenerComparacionesAnteriores = false;
-              };
+              }
 
               $meteor.call('bancos_conciliacion_CompararMovimientos',
                            conciliacionBancariaID,
@@ -139,7 +149,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                           });
 
                           $scope.showProgress = false;
-                      };
+                      }
                   },
                   function (err) {
                       let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -151,8 +161,20 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                       });
                       $scope.showProgress = false;
                   });
-          };
+          }
+    }
 
-    };
+    // ------------------------------------------------------------------------------------------------------
+    // para recibir los eventos desde la tarea en el servidor ...
+    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'conciliacionesBancarias' });
+    EventDDP.addListener('bancos_conciliacionBancaria_reportProgress', function(process) {
+
+        $scope.processProgress.current = process.current;
+        $scope.processProgress.max = process.max;
+        $scope.processProgress.progress = process.progress;
+        // if we don't call this method, angular wont refresh the view each time the progress changes ...
+        // until, of course, the above process ends ...
+        $scope.$apply();
+    });
 }
 ]);

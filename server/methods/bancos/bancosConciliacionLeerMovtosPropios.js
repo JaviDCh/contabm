@@ -1,9 +1,12 @@
 
+import moment from 'moment';
+import numeral from 'numeral';
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+
 Meteor.methods(
 {
     bancos_conciliacion_LeerMovtosPropios: function (conciliacionID) {
 
-        // debugger;
         new SimpleSchema({
             conciliacionID: { type: String, optional: false }
           }).validate({ conciliacionID });
@@ -61,6 +64,17 @@ Meteor.methods(
         // eliminamos los items en la tabla en mongo
         ConciliacionesBancarias_movimientosPropios.remove({ conciliacionID: conciliacionID });
 
+        // -------------------------------------------------------------------------------------------------------------
+        // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
+        let numberOfItems = response.result.length;
+        let reportarCada = Math.floor(numberOfItems / 10);
+        let reportar = 0;
+        let cantidadRecs = 0;
+        EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                            { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                            { current: 1, max: 1, progress: '0 %' });
+        // -------------------------------------------------------------------------------------------------------------
+
         // para identificar cada movimiento con un simple número local al proceso...
         let consecutivo = 1;
         response.result.forEach((item) => {
@@ -78,14 +92,33 @@ Meteor.methods(
             movimientoBancario.monto = item.monto;
             movimientoBancario.fechaEntregado = item.fechaEntregado ? moment(item.fechaEntregado).add(TimeOffset, 'hours').toDate() : null;
             movimientoBancario.conciliado = 'no';
-            
+
             ConciliacionesBancarias_movimientosPropios.insert(movimientoBancario);
             consecutivo++;
-        });
 
-        let message = `Ok, ${response.result.length.toString()} movimientos bancarios han sido leídos
-                       desde la base de datos, para la cuenta bancaria y el período indicados para la
-                       conciliación bancaria.`;
+            // -------------------------------------------------------------------------------------------------------
+            // vamos a reportar progreso al cliente; solo 20 veces ...
+            cantidadRecs++;
+            if (numberOfItems <= 10) {
+                // hay menos de 20 registros; reportamos siempre ...
+                EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                                    { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                                    { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
+            }
+            else {
+                reportar++;
+                if (reportar === reportarCada) {
+                    EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                                        { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                                        { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
+                    reportar = 0;
+                }
+            }
+            // -------------------------------------------------------------------------------------------------------
+        })
+
+        let message = `Ok, <b>${response.result.length.toString()}</b> movimientos bancarios han sido leídos
+                       desde la base de datos, para la <b>cuenta bancaria</b> y el <b>período</b> indicados.`;
 
         return {
             error: false,
