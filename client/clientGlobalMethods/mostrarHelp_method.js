@@ -1,6 +1,5 @@
 
 let mostrarHelp = (currentStateName) => {
-
     // abrimos un página, en un tab separado, que muestra un help para el state actual.
     // NOta: normalmente, el help para cada state será un post en el blog que mantenemos para contab ...
     switch (currentStateName) {
@@ -49,6 +48,13 @@ let mostrarHelp = (currentStateName) => {
         }
         case 'administracion.utilitarios.eliminarCompaniasContab': {
           window.open('https://smrsoftware.wordpress.com/2017/05/31/contabm-como-eliminar-una-compania/', '_blank');
+          break;
+        }
+        case 'bancos.conciliacionesBancarias':
+        case 'bancos.conciliacionesBancarias.filter':
+        case 'bancos.conciliacionesBancarias.lista':
+        case 'bancos.conciliacionesBancarias.conciliacionBancaria': {
+          window.open('https://smrsoftware.wordpress.com/2013/10/18/bancosconciliacin-bancaria/', '_blank');
           break;
         }
         default:

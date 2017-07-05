@@ -1,9 +1,10 @@
 
+import numeral from 'numeral'; 
+
 AngularApp.controller("Bancos_ConciliacionesBancarias_List_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 
-    //debugger;
     $scope.showProgress = false;
 
     // ui-bootstrap alerts ...

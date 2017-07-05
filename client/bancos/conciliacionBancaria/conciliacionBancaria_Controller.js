@@ -1,9 +1,18 @@
 
+import lodash from 'lodash';
+
 AngularApp.controller("Bancos_ConciliacionesBancarias_ConciliacionBancaria_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
       $scope.showProgress = false;
+
+      // para reportar el progreso de la tarea en la página
+      $scope.processProgress = {
+          current: 0,
+          max: 0,
+          progress: 0
+      };
 
       // ui-bootstrap alerts ...
       $scope.alerts = [];
@@ -340,159 +349,159 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
       ];
 
 
-            let movimientosBanco_ui_grid_api = null;
-            let movimientoBancoSeleccionado = {};
+    let movimientosBanco_ui_grid_api = null;
+    let movimientoBancoSeleccionado = {};
 
-            $scope.movimientosBanco_ui_grid = {
+    $scope.movimientosBanco_ui_grid = {
 
-                enableSorting: true,
-                showGridFooter: true,
-                showColumnFooter: false,
-                enableRowSelection: true,
-                enableFiltering: true,
-                enableRowHeaderSelection: false,
-                multiSelect: false,
-                enableSelectAll: false,
-                selectionRowHeaderWidth: 0,
-                rowHeight: 25,
+        enableSorting: true,
+        showGridFooter: true,
+        showColumnFooter: false,
+        enableRowSelection: true,
+        enableFiltering: true,
+        enableRowHeaderSelection: false,
+        multiSelect: false,
+        enableSelectAll: false,
+        selectionRowHeaderWidth: 0,
+        rowHeight: 25,
 
-                onRegisterApi: function (gridApi) {
+        onRegisterApi: function (gridApi) {
 
-                    movimientosBanco_ui_grid_api = gridApi;
+            movimientosBanco_ui_grid_api = gridApi;
 
-                    gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                        //debugger;
-                        movimientoBancoSeleccionado = {};
+            gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+                //debugger;
+                movimientoBancoSeleccionado = {};
 
-                        if (row.isSelected) {
-                            movimientoBancoSeleccionado = row.entity;
-                        }
-                        else {
-                            return;
-                        };
-                    });
-                },
-                // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
-                rowIdentity: function (row) {
-                    return row._id;
-                },
-                getRowIdentity: function (row) {
-                    return row._id;
+                if (row.isSelected) {
+                    movimientoBancoSeleccionado = row.entity;
                 }
-            };
+                else {
+                    return;
+                };
+            });
+        },
+        // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
+        rowIdentity: function (row) {
+            return row._id;
+        },
+        getRowIdentity: function (row) {
+            return row._id;
+        }
+    };
 
-            $scope.movimientosBanco_ui_grid.columnDefs = [
-                {
-                    name: 'fecha',
-                    field: 'fecha',
-                    displayName: 'Fecha',
-                    width: '80',
-                    enableFiltering: false,
-                    cellFilter: 'dateFilter',
-                    headerCellClass: 'ui-grid-centerCell',
-                    cellClass: 'ui-grid-centerCell',
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'date'
-                },
-                {
-                    name: 'consecutivo',
-                    field: 'consecutivo',
-                    displayName: '##',
-                    width: '50',
-                    enableFiltering: true,
-                    headerCellClass: 'ui-grid-centerCell',
-                    cellClass: 'ui-grid-centerCell',
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'number'
-                },
-                {
-                    name: 'numero',
-                    field: 'numero',
-                    displayName: 'Número',
-                    width: '100',
-                    enableFiltering: true,
-                    headerCellClass: 'ui-grid-leftCell',
-                    cellClass: 'ui-grid-leftCell',
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'number'
-                },
-                {
-                    name: 'tipo',
-                    field: 'tipo',
-                    displayName: 'Tipo',
-                    width: '60',
-                    headerCellClass: 'ui-grid-centerCell',
-                    cellClass: 'ui-grid-centerCell',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'string'
-                },
-                {
-                    name: 'beneficiario',
-                    field: 'beneficiario',
-                    displayName: 'Beneficiario',
-                    width: '140',
-                    headerCellClass: 'ui-grid-leftCell',
-                    cellClass: 'ui-grid-leftCell',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'string'
-                },
-                {
-                    name: 'concepto',
-                    field: 'concepto',
-                    displayName: 'Concepto',
-                    width: '140',
-                    headerCellClass: 'ui-grid-leftCell',
-                    cellClass: 'ui-grid-leftCell',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'string'
-                },
-                {
-                    name: 'monto',
-                    field: 'monto',
-                    displayName: 'Monto',
-                    width: '100',
-                    headerCellClass: 'ui-grid-rightCell',
-                    cellClass: 'ui-grid-rightCell',
-                    cellFilter: 'currencyFilter',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'number'
-                },
-                {
-                    name: 'conciliado',
-                    field: 'conciliado',
-                    displayName: 'Conciliado',
-                    width: '100',
-                    headerCellClass: 'ui-grid-centerCell',
-                    cellClass: 'ui-grid-centerCell',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'string'
-                },
-                {
-                    name: 'consecutivoMovPropio',
-                    field: 'consecutivoMovPropio',
-                    displayName: '## propio',
-                    width: '80',
-                    headerCellClass: 'ui-grid-centerCell',
-                    cellClass: 'ui-grid-centerCell',
-                    enableFiltering: true,
-                    enableColumnMenu: false,
-                    enableSorting: true,
-                    type: 'number'
-                },
-            ];
+    $scope.movimientosBanco_ui_grid.columnDefs = [
+        {
+            name: 'fecha',
+            field: 'fecha',
+            displayName: 'Fecha',
+            width: '80',
+            enableFiltering: false,
+            cellFilter: 'dateFilter',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'date'
+        },
+        {
+            name: 'consecutivo',
+            field: 'consecutivo',
+            displayName: '##',
+            width: '50',
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'numero',
+            field: 'numero',
+            displayName: 'Número',
+            width: '100',
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'tipo',
+            field: 'tipo',
+            displayName: 'Tipo',
+            width: '60',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'beneficiario',
+            field: 'beneficiario',
+            displayName: 'Beneficiario',
+            width: '140',
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'concepto',
+            field: 'concepto',
+            displayName: 'Concepto',
+            width: '140',
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'monto',
+            field: 'monto',
+            displayName: 'Monto',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'conciliado',
+            field: 'conciliado',
+            displayName: 'Conciliado',
+            width: '100',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'consecutivoMovPropio',
+            field: 'consecutivoMovPropio',
+            displayName: '## propio',
+            width: '80',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+    ];
 
 
 
@@ -624,23 +633,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
       };
 
 
-    //   $scope.helpers({
-    //       chequerasList: () => {
-    //           // chequerasLocal es un 'client collection' que usamos para registrar una lista de chequeras
-    //           // para usar como dataSource en el drop down list en la forma; este 'client collection' es
-    //           // creado en 'filtro' ...
-    //           return Chequeras.find({ cia: companiaContabSeleccionada.numero });
-    //       },
-    //       proveedores: () => {
-    //           return Proveedores.find();
-    //       },
-    //   });
-
-
       $scope.conciliacionBancaria = {};
 
       function inicializarItem() {
-        //   debugger;
           $scope.showProgress = true;
 
           if ($scope.id == "0") {
@@ -691,7 +686,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                                   { conciliacionID: id },
                                   { sort: { consecutivo: 1 } }
                               );
-
                           }
                       });
 
@@ -718,21 +712,47 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
       $scope.cargarMovimientosBancariosPropios = () => {
 
           if ($scope.conciliacionBancaria.docState) {
-              DialogModal($modal, "<em>Conciliaciones bancarias</em>",
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios propios</em>",
                                   "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
                                   "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
           if (!$scope.conciliacionBancaria || !$scope.conciliacionBancaria._id) {
-              DialogModal($modal, "<em>Conciliaciones bancarias</em>",
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios propios</em>",
                                   "Aparentemente, la conciliación bancaria no está completa aún. " +
                                   "Ud. debe completar el registro de esta conciliación antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
+          // revisamos minimongo a ver si ya existen movimientos propios para la conciliación; de ser así, pedimos confirmación al usuario ...
+          let recordCount = ConciliacionesBancarias_movimientosPropios.find({ conciliacionID: $scope.conciliacionBancaria._id }).count();
+
+          if (recordCount) {
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios propios</em>",
+                                  `Ya existen movimientos bancarios <em>propios</em> para la conciliación bancaria.<br /><br />
+                                  Desea continuar y sustituir los movimientos bancarios propios que ahora existen con
+                                  unos nuevos leídos desde la base de datos?
+                                  `,
+                                 true).then(
+                                     (result) => {
+                                         cargarMovimientosBancariosPropios2();
+                                     },
+                                     (err) => {
+                                         // el usuario canceló el diálogo ...
+                                         return;
+                                     }
+                                 );
+          } else {
+              // no existen movimientos bancarios propios; los leemos desde la base de datos ...
+              cargarMovimientosBancariosPropios2();
+          }
+      }
+
+
+      function cargarMovimientosBancariosPropios2() {
           $scope.showProgress = true;
 
           $meteor.call('bancos_conciliacion_LeerMovtosPropios', $scope.conciliacionBancaria._id).then(
@@ -755,7 +775,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       });
 
                       $scope.showProgress = false;
-                  };
+                  }
               },
               function (err) {
                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -766,40 +786,65 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       msg: errorMessage
                   });
                   $scope.showProgress = false;
-              });
-      };
-
+              })
+      }
 
 
       // para leer movimientos del banco y registrarlos en mongo
       $scope.cargarMovimientosBancariosDelBanco = () => {
 
           if ($scope.conciliacionBancaria.docState) {
-              DialogModal($modal, "<em>Conciliaciones bancarias</em>",
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios del banco</em>",
                                   "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
                                   "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
           if (!$scope.conciliacionBancaria || !$scope.conciliacionBancaria._id) {
-              DialogModal($modal, "<em>Conciliaciones bancarias</em>",
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios del banco</em>",
                                   "Aparentemente, la conciliación bancaria no está completa aún. " +
                                   "Ud. debe completar el registro de esta conciliación antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
+          // revisamos minimongo a ver si ya existen movimientos propios para la conciliación; de ser así, pedimos confirmación al usuario ...
+          let recordCount = ConciliacionesBancarias_movimientosBanco.find({ conciliacionID: $scope.conciliacionBancaria._id }).count();
+
+          if (recordCount) {
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos bancarios del banco</em>",
+                                  `Ya existen movimientos bancarios <em>del banco</em> para la conciliación bancaria.<br /><br />
+                                  Desea continuar y sustituir los movimientos bancarios del banco que ahora existen con
+                                  unos nuevos leídos desde el documento Excel?
+                                  `,
+                                 true).then(
+                                     (result) => {
+                                         cargarMovimientosBancariosDelBanco2();
+                                     },
+                                     (err) => {
+                                         // el usuario canceló el diálogo ...
+                                         return;
+                                     }
+                                 );
+          } else {
+              // no existen movimientos bancarios del banco; los leemos desde el documento Excel que indique el usuario ...
+              cargarMovimientosBancariosDelBanco2();
+          }
+      }
+
+
+      function cargarMovimientosBancariosDelBanco2 () {
           // para abrir un modal que permita al usuario leer un doc excel desde el cliente e importar cada row
           // como una cuenta contable
-
           let modalInstance = $modal.open({
               templateUrl: 'client/bancos/conciliacionBancaria/importarDesdeExcelModal.html',
               controller: 'BancosConciliacionBancariaImportarDesdeExcel_Controller',
               size: 'lg',
               resolve: {
-                  conciliacionBancariaID: () => {
-                      return $scope.conciliacionBancaria._id;
+                  conciliacionBancaria: () => {
+                      // pasamos todo el registro de la conciliación bancaria, para tener acceso al _id, desde, ... 
+                      return $scope.conciliacionBancaria;
                   },
                   companiaSeleccionada: () => {
                       return companiaContabSeleccionada;
@@ -810,14 +855,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     return true;
                 },
                 function (cancel) {
-                    // refrescamos el ui-grid, pues agregamos todas las cuentas desde Excel ..
-                    // $scope.cuentasContables_ui_grid.data = [];
-                    // if (_.isArray($scope.cuentasContables))
-                    //    $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
-
                     return true;
                 });
-      };
+      }
 
 
       $scope.compararMovimientosBancarios = () => {
@@ -859,5 +899,18 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                   return true;
               });
           };
+
+          // ------------------------------------------------------------------------------------------------------
+          // para recibir los eventos desde la tarea en el servidor ...
+          EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'conciliacionesBancarias' });
+          EventDDP.addListener('bancos_conciliacionBancaria_reportProgress', function(process) {
+
+              $scope.processProgress.current = process.current;
+              $scope.processProgress.max = process.max;
+              $scope.processProgress.progress = process.progress;
+              // if we don't call this method, angular wont refresh the view each time the progress changes ...
+              // until, of course, the above process ends ...
+              $scope.$apply();
+          });
   }
 ]);

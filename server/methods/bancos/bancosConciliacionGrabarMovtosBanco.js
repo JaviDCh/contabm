@@ -1,4 +1,6 @@
 
+import numeral from 'numeral';
+
 Meteor.methods(
 {
     bancos_conciliacion_GrabarMovtosBanco: function (conciliacion_ID, lineasLeidasDesdeExcel) {
@@ -31,7 +33,18 @@ Meteor.methods(
                 error: true,
                 message: message
             };
-        };
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
+        let numberOfItems = lineasLeidasDesdeExcel.length;
+        let reportarCada = Math.floor(numberOfItems / 10);
+        let reportar = 0;
+        let cantidadRecs = 0;
+        EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                            { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                            { current: 1, max: 1, progress: '0 %' });
+        // -------------------------------------------------------------------------------------------------------------
 
         // eliminamos los items en la tabla en mongo que puedan existir pues se registraron antes ...
         ConciliacionesBancarias_movimientosBanco.remove({ conciliacionID: conciliacion_ID });
@@ -55,7 +68,27 @@ Meteor.methods(
 
             ConciliacionesBancarias_movimientosBanco.insert(movimientoBancario);
             consecutivo++;
-        });
+
+            // -------------------------------------------------------------------------------------------------------
+            // vamos a reportar progreso al cliente; solo 20 veces ...
+            cantidadRecs++;
+            if (numberOfItems <= 10) {
+                // hay menos de 20 registros; reportamos siempre ...
+                EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                                    { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                                    { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
+            }
+            else {
+                reportar++;
+                if (reportar === reportarCada) {
+                    EventDDP.matchEmit('bancos_conciliacionBancaria_reportProgress',
+                                        { myuserId: this.userId, app: 'bancos', process: 'conciliacionesBancarias' },
+                                        { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
+                    reportar = 0;
+                }
+            }
+            // -------------------------------------------------------------------------------------------------------
+        })
 
         let message = `Ok, <b>${lineasLeidasDesdeExcel.length.toString()}</b> movimientos bancarios
                        han sido registrados en la base de datos, para la cuenta bancaria y el
