@@ -23,6 +23,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
       let companiaContabSeleccionada = $scope.$parent.companiaSeleccionada;
       $scope.cuentasBancarias = $scope.$parent.cuentasBancarias;
+      $scope.cuentasContables = $scope.$parent.cuentasContables;
 
       $scope.origen = $stateParams.origen;
       $scope.id = $stateParams.id;
@@ -45,6 +46,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                   if (cuentaBancariaSeleccionada) {
                       $scope.conciliacionBancaria.banco = cuentaBancariaSeleccionada.banco;
                       $scope.conciliacionBancaria.moneda = cuentaBancariaSeleccionada.moneda;
+                      $scope.conciliacionBancaria.cuentaContable = cuentaBancariaSeleccionada.cuentaContable;
                   };
               };
           };
@@ -134,9 +136,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
           // leemos la cuenta bancaria para obtener el banco, moneda y cuenta bancaria (nombre, simbolo, l...)
           let cuentasBancariasList = FuncionesGlobalesBancos.flattenBancos(companiaContabSeleccionada);
-          let cuentaBancariaItem = _.find(cuentasBancariasList, (x) => {
+          let cuentaBancariaItem = lodash.find(cuentasBancariasList, (x) => {
                                               return x.cuentaInterna === $scope.conciliacionBancaria.cuentaBancaria;
                                           });
+
+          // leemos la cuenta contable asociada a la conciliación; la idea es pasarla al modal y mostrarla, finalmente, en el doc excel
+          let cuentaContable = lodash.find($scope.cuentasContables, (x) => { return x.id === $scope.conciliacionBancaria.cuentaContable; });
 
           let modalInstance = $modal.open({
               templateUrl: 'client/bancos/conciliacionBancaria/exportarExcelModal.html',
@@ -145,6 +150,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               resolve: {
                   movimientosPropiosNoEncontrados: () => {
                       return lodash.filter($scope.conciliacionesBancarias_movimientosPropios,
+                                    (x) => { return x.conciliado === 'no'; });
+
+                      },
+                  movimientosContablesNoEncontrados: () => {
+                      return lodash.filter($scope.conciliacionesBancarias_movimientosContables,
                                     (x) => { return x.conciliado === 'no'; });
 
                       },
@@ -165,10 +175,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       return cuentaBancariaItem && cuentaBancariaItem.cuentaBancaria ?
                              cuentaBancariaItem.cuentaBancaria : null;
                   },
+                  cuentaContable: () => {
+                      return cuentaContable && cuentaContable.cuentaDescripcionCia ? cuentaContable.cuentaDescripcionCia : 'Cuenta contable indefinida (???)';
+                  },
                   ciaSeleccionada: () => {
                       return companiaContabSeleccionada;
                   },
-
               },
           }).result.then(
                 function (resolve) {
@@ -315,7 +327,17 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               displayName: 'Conciliado',
               width: '100',
               headerCellClass: 'ui-grid-centerCell',
-              cellClass: 'ui-grid-centerCell',
+              cellClass: function (grid, row, col, rowIndex, colIndex) {
+                  // con el row viene el entiy con el valor de cada celda
+                  let conciliado = row.entity && row.entity.conciliado ? row.entity.conciliado : "";
+                  if (conciliado === "no") {
+                      // 3: pagada
+                      return 'ui-grid-centerCell red';
+                  } else if (conciliado === "si") {
+                      // 4: anulada
+                      return 'ui-grid-centerCell blue';
+                  }
+              },
               enableFiltering: true,
               enableColumnMenu: false,
               enableSorting: true,
@@ -347,6 +369,184 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               type: 'date'
           },
       ];
+
+
+    let movimientosContables_ui_grid_api = null;
+    let movimientoContableSeleccionado = {};
+
+    $scope.movimientosContables_ui_grid = {
+
+        enableSorting: true,
+        showGridFooter: true,
+        showColumnFooter: false,
+        enableRowSelection: true,
+        enableFiltering: true,
+        enableRowHeaderSelection: false,
+        multiSelect: false,
+        enableSelectAll: false,
+        selectionRowHeaderWidth: 0,
+        rowHeight: 25,
+
+        onRegisterApi: function (gridApi) {
+
+            movimientosContables_ui_grid_api = gridApi;
+
+            gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+                //debugger;
+                movimientoContableSeleccionado = {};
+
+                if (row.isSelected) {
+                    movimientoContableSeleccionado = row.entity;
+                }
+                else {
+                    return;
+                };
+            });
+        },
+        // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
+        rowIdentity: function (row) {
+            return row._id;
+        },
+        getRowIdentity: function (row) {
+            return row._id;
+        }
+    };
+
+    $scope.movimientosContables_ui_grid.columnDefs = [
+        {
+            name: 'fecha',
+            field: 'fecha',
+            displayName: 'Fecha',
+            width: '80',
+            enableFiltering: false,
+            cellFilter: 'dateFilter',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'date'
+        },
+        {
+            name: 'consecutivo',
+            field: 'consecutivo',
+            displayName: '##',
+            width: '50',
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'comprobante',
+            field: 'comprobante',
+            displayName: '#Comp',
+            width: '60',
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'partida',
+            field: 'partida',
+            displayName: '#Part',
+            width: '60',
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'descripcionComprobante',
+            field: 'descripcionComprobante',
+            displayName: 'Descripción comprobante',
+            width: '180',
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'descripcionPartida',
+            field: 'descripcionPartida',
+            displayName: 'Descripción partida',
+            width: '180',
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'referencia',
+            field: 'referencia',
+            displayName: 'Referencia',
+            width: '60',
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'monto',
+            field: 'monto',
+            displayName: 'Monto',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+        {
+            name: 'conciliado',
+            field: 'conciliado',
+            displayName: 'Conciliado',
+            width: '100',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: function (grid, row, col, rowIndex, colIndex) {
+                // con el row viene el entiy con el valor de cada celda
+                let conciliado = row.entity && row.entity.conciliado ? row.entity.conciliado : "";
+                if (conciliado === "no") {
+                    // 3: pagada
+                    return 'ui-grid-centerCell red';
+                } else if (conciliado === "si") {
+                    // 4: anulada
+                    return 'ui-grid-centerCell blue';
+                }
+            },
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
+            name: 'consecutivoMovBanco',
+            field: 'consecutivoMovBanco',
+            displayName: '## banco',
+            width: '80',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'number'
+        },
+    ];
+
 
 
     let movimientosBanco_ui_grid_api = null;
@@ -477,23 +677,47 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             enableSorting: true,
             type: 'number'
         },
+        // {
+        //     name: 'conciliado',
+        //     field: 'conciliado',
+        //     displayName: 'Conciliado',
+        //     width: '100',
+        //     headerCellClass: 'ui-grid-centerCell',
+        //     cellClass: 'ui-grid-centerCell',
+        //     enableFiltering: true,
+        //     enableColumnMenu: false,
+        //     enableSorting: true,
+        //     type: 'string'
+        // },
         {
-            name: 'conciliado',
-            field: 'conciliado',
-            displayName: 'Conciliado',
+            name: 'consecutivoMovPropio',
+            field: 'consecutivoMovPropio',
+            displayName: 'Conc bancos',
             width: '100',
             headerCellClass: 'ui-grid-centerCell',
             cellClass: 'ui-grid-centerCell',
             enableFiltering: true,
             enableColumnMenu: false,
             enableSorting: true,
-            type: 'string'
+            type: 'number'
         },
+        // {
+        //     name: 'conciliadoContab',
+        //     field: 'conciliadoContab',
+        //     displayName: 'Conc contab',
+        //     width: '100',
+        //     headerCellClass: 'ui-grid-centerCell',
+        //     cellClass: 'ui-grid-centerCell',
+        //     enableFiltering: true,
+        //     enableColumnMenu: false,
+        //     enableSorting: true,
+        //     type: 'string'
+        // },
         {
-            name: 'consecutivoMovPropio',
-            field: 'consecutivoMovPropio',
-            displayName: '## propio',
-            width: '80',
+            name: 'consecutivoMovContab',
+            field: 'consecutivoMovContab',
+            displayName: 'Conc contab',
+            width: '100',
             headerCellClass: 'ui-grid-centerCell',
             cellClass: 'ui-grid-centerCell',
             enableFiltering: true,
@@ -502,7 +726,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             type: 'number'
         },
     ];
-
 
 
       $scope.nuevo0 = function () {
@@ -544,7 +767,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                                   "Aparentemente, <em>no se han efectuado cambios</em> en el registro. No hay nada que grabar.",
                                  false).then();
               return;
-          };
+          }
 
           $scope.showProgress = true;
 
@@ -563,7 +786,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + ConciliacionesBancarias.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
-          };
+          }
 
           if (errores && errores.length) {
 
@@ -583,44 +806,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
               $scope.showProgress = false;
               return;
-          };
+          }
 
-          $meteor.call('conciliacionesBancariasSave', editedItem).then(
-              function (data) {
+          Meteor.call('bancos.conciliacionesBancarias.save', editedItem, (err, result) => {
 
-                  if (data.error) {
-                      // el método que intenta grabar los cambis puede regresar un error cuando,
-                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: data.message
-                      });
-                      $scope.showProgress = false;
-                  } else {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'info',
-                          msg: data.message
-                      });
-
-                      // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
-                      $scope.id = data.id;
-
-                      // solo si el item es nuevo, no hemos creado un helper para el mismo (pues es nuevo y no
-                      // existía en mongo); lo hacemos ahora para que el item que se ha agregado en mongo sea el
-                      // que efectivamente se muestre al usuario una vez que graba el item en mongo. Además, para
-                      // agregar el 'reactivity' que existe para items que existían y que se editan
-                      if ($scope.conciliacionBancaria && $scope.conciliacionBancaria.docState && $scope.conciliacionBancaria.docState == 1) {
-                          // 'inicializar...' lee el registro recién agregado desde mongo y agrega un 'helper' para él ...
-                          inicializarItem($scope.id);
-                      };
-
-                      $scope.showProgress = false;
-                  };
-              },
-              function (err) {
-
+              if (err) {
                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
@@ -628,9 +818,47 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       type: 'danger',
                       msg: errorMessage
                   });
+
                   $scope.showProgress = false;
-              });
-      };
+                  $scope.$apply();
+
+                  return;
+              }
+
+              if (result.error) {
+                  // el método que intenta grabar los cambis puede regresar un error cuando,
+                  // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'danger',
+                      msg: result.message
+                  });
+                  $scope.showProgress = false;
+                  $scope.$apply();
+              } else {
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'info',
+                      msg: result.message
+                  });
+
+                  // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
+                  $scope.id = result.id;
+
+                  // solo si el item es nuevo, no hemos creado un helper para el mismo (pues es nuevo y no
+                  // existía en mongo); lo hacemos ahora para que el item que se ha agregado en mongo sea el
+                  // que efectivamente se muestre al usuario una vez que graba el item en mongo. Además, para
+                  // agregar el 'reactivity' que existe para items que existían y que se editan
+                  if ($scope.conciliacionBancaria && $scope.conciliacionBancaria.docState && $scope.conciliacionBancaria.docState == 1) {
+                      // 'inicializar...' lee el registro recién agregado desde mongo y agrega un 'helper' para él ...
+                      inicializarItem($scope.id);
+                  };
+
+                  $scope.showProgress = false;
+                  $scope.$apply();
+              }
+          })
+      }
 
 
       $scope.conciliacionBancaria = {};
@@ -681,6 +909,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                                   { sort: { consecutivo: 1 } }
                               );
                           },
+                          conciliacionesBancarias_movimientosContables: () => {
+                              return ConciliacionesBancarias_movimientosCuentaContable.find(
+                                  { conciliacionID: id },
+                                  { sort: { consecutivo: 1 } }
+                              );
+                          },
                           conciliacionesBancarias_movimientosBanco: () => {
                               return ConciliacionesBancarias_movimientosBanco.find(
                                   { conciliacionID: id },
@@ -695,7 +929,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                       $scope.movimientosBanco_ui_grid.data = [];
                       $scope.movimientosBanco_ui_grid.data = $scope.conciliacionesBancarias_movimientosBanco;
 
-                      // en este momento tenemos la vacación y el empleado ...
+                      $scope.movimientosContables_ui_grid.data = [];
+                      $scope.movimientosContables_ui_grid.data = $scope.conciliacionesBancarias_movimientosContables;
+
                       $scope.showProgress = false;
                       $scope.$apply();
                 },
@@ -790,6 +1026,121 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
       }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // para leer movimientos contables y registrarlos en mongo
+      $scope.cargarMovimientosBancariosAsientosContables = () => {
+
+          if ($scope.conciliacionBancaria.docState) {
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos contables<em>",
+                                  "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
+                                  "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
+                                 false).then();
+              return;
+          }
+
+          if (!$scope.conciliacionBancaria || !$scope.conciliacionBancaria._id) {
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos contables<em>",
+                                  "Aparentemente, la conciliación bancaria no está completa aún. " +
+                                  "Ud. debe completar el registro de esta conciliación antes de intentar ejecutar esta función.",
+                                 false).then();
+              return;
+          }
+
+          // revisamos minimongo a ver si ya existen movimientos propios para la conciliación; de ser así, pedimos confirmación al usuario ...
+          let recordCount = ConciliacionesBancarias_movimientosCuentaContable.find({ conciliacionID: $scope.conciliacionBancaria._id }).count();
+
+          if (recordCount) {
+              DialogModal($modal, "<em>Conciliaciones bancarias - Leer y cargar movimientos contables<em>",
+                                  `Ya existen movimientos bancarios <em>propios</em> para la conciliación bancaria.<br /><br />
+                                  Desea continuar y sustituir los movimientos bancarios propios que ahora existen con
+                                  unos nuevos leídos desde la base de datos?
+                                  `,
+                                 true).then(
+                                     (result) => {
+                                         cargarMovimientosBancariosAsientosContables2();
+                                     },
+                                     (err) => {
+                                         // el usuario canceló el diálogo ...
+                                         return;
+                                     }
+                                 );
+          } else {
+              // no existen movimientos bancarios propios; los leemos desde la base de datos ...
+              cargarMovimientosBancariosAsientosContables2();
+          }
+      }
+
+
+      function cargarMovimientosBancariosAsientosContables2() {
+          $scope.showProgress = true;
+
+          $meteor.call('bancos.conciliacion.LeerMovtosContables', $scope.conciliacionBancaria._id).then(
+              function (data) {
+
+                  if (data.error) {
+                      // el método que intenta grabar los cambis puede regresar un error cuando,
+                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                      $scope.alerts.length = 0;
+                      $scope.alerts.push({
+                          type: 'danger',
+                          msg: data.message
+                      });
+                      $scope.showProgress = false;
+                  } else {
+                      $scope.alerts.length = 0;
+                      $scope.alerts.push({
+                          type: 'info',
+                          msg: data.message
+                      });
+
+                      $scope.showProgress = false;
+                  }
+              },
+              function (err) {
+                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                  $scope.alerts.length = 0;
+                  $scope.alerts.push({
+                      type: 'danger',
+                      msg: errorMessage
+                  });
+                  $scope.showProgress = false;
+              })
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       // para leer movimientos del banco y registrarlos en mongo
       $scope.cargarMovimientosBancariosDelBanco = () => {
 
@@ -843,7 +1194,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               size: 'lg',
               resolve: {
                   conciliacionBancaria: () => {
-                      // pasamos todo el registro de la conciliación bancaria, para tener acceso al _id, desde, ... 
+                      // pasamos todo el registro de la conciliación bancaria, para tener acceso al _id, desde, ...
                       return $scope.conciliacionBancaria;
                   },
                   companiaSeleccionada: () => {

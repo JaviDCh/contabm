@@ -1,12 +1,16 @@
 
 AngularApp.controller('BancosConciliacionBancariaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'movimientosPropiosNoEncontrados',
+                                                  'movimientosContablesNoEncontrados',
                                                   'movimientosBancoNoEncontrados',
                                                   'banco', 'moneda', 'cuentaBancaria',
+                                                  'cuentaContable',
                                                   'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, movimientosPropiosNoEncontrados,
+                                                   movimientosContablesNoEncontrados,
                                                    movimientosBancoNoEncontrados,
                                                    banco, moneda, cuentaBancaria,
+                                                   cuentaContable,
                                                    ciaSeleccionada) {
     // ui-bootstrap alerts ...
     $scope.alerts = [];
@@ -33,9 +37,10 @@ function ($scope, $modalInstance, $modal, $meteor, movimientosPropiosNoEncontrad
         $scope.showProgress = true;
 
         Meteor.call('bancos.conciliacionBancaria.exportarExcel', JSON.stringify(movimientosPropiosNoEncontrados),
-                                                                  JSON.stringify(movimientosBancoNoEncontrados),
-                                                                  banco, moneda, cuentaBancaria,
-                                                                  ciaSeleccionada, (err, result) => {
+                                                                 JSON.stringify(movimientosContablesNoEncontrados),
+                                                                 JSON.stringify(movimientosBancoNoEncontrados),
+                                                                 banco, moneda, cuentaBancaria, cuentaContable, 
+                                                                 ciaSeleccionada, (err, result) => {
 
             if (err) {
               let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);

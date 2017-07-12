@@ -77,7 +77,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
                   $scope.showProgress = false;
                   $scope.$apply();
                   return;
-              };
+              }
 
               if (result.error) {
                   $scope.alerts.length = 0;

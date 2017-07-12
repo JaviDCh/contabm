@@ -14,23 +14,21 @@ import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/gr
 Meteor.methods(
 {
     'bancos.conciliacionBancaria.exportarExcel': function (movimientosPropiosNoEncontrados,
+                                                           movimientosContablesNoEncontrados,
                                                            movimientosBancoNoEncontrados,
                                                            banco, moneda, cuentaBancaria,
+                                                           cuentaContable,
                                                            ciaSeleccionada)
     {
-        // debugger;
-        // let Future = Npm.require('fibers/future');
-        // let XlsxInjector = Meteor.npmRequire('xlsx-injector');
-        // let fs = Npm.require('fs');
-        // let path = Npm.require('path');
-
         new SimpleSchema({
             movimientosPropiosNoEncontrados: { type: String, optional: false },
+            movimientosContablesNoEncontrados: { type: String, optional: false },
             movimientosBancoNoEncontrados: { type: String, optional: false },
             ciaSeleccionada: { type: Object, blackbox: true, optional: false }
-        }).validate({ movimientosPropiosNoEncontrados, movimientosBancoNoEncontrados, ciaSeleccionada, });
+        }).validate({ movimientosPropiosNoEncontrados, movimientosContablesNoEncontrados, movimientosBancoNoEncontrados, ciaSeleccionada, });
 
         movimientosPropiosNoEncontrados = JSON.parse(movimientosPropiosNoEncontrados);
+        movimientosContablesNoEncontrados = JSON.parse(movimientosContablesNoEncontrados);
         movimientosBancoNoEncontrados = JSON.parse(movimientosBancoNoEncontrados);
 
         // agregamos una linea de total a cada array
@@ -59,6 +57,41 @@ Meteor.methods(
 
 
 
+        // agregamos una linea de total a cada array
+        let movimientosContablesNoEncontrados2 = [];
+
+        lineaTotales = {
+            fecha: '',
+            consecutivo: '',
+            numero: '',
+            descripcionComprobante: cuentaContable,
+            descripcionPartida: `${numeral(movimientosContablesNoEncontrados.length).format('0,0')} asientos contables`,
+            referencia: '',
+            monto: lodash.sumBy(movimientosContablesNoEncontrados, 'monto'),
+            tipoReg: 1,
+        };
+
+        movimientosContablesNoEncontrados2.push(lineaTotales);
+
+        // en ambos arrays, las fechas vienen serializadas como strings
+        let movimientoContable = {};
+        movimientosContablesNoEncontrados.forEach((x) =>
+        {
+            movimientoContable = {
+                fecha: moment(x.fecha).format("DD-MMM-YYYY"),
+                consecutivo: x.consecutivo,
+                numero: `${x.comprobante.toString()} - ${x.partida.toString()}`,
+                descripcionComprobante: x.descripcionComprobante,
+                descripcionPartida: x.descripcionPartida,
+                referencia: x.referencia,
+                monto: x.monto,
+                tipoReg: 0,
+            };
+
+            movimientosContablesNoEncontrados2.push(movimientoContable); ;
+        });
+
+
 
         // agregamos una linea de total a cada array
         let movimientosBancoNoEncontrados2 = [];
@@ -70,6 +103,8 @@ Meteor.methods(
             tipo: moneda,
             beneficiario: cuentaBancaria,
             concepto: `${numeral(movimientosBancoNoEncontrados.length).format('0,0')} movtos bancarios`,
+            conciliadoBancos: '',
+            conciliadoContab: '',
             monto: lodash.sumBy(movimientosBancoNoEncontrados, 'monto'),
             tipoReg: 1,
         };
@@ -90,9 +125,12 @@ Meteor.methods(
             movimientoBanco.tipo = x.tipo ? x.tipo : "";
             movimientoBanco.beneficiario = x.beneficiario ? x.beneficiario : "";
             movimientoBanco.concepto = x.concepto ? x.concepto : "";
+            movimientoBanco.conciliadoBancos = x.conciliado;
+            movimientoBanco.conciliadoContab = x.conciliadoContab;
             movimientoBanco.monto = x.monto;
 
             movimientosBancoNoEncontrados2.push(movimientoBanco); ;
+            movimientoBanco.concepto = x.concepto ? x.concepto : "";
         });
 
         // finalmente, producimos un resumen de movimientos no encontrados, de acueerdo a su tipo
@@ -119,6 +157,34 @@ Meteor.methods(
             tipoReg: 1,
         };
         resumenPorTipoArray.push(resumenPorTipo);
+
+
+        // ahora producimos el resumen, pero para movimientos contables
+        groupByTipoArray = [];
+        groupByTipoArray = lodash.groupBy(movimientosContablesNoEncontrados, (x) => { return x.monto >= 0 ? 'DB' : 'CR'; });
+        let resumenPorTipo_contab_Array = [];
+        resumenPorTipo = {};
+
+        // primiero agregamos la linea 'resumen'
+        for (let key in groupByTipoArray) {
+            resumenPorTipo = {
+                tipo: key,
+                cantidad: groupByTipoArray[key].length,
+                monto: lodash.sumBy(groupByTipoArray[key], 'monto'),
+                tipoReg: 0,
+            };
+            resumenPorTipo_contab_Array.push(resumenPorTipo);
+        };
+
+        // agregamos una linea de totales ...
+        resumenPorTipo = {
+            tipo: "",
+            cantidad: movimientosContablesNoEncontrados.length,
+            monto: lodash.sumBy(movimientosContablesNoEncontrados, 'monto'),
+            tipoReg: 1,
+        };
+        resumenPorTipo_contab_Array.push(resumenPorTipo);
+
 
         // ----------------------------------------------------------------------------------------------------
         // obtenemos el directorio en el server donde están las plantillas (guardadas por el usuario mediante collectionFS)
@@ -153,6 +219,13 @@ Meteor.methods(
             fechaHoy: moment(new Date()).format("DD-MMM-YYYY"),
             nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
             items: lodash.orderBy(resumenPorTipoArray, ['tipoReg', 'tipo'], ['desc', 'asc']),
+            itemsContab: lodash.orderBy(resumenPorTipo_contab_Array, ['tipoReg', 'tipo'], ['desc', 'asc']),
+        };
+
+        let values4 = {
+            fechaHoy: moment(new Date()).format("DD-MMM-YYYY"),
+            nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
+            items: lodash.orderBy(movimientosContablesNoEncontrados2, ['consecutivo'], ['asc']),
         };
 
         // Open a workbook
@@ -166,6 +239,9 @@ Meteor.methods(
 
         sheetNumber = 3;
         workbook.substitute(sheetNumber, values3);
+
+        sheetNumber = 4;
+        workbook.substitute(sheetNumber, values4);
 
         // Save the workbook
         workbook.writeFile(outputPath);

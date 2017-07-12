@@ -53,5 +53,6 @@ Meteor.publish("conciliacionesBancarias", function (filtro) {
         ConciliacionesBancarias.find(selector),
         ConciliacionesBancarias_movimientosPropios.find({ conciliacionID: { $in: filtroConciliacionesLeidas }}),
         ConciliacionesBancarias_movimientosBanco.find({ conciliacionID: { $in: filtroConciliacionesLeidas }}),
+        ConciliacionesBancarias_movimientosCuentaContable.find({ conciliacionID: { $in: filtroConciliacionesLeidas }}),
     ];
 });

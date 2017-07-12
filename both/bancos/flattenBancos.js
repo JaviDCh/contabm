@@ -24,6 +24,7 @@ let flattenBancos = function (ciaContab) {
                             let cuentaBancaria = {
                                 cuentaInterna: cuenta.cuentaInterna,
                                 cuentaBancaria: cuenta.cuentaBancaria,
+                                cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null,
                                 moneda: cuenta.moneda,
                                 simboloMoneda: _.find(monedas, (x) => { return x.moneda === cuenta.moneda; }).simbolo,
                                 banco: banco.banco,
@@ -36,6 +37,7 @@ let flattenBancos = function (ciaContab) {
                             let cuentaBancaria = {
                                 cuentaInterna: cuenta.cuentaInterna,
                                 cuentaBancaria: cuenta.cuentaBancaria,
+                                cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null, 
                                 moneda: cuenta.moneda,
                                 simboloMoneda: _.find(monedas, (x) => { return x.moneda === cuenta.moneda; }).simbolo,
                                 banco: banco.banco,

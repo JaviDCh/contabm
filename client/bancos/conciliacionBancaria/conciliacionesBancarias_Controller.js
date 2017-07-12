@@ -33,6 +33,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
           let cuentaBancaria = {
               _id: new Mongo.ObjectID()._str,
               cuentaBancaria: cuenta.cuentaInterna,
+              cuentaContable: cuenta.cuentaContable,
               descripcion: `${cuenta.nombreBanco} - ${cuenta.simboloMoneda} - ${cuenta.cuentaBancaria}`,
               banco: cuenta.banco,
               moneda: cuenta.moneda,
@@ -40,6 +41,19 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
           $scope.cuentasBancarias.push(cuentaBancaria);
       });
+
+      // leemos el catálogo de cuentas contables 'persistidas', para poder usarlo al agregar el registro de conciliación,
+      // al cual el usuario asocia la cuenta contable de la cuenta bancaria
+      let cuentasContablesLista = [];
+
+      CuentasContables2.find({ cia: companiaSeleccionada.numero, totDet: 'D' },
+                             { sort: { cuenta: true }} ).
+                        forEach((cuenta) => {
+                             // cuentaDescripcionCia() es un 'helper' definido en el collection CuentasContables ...
+                             cuentasContablesLista.push({ id: cuenta.id, cuentaDescripcionCia: cuenta.cuentaDescripcionCia() });
+                        });
+
+      $scope.cuentasContables = cuentasContablesLista;
 
       $scope.showProgress = false;
   }

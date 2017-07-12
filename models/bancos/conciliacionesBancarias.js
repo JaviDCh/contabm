@@ -6,6 +6,7 @@ let schema = new SimpleSchema({
     desde: { type: Date, label: 'Desde', optional: false, },
     hasta: { type: Date, label: 'Hasta', optional: false, },
     cuentaBancaria: { type: Number, label: 'Cuenta bancaria ID', optional: false, },
+    cuentaContable: { type: Number, label: 'Cuenta contable ID', optional: true, },
     moneda: { type: Number, label: 'Moneda ID', optional: false, },
     banco: { type: Number, label: 'Banco ID', optional: false, },
     observaciones: { type: String, label: 'Observaciones', optional: true, },
@@ -20,7 +21,7 @@ let schema = new SimpleSchema({
 
 ConciliacionesBancarias.attachSchema(schema);
 
-// ---------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------
 ConciliacionesBancarias_movimientosPropios = new Mongo.Collection("conciliacionesBancarias_movimientosPropios");
 
 let schemaMovimientosPropios = new SimpleSchema({
@@ -40,6 +41,27 @@ let schemaMovimientosPropios = new SimpleSchema({
 
 ConciliacionesBancarias_movimientosPropios.attachSchema(schemaMovimientosPropios);
 
+// -------------------------------------------------------------------------------------------------------------
+ConciliacionesBancarias_movimientosCuentaContable = new Mongo.Collection("conciliacionesBancarias_movimientosCuentaContable");
+
+let schemaMovimientosCuentaContable = new SimpleSchema({
+    _id: { type: String, optional: false, },
+    conciliacionID: { type: String, optional: false, },
+    consecutivo: { type: Number, label: 'Número consecutivo asignado', decimal: false, optional: false, },
+    comprobante: { type: Number, label: 'Número comprobante', optional: false, },
+    partida: { type: Number, label: 'Número partida', optional: false, },
+    fecha: { type: Date, label: 'Fecha', optional: false, },
+    descripcionComprobante: { type: String, label: 'Descripción comprobante', optional: true, },
+    descripcionPartida: { type: String, label: 'Descripción partida', optional: false, },
+    referencia: { type: String, label: 'Concepto', optional: true, },
+    monto: { type: Number, label: 'Monto', optional: false, decimal: true, },
+
+    conciliado: { type: String, label: 'Conciliado (si/no)?', optional: true, },
+    consecutivoMovBanco: { type: Number, label: 'Número consecutivo mov banco', decimal: false, optional: true, },
+});
+
+ConciliacionesBancarias_movimientosCuentaContable.attachSchema(schemaMovimientosCuentaContable);
+
 // ---------------------------------------------------------------------------------------------
 ConciliacionesBancarias_movimientosBanco = new Mongo.Collection("conciliacionesBancarias_movimientosBanco");
 
@@ -53,8 +75,14 @@ let schemaMovimientosBanco = new SimpleSchema({
     beneficiario: { type: String, label: 'Beneficiario', optional: true, },
     concepto: { type: String, label: 'Concepto', optional: true, },
     monto: { type: Number, label: 'Monto', optional: false, decimal: true, },
+
+    // fields para conciliar contra movimientos propios ...
     conciliado: { type: String, label: 'Conciliado (si/no)?', optional: true, },
     consecutivoMovPropio: { type: Number, label: 'Número consecutivo mov propio', decimal: false, optional: true, },
+
+    // fields para conciliar contra movimientos contables (desde la cuenta contable en la contabilidad)
+    conciliadoContab: { type: String, label: 'Conciliado (si/no)?', optional: true, },
+    consecutivoMovContab: { type: Number, label: 'Número consecutivo mov propio', decimal: false, optional: true, },
 });
 
 ConciliacionesBancarias_movimientosBanco.attachSchema(schemaMovimientosBanco);

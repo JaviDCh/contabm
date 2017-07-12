@@ -18,4 +18,8 @@ Accounts.onCreateUser(function(options, user) {
 
 Meteor.startup(function() {
     FS.TempStore.setMaxListeners(0);
+
+    ConciliacionesBancarias_movimientosPropios._ensureIndex({ "conciliacionID": 1 });
+    ConciliacionesBancarias_movimientosCuentaContable._ensureIndex({ "conciliacionID": 1 });
+    ConciliacionesBancarias_movimientosBanco._ensureIndex({ "conciliacionID": 1 });
 });

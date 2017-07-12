@@ -25,6 +25,7 @@
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" ng-click="cargarMovimientosBancariosPropios()" class="navbar_custom_small_node">Cargar propios&nbsp;&nbsp;</a></li>
                             <li><a href="#" ng-click="cargarMovimientosBancariosDelBanco()" class="navbar_custom_small_node">Cargar del banco&nbsp;&nbsp;<span class="fa fa-file-excel-o"></span></a></li>
+                            <li><a href="#" ng-click="cargarMovimientosBancariosAsientosContables()" class="navbar_custom_small_node">Cargar asientos contables&nbsp;&nbsp;</a></li>
                             <li><a href="#" ng-click="compararMovimientosBancarios()" class="navbar_custom_small_node">Comparar&nbsp;&nbsp;</a></li>
                         </ul>
                     </li>
@@ -73,55 +74,79 @@
                               novalidate
                               style="margin-top: 5px; text-align: left; font-size: small; ">
 
-                                <div class="row row-centered">
+                              <div class="row row-centered">
 
-                                    <div class="col-sm-5 col-centered">
-                                        <div class="form-group">
-                                            <div class="col-sm-6 col-centered">
-                                                <label for="desde">Desde</label>
-                                                <input type="date"
-                                                       name="desde"
-                                                       id="desde"
-                                                       class="form-control"
-                                                       ng-model="conciliacionBancaria.desde"
-                                                       ng-change="setIsEdited('desde')"
-                                                       ng-required="true"
-                                                       ng-model-options="{ updateOn: 'blur' }" />
-                                            </div>
-                                            <div class="col-sm-6 col-centered">
-                                                <label for="desde">Hasta</label>
-                                                <input type="date"
-                                                       name="hasta"
-                                                       id="hasta"
-                                                       class="form-control"
-                                                       ng-model="conciliacionBancaria.hasta"
-                                                       ng-change="setIsEdited('hasta')"
-                                                       ng-required="true"
-                                                       ng-model-options="{ updateOn: 'blur' }" />
-                                            </div>
-                                        </div>
-                                    </div>
+                                  <div class="col-sm-5 col-centered">
+                                      <div class="form-group">
+                                          <div class="col-sm-6 col-centered">
+                                              <label for="desde">Desde</label>
+                                              <input type="date"
+                                                     name="desde"
+                                                     id="desde"
+                                                     class="form-control"
+                                                     ng-model="conciliacionBancaria.desde"
+                                                     ng-change="setIsEdited('desde')"
+                                                     ng-required="true"
+                                                     ng-model-options="{ updateOn: 'blur' }" />
+                                          </div>
+                                          <div class="col-sm-6 col-centered">
+                                              <label for="desde">Hasta</label>
+                                              <input type="date"
+                                                     name="hasta"
+                                                     id="hasta"
+                                                     class="form-control"
+                                                     ng-model="conciliacionBancaria.hasta"
+                                                     ng-change="setIsEdited('hasta')"
+                                                     ng-required="true"
+                                                     ng-model-options="{ updateOn: 'blur' }" />
+                                          </div>
+                                      </div>
+                                  </div>
 
-                                    <div class="col-sm-1 col-centered">
-                                    </div>
+                                  <div class="col-sm-1 col-centered">
+                                  </div>
 
-                                    <!-- Cuenta -->
-                                    <div class="col-sm-4 col-centered">
-                                        <div class="form-group">
-                                            <label for="cuentaBancaria">Cuenta bancaria</label>
-                                            <select class="form-control"
-                                                    name="cuentaBancaria"
-                                                    id="cuentaBancaria"
-                                                    ng-model="conciliacionBancaria.cuentaBancaria"
-                                                    ng-change="setIsEdited('cuentaBancaria')"
-                                                    ng-options="item.cuentaBancaria as item.descripcion for item in cuentasBancarias | orderBy:'descripcion'"
-                                                    ng-model-options="{ updateOn: 'blur' }"
-                                                    required></select>
-                                        </div>
-                                    </div>
+                                  <!-- Cuenta -->
+                                  <div class="col-sm-4 col-centered">
+                                      <div class="form-group">
+                                          <label for="cuentaBancaria">Cuenta bancaria</label>
+                                          <select class="form-control"
+                                                  name="cuentaBancaria"
+                                                  id="cuentaBancaria"
+                                                  ng-model="conciliacionBancaria.cuentaBancaria"
+                                                  ng-change="setIsEdited('cuentaBancaria')"
+                                                  ng-options="item.cuentaBancaria as item.descripcion for item in cuentasBancarias | orderBy:'descripcion'"
+                                                  ng-model-options="{ updateOn: 'blur' }"
+                                                  required></select>
+                                      </div>
+                                  </div>
 
-                                </div>
+                              </div>
 
+                              <div class="row row-centered">
+
+                                  <div class="col-sm-5 col-centered">
+                                  </div>
+
+                                  <div class="col-sm-1 col-centered">
+                                  </div>
+
+                                  <!-- Cuenta contable -->
+                                  <div class="col-sm-4 col-centered">
+                                      <div class="form-group">
+                                          <label for="cuentaBancaria">Cuenta contable</label>
+                                          <select class="form-control"
+                                                  name="cuentaContable"
+                                                  id="cuentaContable"
+                                                  ng-model="conciliacionBancaria.cuentaContable"
+                                                  ng-change="setIsEdited('cuentaContable')"
+                                                  ng-options="item.id as item.cuentaDescripcionCia for item in cuentasContables | orderBy:'cuentaDescripcionCia'"
+                                                  ng-model-options="{ updateOn: 'blur' }"
+                                                  required></select>
+                                      </div>
+                                  </div>
+
+                              </div>
 
                                 <div class="row row-centered">
                                     <!-- observaciones -->
@@ -173,6 +198,20 @@
                     <div class="col-sm-12 col-sm-offset-0">
 
                         <div ui-grid="movimientosPropios_ui_grid"
+                             ui-grid-resize-columns
+                             ui-grid-selection
+                             class="angularGrid"
+                             style="height: 300px; width: 100%; ">
+                        </div>
+
+                    </div>
+                </div>
+            </tab>
+            <tab heading="Movimientos contables">
+                <div class="row" style="text-align: center; ">
+                    <div class="col-sm-12 col-sm-offset-0">
+
+                        <div ui-grid="movimientosContables_ui_grid"
                              ui-grid-resize-columns
                              ui-grid-selection
                              class="angularGrid"

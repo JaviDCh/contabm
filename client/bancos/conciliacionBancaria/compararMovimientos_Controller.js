@@ -14,8 +14,24 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
     $scope.processProgress = {
         current: 0,
         max: 0,
-        progress: 0
+        progress: 0,
+        message: ''
     };
+
+    // -------------------------------------------------------------------------------------------------------
+    // para recibir los eventos desde la tarea en el servidor ...
+    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'conciliacionesBancarias' });
+    EventDDP.addListener('bancos_conciliacionBancaria_reportProgress', function(process) {
+        $scope.processProgress.current = process.current;
+        $scope.processProgress.max = process.max;
+        $scope.processProgress.progress = process.progress;
+        $scope.processProgress.message = process.message ? process.message : null;
+        // if we don't call this method, angular wont refresh the view each time the progress changes ...
+        // until, of course, the above process ends ...
+        $scope.$apply();
+    });
+    // -------------------------------------------------------------------------------------------------------
+
 
     $scope.ok = function () {
         $modalInstance.close("Ok");
@@ -126,55 +142,48 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                   mantenerComparacionesAnteriores = false;
               }
 
-              $meteor.call('bancos_conciliacion_CompararMovimientos',
+              Meteor.call('bancos.conciliacion.compararMovimientos',
                            conciliacionBancariaID,
                            JSON.stringify(criteriosSeleccionadosArray),
-                           mantenerComparacionesAnteriores).then(
-                  function (data) {
+                           mantenerComparacionesAnteriores, (err, result) => {
 
-                      if (data.error) {
-                          // el método que intenta grabar los cambis puede regresar un error cuando,
-                          // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                          $scope.alerts.length = 0;
-                          $scope.alerts.push({
-                              type: 'danger',
-                              msg: data.message
-                          });
-                          $scope.showProgress = false;
-                      } else {
-                          $scope.alerts.length = 0;
-                          $scope.alerts.push({
-                              type: 'info',
-                              msg: data.message
-                          });
+                   if (err) {
+                       let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
-                          $scope.showProgress = false;
-                      }
-                  },
-                  function (err) {
-                      let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                       $scope.alerts.length = 0;
+                       $scope.alerts.push({
+                           type: 'danger',
+                           msg: errorMessage
+                       });
 
+                       $scope.showProgress = false;
+                       $scope.$apply();
+
+                       return;
+                   }
+
+                  if (result.error) {
+                      // el método que intenta grabar los cambis puede regresar un error cuando,
+                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
                       $scope.alerts.length = 0;
                       $scope.alerts.push({
                           type: 'danger',
-                          msg: errorMessage
+                          msg: result.message
                       });
                       $scope.showProgress = false;
-                  });
+                      $scope.$apply();
+                  } else {
+                      $scope.alerts.length = 0;
+                      $scope.alerts.push({
+                          type: 'info',
+                          msg: result.message
+                      });
+
+                      $scope.showProgress = false;
+                      $scope.$apply();
+                  }
+              })
           }
     }
-
-    // ------------------------------------------------------------------------------------------------------
-    // para recibir los eventos desde la tarea en el servidor ...
-    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'conciliacionesBancarias' });
-    EventDDP.addListener('bancos_conciliacionBancaria_reportProgress', function(process) {
-
-        $scope.processProgress.current = process.current;
-        $scope.processProgress.max = process.max;
-        $scope.processProgress.progress = process.progress;
-        // if we don't call this method, angular wont refresh the view each time the progress changes ...
-        // until, of course, the above process ends ...
-        $scope.$apply();
-    });
 }
 ]);
