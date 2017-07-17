@@ -52,7 +52,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
 
     $scope.showProgress = true;
 
-    Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) =>  {
+    Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
 
         if (err) {
             let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -151,7 +151,15 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
         $scope.showProgress = true;
         // ejecutamos un método en el servidor que lee la 'entidad' (factura, mov banc, pago, etc.) y
         // agrega un asiento contable para la mismo ...
-        Meteor.call('generales.agregarAsientoContableAEntidad', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
+
+        // usamos 'apply' en vez de 'call' para que el método no se ejecute nuevamente luego de un cierto timeout;
+        // nótese que la idea es que el debugging sea más friendly, pues al hacerlo pasa algún tiempo, el method hace un
+        // timeout y se reejecuta; a veces multiples veces ...
+        // Meteor.apply(name, args, [options], [asyncCallback])
+        Meteor.apply('generales.agregarAsientoContableAEntidad',
+                     [ provieneDe, entidadID, ciaSeleccionada.numero ],
+                     { noRetry: true },
+                     (err, result) =>  {
 
             if (err) {
                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);

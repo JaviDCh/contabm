@@ -9,7 +9,9 @@ let mensajeErrorDesdeMethod_preparar = (errorFromMeteorMethod) => {
 
     let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
 
-    if (err.errorType && err.reason) {
+    if (err.error && err.errorType && err.reason) {
+        errorMessage += `<br />(${err.errorType}: ${err.error}) - ${err.reason}`;
+    } else if (err.errorType && err.reason) {
       errorMessage += `<br />(${err.errorType}) - ${err.reason}`;
     } else if (err.reason){
       errorMessage += `<br />${err.reason}`;
@@ -17,10 +19,11 @@ let mensajeErrorDesdeMethod_preparar = (errorFromMeteorMethod) => {
       errorMessage += `<br />${err.errorType}`;
     }
 
-    if (err.details)
+    if (err.details) {
         errorMessage += "<br />" + err.details;
+    }
 
     return errorMessage;
-};
+}
 
 ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar = mensajeErrorDesdeMethod_preparar;

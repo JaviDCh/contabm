@@ -567,7 +567,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'impRetID',
                 field: 'impRetID',
                 displayName: 'Concepto',
-                width: 150,
+                width: 100,
 
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownIdLabel: 'ID',
@@ -614,7 +614,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'porcentaje',
                 field: 'porcentaje',
                 displayName: '%',
-                width: 80,
+                width: 60,
                 enableFiltering: false,
                 headerCellClass: 'ui-grid-rightCell',
                 cellClass: 'ui-grid-rightCell',
@@ -628,7 +628,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'tipoAlicuota',
                 field: 'tipoAlicuota',
                 displayName: 'Tipo alícuota',
-                width: 100,
+                width: 80,
                 enableFiltering: false,
                 headerCellClass: 'ui-grid-centerCell',
                 cellClass: 'ui-grid-centerCell',
@@ -641,7 +641,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'montoAntesSustraendo',
                 field: 'montoAntesSustraendo',
                 displayName: 'Monto',
-                width: 120,
+                width: 100,
                 enableFiltering: false,
                 headerCellClass: 'ui-grid-rightCell',
                 cellClass: 'ui-grid-rightCell',
@@ -655,7 +655,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'sustraendo',
                 field: 'sustraendo',
                 displayName: 'Sustraendo',
-                width: 100,
+                width: 80,
                 enableFiltering: false,
                 headerCellClass: 'ui-grid-rightCell',
                 cellClass: 'ui-grid-rightCell',
@@ -669,7 +669,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 name: 'monto',
                 field: 'monto',
                 displayName: 'Monto',
-                width: 120,
+                width: 100,
                 enableFiltering: false,
                 headerCellClass: 'ui-grid-rightCell',
                 cellClass: 'ui-grid-rightCell',
@@ -692,6 +692,20 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 enableCellEdit: true,
                 enableSorting: true,
                 type: 'date'
+            },
+            {
+                name: 'contabilizarAlPagar_flag',
+                field: 'contabilizarAlPagar_flag',
+                displayName: 'Contab al pagar',
+                width: 100,
+                enableFiltering: false,
+                headerCellClass: 'ui-grid-centerCell',
+                cellClass: 'ui-grid-centerCell',
+                cellFilter: 'boolFilter',
+                enableColumnMenu: false,
+                enableCellEdit: true,
+                enableSorting: true,
+                type: 'boolean'
             },
             {
                 name: 'delButton',
@@ -1421,15 +1435,17 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
               $scope.showProgress = true;
 
                // mantenemos las fechas de la factura, pues puede ser necesario validar los valores originales
-              factura_leerByID_desdeSql(parseInt($scope.id));
+              factura_leerByID_desdeSql($scope.id);
           };
       };
 
       inicializarItem();
 
       function factura_leerByID_desdeSql(pk) {
+
           // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
-          Meteor.call('factura.leerByID.desdeSql', pk, (err, result) => {
+          let facturaID = parseInt($scope.id);
+          Meteor.call('factura.leerByID.desdeSql', facturaID, (err, result) => {
 
               if (err) {
                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
@@ -1442,8 +1458,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
                   $scope.showProgress = false;
                   $scope.$apply();
+
                   return;
-              };
+              }
 
               $scope.factura = {};
               $scope.factura = JSON.parse(result);
@@ -1489,24 +1506,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
               // finalmente, leemos lo datos importantes del proveedor para tenerlos para cuando sea
               // necesario (al calcular, determinar impuestos y retenciones, etc.)
-              $meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor).then(
-                  function (data) {
+              Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
 
-                      if (data.error) {
-                          $scope.alerts.length = 0;
-                          $scope.alerts.push({
-                              type: 'danger',
-                              msg: data.message
-                          });
-                          $scope.showProgress = false;
-                      } else {
-                          $scope.proveedor = JSON.parse(data);;
-
-                          $scope.showProgress = false;
-                      };
-                  },
-                  function (err) {
-
+                  if (err) {
                       let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
                       $scope.alerts.length = 0;
@@ -1514,10 +1516,31 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                           type: 'danger',
                           msg: errorMessage
                       });
+
                       $scope.showProgress = false;
-                  });
-          });
-      };
+                      $scope.$apply();
+
+                      return;
+                  }
+
+                  if (result.error) {
+                      $scope.alerts.length = 0;
+                      $scope.alerts.push({
+                          type: 'danger',
+                          msg: result.message
+                      });
+                      $scope.showProgress = false;
+
+                      $scope.$apply();
+                  } else {
+                      $scope.proveedor = JSON.parse(result);;
+                      $scope.showProgress = false;
+                      
+                      $scope.$apply();
+                  }
+              })
+          })
+      }
 
 
       // ------------------------------------------------------------------------------------

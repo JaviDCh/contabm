@@ -55,6 +55,7 @@ let facturasImpuestos_SimpleSchema = new SimpleSchema({
      sustraendo: { type: Number, label: 'Sustraendo', decimal: true, optional: true },
      monto: { type: Number, label: 'Monto', decimal: true, optional: false },
      fechaRecepcionPlanilla: { type: Date, label: 'FechaRecepcionPlanilla', optional: true },
+     contabilizarAlPagar_flag: { type: Boolean, label: 'Contabilizar al pagar?', optional: true },
  });
 
  let cuotasFactura_SimpleSchema = new SimpleSchema({

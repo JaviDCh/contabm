@@ -68,6 +68,7 @@ Facturas_Impuestos_sql = sequelize.define('facturas_Impuestos', {
     sustraendo: { type: Sequelize.DECIMAL(10, 2), field: 'Sustraendo', allowNull: true },
     monto: { type: Sequelize.DECIMAL(10, 2), field: 'Monto', allowNull: false },
     fechaRecepcionPlanilla: { type: Sequelize.DATE, field: 'FechaRecepcionPlanilla', allowNull: true },
+    contabilizarAlPagar_flag: { type: Sequelize.BOOLEAN, field: 'ContabilizarAlPagar_flag', allowNull: true },
 }, {
      tableName: 'Facturas_Impuestos'
 });

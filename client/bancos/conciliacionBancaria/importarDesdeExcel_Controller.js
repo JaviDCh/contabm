@@ -178,6 +178,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
 
                         if (debitos) {
                             if (!lodash.isFinite(debitos)) {
+                                // el monto es un string; lo convetimos a un número negativo
                                 debitos = debitos.toString().trim();
                                 debitos = debitos.replace("â€", "");
                                 debitos = debitos.replace(/\./gi, "");
@@ -185,6 +186,13 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
                                 // validamos que el string sea un Number
                                 if (!isNaN(parseFloat(debitos)) && isFinite(debitos)) {
                                     debitos = parseFloat(debitos);
+                                    if (debitos > 0) {
+                                        debitos *= -1;         // siempre asumimos que un crédito es un monto negativo ...
+                                    }
+                                }
+                            } else {
+                                // parece que el valor viene ya como un número; debe ser negativo ... 
+                                if (debitos > 0) {
                                     debitos *= -1;         // siempre asumimos que un crédito es un monto negativo ...
                                 }
                             }

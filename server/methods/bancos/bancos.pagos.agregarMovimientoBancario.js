@@ -102,7 +102,7 @@ Meteor.methods({
            beneficiario: pago.beneficiario,
            concepto: pago.concepto,
            signo: pago.miSuFlag === 1 ? false : true,       // miSuFlag -> 1: pago a prov / 2: cobro a clientes
-           montoBase: pago.monto,
+           montoBase: pago.miSuFlag === 1 ? (pago.monto * -1) : pago.monto,
            monto: pago.miSuFlag === 1 ? (pago.monto * -1) : pago.monto,
            ingreso: new Date(),
            ultMod: new Date,
