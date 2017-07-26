@@ -48,10 +48,16 @@ AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
             controller: 'Catalogos_GruposContables_Controller',
             parent: 'contab'
         })
-        .state('contab.MesesDelAnoFiscal', {
-            url: '/MesesDelAnoFiscal',
+        .state('contab.mesesDelAnoFiscal', {
+            url: '/mesesDelAnoFiscal',
             templateUrl: 'client/contab/catalogos/mesesDelAnoFiscal/mesesDelAnoFiscal.html',
             controller: 'Catalogos_MesesDelAnoFiscal_Controller',
+            parent: 'contab'
+        })
+        .state('contab.parametrosContab', {
+            url: '/parametrosContab',
+            templateUrl: 'client/contab/catalogos/parametrosContab/parametrosContab.html',
+            controller: 'Catalogos_ParametrosContab_Controller',
             parent: 'contab'
         })
         .state('contab.filtrosConsultasContab', {

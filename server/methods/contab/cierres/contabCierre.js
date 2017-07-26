@@ -10,13 +10,37 @@ Meteor.methods(
         Match.test(anoFiscal, Match.Integer);
         Match.test(ciaContab, Match.Object);
 
+        // debemos leer la tabla de parámetros para determinar si el cierre puede ser ejecutado aún con asientos descuadrados ...
+        query = `Select Top 1 CierreContabPermitirAsientosDescuadrados From ParametrosContab Where Cia = ?`;
+
+        response = null;
+        response = Async.runSync(function(done) {
+            sequelize.query(query, { replacements: [ ciaContab.numero ], type: sequelize.QueryTypes.SELECT })
+                .then(function(result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        });
+
+        if (response.error) {
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+
+        if (response.result.length == 0) {
+            errMessage = `Error: No hemos encontrado un registro en la tabla de <em>parámetros contab</em> para la
+                         compañía Contab seleccionada.`;
+
+            return { error: true, errMessage: errMessage };
+        }
+
+        let cierreContabPermitirAsientosDescuadrados = response.result[0].CierreContabPermitirAsientosDescuadrados;
+
         let mesesDelAnoFiscal = leerMesesDesdeTablaMesesDelAnoFiscal(mesesArray, ciaContab.numero);
 
         // para, en cierres de meses (ie: no cierre anual), notificar al usuario la existencia de asientos de tipo cierre anual ...
         let existenAsientosTipoCierreAnual = false;
+        let mesesConAsientosDescuadrados = [];
 
         // nota: mesACerrar es un array que puede tener más de un mes a cerrar (ej: [ 01, 02, 03, 04, ...])
-
         mesesArray.forEach((mesFiscal) => {
 
             // pasamos 12 cuando el mes fiscal es 13, pues debemos efectuar el cierre anual, pero el período calendario
@@ -25,8 +49,9 @@ Meteor.methods(
                                                                                   anoFiscal,
                                                                                   ciaContab.numero);
 
-            if (periodoCalendario.error)
+            if (periodoCalendario.error) {
                 throw new Meteor.Error(periodoCalendario.errMessage);
+            }
 
             let primerDiaMes = periodoCalendario.desde;
             let ultimoDiaMes = periodoCalendario.hasta;
@@ -38,13 +63,17 @@ Meteor.methods(
                                                                                               ciaContab);
 
             if (asientosDescuadrados.error) {
-                throw new Meteor.Error("asientos-descuadrados",
-                `Existen asientos contables descuadrados en el mes <em><b>${nombreMesCalendario}</b></em>.
-                 Por favor revise los asientos contables registrados para el mes mencionado y corrija
-                 los que no estén cuadrados.<br /><br />
-                 Luego regrese y ejecute nuevamente el cierre contable para este mes.`);
-            };
-
+                if (cierreContabPermitirAsientosDescuadrados) {
+                    // no fallamos pues se puede ejecutar el cierre con asientos descuadrados (según parametrosContab); la idea es,
+                    // sin embargo, notificar cuales meses contienen asientos descuadrados ...
+                    mesesConAsientosDescuadrados.push(nombreMesCalendario);
+                } else {
+                    throw new Meteor.Error("asientos-descuadrados",
+                    `Existen asientos contables descuadrados en el mes <em><b>${nombreMesCalendario}</b></em>.
+                     Por favor revise los asientos contables registrados para el mes mencionado y corrija
+                     los que no estén cuadrados.<br /><br /> Luego regrese y ejecute nuevamente el cierre contable para este mes.`);
+                }
+            }
 
 
             // -------------------------------------------------------------------------------------------------------------
@@ -234,7 +263,30 @@ Meteor.methods(
 
         });
 
+        // solo cuando se permite cerrar con asientos descuadrados, construimos un mensaje que informe al usuario la existencia de
+        // éstos ...
         let finalMessage = "";
+        let mensajeAsientosDescuadrados = "";
+
+        if (mesesConAsientosDescuadrados.length) {
+            mensajeAsientosDescuadrados = `<br /><b>Nota:</b> existen asientos descuadrados en los meses: <b>`;
+
+            let c = 1;
+            mesesConAsientosDescuadrados.forEach((x) => {
+                if (c === 1) {
+                    mensajeAsientosDescuadrados += x;
+                } else {
+                    mensajeAsientosDescuadrados += `, ${x}`;
+                }
+                c++;
+            })
+
+            mensajeAsientosDescuadrados += "</b>. ";
+            mensajeAsientosDescuadrados += `Sin embargo, el cierre se ha ejecutado en forma normal, pues así se ha indicado en la tabla
+                                            <em>Parámetros Contab.</em>`;
+        }
+
+
 
         if (mesesArray.length == 1)
             if (mesesArray[0] != 13) {
@@ -263,6 +315,7 @@ Meteor.methods(
                                 de este tipo que se ha encontrado.`;
 
 
+        finalMessage += mensajeAsientosDescuadrados;
         return finalMessage;
     }
 });

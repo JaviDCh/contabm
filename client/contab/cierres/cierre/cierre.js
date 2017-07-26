@@ -65,7 +65,6 @@ AngularApp.controller("Contab_Cierre_Controller",
 
   $scope.cerrar = () => {
 
-    //   debugger;
       if (!$scope.parametros.mesACerrar || !_.isArray($scope.parametros.mesACerrar) || _.isEmpty($scope.parametros.mesACerrar)) {
 
           $scope.alerts.length = 0;
@@ -117,38 +116,55 @@ AngularApp.controller("Contab_Cierre_Controller",
               mesesArray.push(i);
           };
 
-          $meteor.call('contabCierre', mesesArray, $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc).then(
-            function (data0) {
+          Meteor.apply('contabCierre',
+                       [ mesesArray, $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc ],
+                       [{ noRerty: true }],
+                       (err, result) => {
+
+                if (err) {
+                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                      type: 'danger',
+                      msg: errorMessage
+                    });
+
+                    $scope.showProgress = false;
+                    $scope.$apply();
+
+                    return;
+                }
+
                 $scope.alerts.length = 0;
-                $scope.alerts.push({ type: 'info', msg: data0 });
+                $scope.alerts.push({ type: 'info', msg: result });
 
                 construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal, companiaSeleccionadaDoc);
-              },
-              function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
-
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({ type: 'danger', msg: errorMessage });
-
-                  $scope.showProgress = false;
-              })
+          })
       }
       else if (mesACerrar === -30) {
-          $meteor.call('construirAsientoAutomaticoCierre', $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc).then(
-            function (data0) {
+          Meteor.apply('construirAsientoAutomaticoCierre', [ $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc ], [{ noRetry: true }], (err, result) => {
+
+               if (err) {
+                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                   $scope.alerts.length = 0;
+                   $scope.alerts.push({
+                     type: 'danger',
+                     msg: errorMessage
+                   });
+
+                   $scope.showProgress = false;
+                   $scope.$apply();
+
+                   return;
+               }
+
                 $scope.alerts.length = 0;
-                $scope.alerts.push({ type: 'info', msg: data0 });
+                $scope.alerts.push({ type: 'info', msg: result });
 
                 construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal, companiaSeleccionadaDoc);
-              },
-              function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
-
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({ type: 'danger', msg: errorMessage });
-
-                  $scope.showProgress = false;
-              })
+          })
       }
       else if (mesACerrar === -20) {
 
@@ -187,7 +203,7 @@ AngularApp.controller("Contab_Cierre_Controller",
                   $scope.showProgress = false;
               })
       }
-  };
+  }
 
 }
 ]);
@@ -196,22 +212,34 @@ AngularApp.controller("Contab_Cierre_Controller",
 function construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal, companiaSeleccionadaDoc) {
 
     // para construir la lista de meses a cerrar que se muestra al usuario para que seleccione el/los que desea cerrar
-
     // nótese que existen casos especiales: cuando se ha cerrado ya todo el año y vienen el cierre anual y el traspaso de saldos ...
+    Meteor.call('contabLeerUltimoMesCerrado', companiaSeleccionadaDoc, (err, result) => {
 
-    $meteor.call('contabLeerUltimoMesCerrado', companiaSeleccionadaDoc).then(
-      function (data) {
-          // debugger;
-          let result = JSON.parse(data);
+            if (err) {
+                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                type: 'danger',
+                msg: errorMessage
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+          let result2 = JSON.parse(result);
 
           // la tabla MesesDelAnoFiscal viene también con este Method
           // cargamos el contenido de la tabla mesesDelAnoFiscal en un array
           mesesDelAnoFiscal = [];
-          result.mesesAnoFiscal.forEach((mes) => {
+          result2.mesesAnoFiscal.forEach((mes) => {
               mesesDelAnoFiscal.push(mes);
           });
 
-          $scope.ultimoMesCerrado = result.ultimoMesCerradoContab;
+          $scope.ultimoMesCerrado = result2.ultimoMesCerradoContab;
 
           // Nombre del último mes cerrado: la correspondencia entre el mes fiscal y el mes calendario, está en mesesDelAnoFiscal
           $scope.mes2 = lodash.find(mesesDelAnoFiscal, (x) => { return x.mesFiscal === $scope.ultimoMesCerrado.mes; }).nombreMes;
@@ -230,86 +258,84 @@ function construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal
 
               // el usuario puede venir del cierre (ie: lo acaba de ejecutar). Si acaba de agregar asientos automáticos, proponemos
               // que efectúe el cierre anual ...
-
               if ($scope.parametros && _.isArray($scope.parametros.mesACerrar) && $scope.parametros.mesACerrar[0] === -30) {
                   $scope.mesesArray.push({ mes: -20, nombre: 'Cierre anual para el año ' + parseInt($scope.ultimoMesCerrado.ano) });
 
                   $scope.showProgress = false;
+                  $scope.$apply();
               }
               else {
-                  $meteor.call('determinarSiExisteAsientoAutomaticoCierreAnual', $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc).then(
-                    function (data) {
-                        // debugger;
-                        let result = JSON.parse(data);
+                  Meteor.call('determinarSiExisteAsientoAutomaticoCierreAnual', $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc, (err, result) => {
 
-                        if (result.cantidadAsientosTipoCierreAnual > 0) {
+                    if (err) {
+                        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
 
-                            // ya existen asientos de tipo cierre anual; proponemos reconstruirlos
+                        $scope.alerts.length = 0;
+                        $scope.alerts.push({
+                         type: 'danger',
+                         msg: errorMessage
+                        });
 
-                            // $scope.alerts.length = 0;
-                            $scope.alerts.push({
-                                type: 'info',
-                                msg: `El cierre mensual para el <b>último</b> mes del año ha sido ejecutado.<br />
-                                      Hemos encontrado que <b>ya existen</b> asientos de tipo <em>cierre anual</em> para el año fiscal
-                                      ${$scope.ultimoMesCerrado.ano.toString()}. <br /><br />
-                                      Ud. puede volver a construirlos ahora, o ejecutar el cierre anual directamente.
-                                `
-                            });
+                        $scope.showProgress = false;
+                        $scope.$apply();
 
-                            $scope.mesesArray.push({ mes: -30, nombre: 'Reconstruir asientos de tipo cierre anual' });
-                            $scope.mesesArray.push({ mes: -20, nombre: 'Cierre anual para el año ' + parseInt($scope.ultimoMesCerrado.ano) });
+                        return;
+                    }
 
-                            $scope.showProgress = false;
-                        }
-                        else {
+                    let result3 = JSON.parse(result);
 
-                            // no existen asientos de tipo cierre anual; proponemos agregarlos
+                    if (result3.cantidadAsientosTipoCierreAnual > 0) {
 
-                            $scope.alerts.length = 0;
-                            $scope.alerts.push({
-                                type: 'info',
-                                msg: `El cierre mensual para el <b>último</b> mes del año ha sido ejecutado.<br />
-                                      Hemos encontrado que <b>no existen</b> asientos de tipo <em>cierre anual</em> para el año fiscal
-                                      ${$scope.ultimoMesCerrado.ano.toString()}. <br /><br />
-                                      Ud. debe construirlos ahora; también puede ejecutar el cierre anual directamente.
-                                `
-                            });
+                        // ya existen asientos de tipo cierre anual; proponemos reconstruirlos
+                        $scope.alerts.push({
+                            type: 'info',
+                            msg: `El cierre mensual para el <b>último</b> mes del año ha sido ejecutado.<br />
+                                  Hemos encontrado que <b>ya existen</b> asientos de tipo <em>cierre anual</em> para el año fiscal
+                                  ${$scope.ultimoMesCerrado.ano.toString()}. <br /><br />
+                                  Ud. puede volver a construirlos ahora, o ejecutar el cierre anual directamente.
+                            `
+                        });
 
-                            $scope.mesesArray.push({ mes: -30, nombre: 'Construir asientos de tipo cierre anual' });
-                            $scope.mesesArray.push({ mes: -20, nombre: 'Cierre anual para el año ' + parseInt($scope.ultimoMesCerrado.ano) });
+                        $scope.mesesArray.push({ mes: -30, nombre: 'Reconstruir asientos de tipo cierre anual' });
+                        $scope.mesesArray.push({ mes: -20, nombre: 'Cierre anual para el año ' + parseInt($scope.ultimoMesCerrado.ano) });
 
-                            $scope.showProgress = false;
-                        };
+                        $scope.showProgress = false;
+                        $scope.$apply();
+                    }
+                    else {
 
-                },
-                  function (err) {
-                      let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar = mensajeErrorDesdeMethod_preparar(err);
+                        // no existen asientos de tipo cierre anual; proponemos agregarlos
+                        $scope.alerts.length = 0;
+                        $scope.alerts.push({
+                            type: 'info',
+                            msg: `El cierre mensual para el <b>último</b> mes del año ha sido ejecutado.<br />
+                                  Hemos encontrado que <b>no existen</b> asientos de tipo <em>cierre anual</em> para el año fiscal
+                                  ${$scope.ultimoMesCerrado.ano.toString()}. <br /><br />
+                                  Ud. debe construirlos ahora; también puede ejecutar el cierre anual directamente.
+                            `
+                        });
 
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({ type: 'danger', msg: errorMessage });
+                        $scope.mesesArray.push({ mes: -30, nombre: 'Construir asientos de tipo cierre anual' });
+                        $scope.mesesArray.push({ mes: -20, nombre: 'Cierre anual para el año ' + parseInt($scope.ultimoMesCerrado.ano) });
 
-                      $scope.showProgress = false;
-                  })
+                        $scope.showProgress = false;
+                        $scope.$apply();
+                    }
+              })
           }
       }
       else if (parseInt($scope.ultimoMesCerrado.mes) == 13) {
           $scope.mesesArray.push({ mes: 13, nombre: 'Traspaso de saldos al año ' + (parseInt($scope.ultimoMesCerrado.ano) + 1) });
           $scope.showProgress = false;
+          $scope.$apply();
       }
       else {
           $scope.mesesArray = determinarMesesHastaElUltimoMesFiscal($scope.ultimoMesCerrado.mes, mesesDelAnoFiscal);
           $scope.showProgress = false;
+          $scope.$apply();
       }
-    },
-    function (err) {
-        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar = mensajeErrorDesdeMethod_preparar(err);
-
-        $scope.alerts.length = 0;
-        $scope.alerts.push({ type: 'danger', msg: errorMessage });
-
-        $scope.showProgress = false;
-    });
-};
+    })
+}
 
 
 

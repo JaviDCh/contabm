@@ -57,6 +57,10 @@ let mostrarHelp = (currentStateName) => {
           window.open('https://smrsoftware.wordpress.com/2013/10/18/bancosconciliacin-bancaria/', '_blank');
           break;
         }
+        case 'contab.cierre': {
+          window.open('https://smrsoftware.wordpress.com/2017/07/26/cierre-contable/', '_blank');
+          break;
+        }
         default:
     };
 };

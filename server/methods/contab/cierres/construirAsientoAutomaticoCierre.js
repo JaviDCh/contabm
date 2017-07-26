@@ -1,7 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
-import numeral from 'numeral'; 
+import numeral from 'numeral';
 
 Meteor.methods(
 {
@@ -41,6 +41,12 @@ Meteor.methods(
         // leemos la cuenta contable definida como GyP
         const cuentaContableGyP = determinarCuentaContableGyP(ciaContab);
 
+        if (!cuentaContableGyP) {
+            throw new Meteor.Error("error-leer-cuentaContableGyP",
+                        `Hemos obtenido un error al intentar leer la cuenta contable de tipo GyP
+                        para la compañía Contab seleccionada.`);
+        }
+
         // determinamos las monedas y monedas original usadas en los asientos del período y las guardamos en un array
         const monedasEnAsientosArray = determinarMonedasUsadasEnAsientos(primerDiaMes, ultimoDiaMes, ciaContab);
 
@@ -50,11 +56,11 @@ Meteor.methods(
         // leemos el factor de cambio más reciente para usarlo en el asiento de cierre anual
         const factorCambio = ContabFunctions.leerCambioMonedaMasReciente(ultimoDiaMes);
 
-        if (factorCambio.error)
+        if (factorCambio.error) {
             throw new Meteor.Error("error-leer-factorCambio",
                         `Hemos obtenido un error al intentar leer el factor de cambio para la fecha más reciente a
                         ${moment(ultimoDiaMes).format('YYYY-MM-DD')}.`);
-
+        }
 
         // -------------------------------------------------------------------------------------------------------------
         // valores para reportar el progreso
