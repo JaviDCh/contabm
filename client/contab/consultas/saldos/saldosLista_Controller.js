@@ -1,5 +1,5 @@
 
-import lodash from 'lodash'; 
+import lodash from 'lodash';
 
 AngularApp.controller("Contab_Consultas_Saldos_Lista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
@@ -59,6 +59,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         enableSorting: true,
         showColumnFooter: true,
+        showGridFooter: true,
         enableFiltering: true,
         enableRowSelection: true,
         enableRowHeaderSelection: false,
@@ -440,8 +441,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     $scope.saldosContables_ui_grid.data = [];
     $scope.showProgress = true;
 
-    // suscribimos a los asientos que se han leído desde sql y grabado a mongo para el usuario
-    // debugger;
+    let subscriptionHandle = null;
+
+    subscriptionHandle =
     Meteor.subscribe('tempConsulta_saldosContables', () => {
 
         $scope.saldosContables = Temp_Consulta_SaldosContables.find({ user: Meteor.userId() }, { sort: { cuentaContableID: true }}).fetch();
@@ -456,6 +458,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         $scope.showProgress = false;
         $scope.$apply();
-    });
+    })
+
+    $scope.$on("$destroy", () => {
+        if (subscriptionHandle && subscriptionHandle.stop) {
+            subscriptionHandle.stop();
+        }
+    })
   }
 ]);
