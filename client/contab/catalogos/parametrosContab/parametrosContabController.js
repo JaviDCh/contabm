@@ -1,7 +1,7 @@
 
 import lodash from 'lodash';
 
-AngularApp.controller("Catalogos_ParametrosContab_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_ParametrosContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

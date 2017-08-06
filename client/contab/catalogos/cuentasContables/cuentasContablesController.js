@@ -1,10 +1,10 @@
 
+import lodash from 'lodash';
+import numeral from 'numeral';
 
-// Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_CuentasContables_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -152,9 +152,9 @@ AngularApp.controller("Catalogos_CuentasContables_Controller",
               field: 'docState',
               displayName: '',
               cellTemplate:
-              '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
-              '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
-              '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>',
+              '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: blue; font: xx-small; padding-top: 8px; "></span>' +
+              '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: brown; font: xx-small; padding-top: 8px; "></span>' +
+              '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
               enableCellEdit: false,
               enableColumnMenu: false,
               enableSorting: false,
@@ -308,19 +308,6 @@ AngularApp.controller("Catalogos_CuentasContables_Controller",
              $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
       };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
       $scope.save = function () {
          //   debugger;
            $scope.showProgress = true;
@@ -420,22 +407,6 @@ AngularApp.controller("Catalogos_CuentasContables_Controller",
          };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       $scope.showProgress = true;
       let cuentasContablesSubscriptioHandle = null;
 
@@ -462,16 +433,12 @@ AngularApp.controller("Catalogos_CuentasContables_Controller",
 
                 $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
 
-                // solo para intentar 'refrescar' el ui-grid ...
-                // cuentasContables_ui_grid_api.core.notifyDataChange(uiGridConstants.dataChange.ALL);
+                let count = $scope.cuentasContables && lodash.isArray($scope.cuentasContables) ? $scope.cuentasContables.length : 0
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
                     type: 'info',
-                    msg: `${$scope.cuentasContables && _.isArray($scope.cuentasContables) ?
-                            $scope.cuentasContables.length.toString() : 0}
-                          cuentas contables leídas
-                          para la <em>compañía Contab</em> seleccionada ...`
+                    msg: `<b>${numeral(count).format('0,0')}</b> cuentas contables leídas para la <em>compañía Contab</em> seleccionada ...`
                 });
 
                 $scope.showProgress = false;

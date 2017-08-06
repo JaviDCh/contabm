@@ -1,5 +1,5 @@
 
-AngularApp.controller('BancosProveedoresClientes_ExportarExcel_Controller',
+angular.module("contabM.bancos.catalogos").controller('BancosProveedoresClientes_ExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, ciaSeleccionada) {
 

@@ -12,10 +12,14 @@
 
   // nótese que importamos los assets de npm packages ...
   import 'angular-ui-grid/ui-grid.css';
-  // import 'angular-ui-grid/ui-grid.woff';
-  // import 'angular-ui-grid/ui-grid.ttf';
 
   AngularApp = angular.module("contabM", [ angularMeteor, uiRouter, 'ui.bootstrap', 'accounts.ui',
                                           'ui.grid', 'ui.grid.edit', 'ui.grid.cellNav',
                                           'ui.grid.resizeColumns', 'ui.grid.selection',
-                                          'ui.grid.pinning']);
+                                          'ui.grid.pinning', 'contabM.contab', 'contabM.bancos'
+                                      ]);
+
+  angular.module("contabM")
+      .component("helloWorld",{
+          template: '<p style="color: red; ">Hello World!</p>'
+      });

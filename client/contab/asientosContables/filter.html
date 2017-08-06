@@ -10,7 +10,6 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="col-sm-10 col-sm-offset-1" style="text-align: left; ">
         <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
@@ -18,12 +17,6 @@
         </alert>
     </div>
 </div>
-
-<!-- <tabset>
-        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" select="onTabSelected(tab.slug)">
-          {{ tab.content }}
-        </tab>
-      </tabset> -->
 
 <tabset>
     <tab heading="General">

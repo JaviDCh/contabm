@@ -1,5 +1,5 @@
 
-AngularApp.controller('ContabCatalogosCuentasContablesExportarExcel_Controller',
+angular.module("contabM.contab.catalogos").controller('ContabCatalogosCuentasContablesExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, ciaSeleccionada) {
 

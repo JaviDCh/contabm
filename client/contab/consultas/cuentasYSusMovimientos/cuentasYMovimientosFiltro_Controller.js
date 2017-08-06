@@ -68,6 +68,17 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
     function aplicarFiltroYAbrirLista() {
 
+        if (lodash.isEmpty($scope.filtro)) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: `Por favor indique un <b><em>filtro</em></b> a este proceso. La ejecución de este proceso sin la aplicación de un filtro seria,
+                      probablemente, muy costosa.`
+            });
+
+            return;
+        }
+
         $scope.showProgress = true;
 
         Meteor.call('contab_consulta_cuentasYSusMovimientos_LeerDesdeSql', JSON.stringify($scope.filtro), companiaContab.numero, (err, result) => {

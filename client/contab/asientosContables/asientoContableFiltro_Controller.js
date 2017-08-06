@@ -1,5 +1,5 @@
 
-
+import lodash from 'lodash';
 
 AngularApp.controller("Contab_AsientoContableFiltro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
@@ -60,6 +60,17 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
 
     $scope.aplicarFiltroYAbrirLista = function () {
+
+        if (lodash.isEmpty($scope.filtro)) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: `Por favor indique un <b><em>filtro</em></b> a este proceso. La ejecución de este proceso sin la aplicación de un filtro seria,
+                      probablemente, muy costosa.`
+            });
+
+            return;
+        }
 
         $scope.showProgress = true;
         $scope.filtro.cuentasContables = [];

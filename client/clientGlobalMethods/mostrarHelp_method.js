@@ -61,6 +61,14 @@ let mostrarHelp = (currentStateName) => {
           window.open('https://smrsoftware.wordpress.com/2017/07/26/cierre-contable/', '_blank');
           break;
         }
+        case 'contab.consulta_saldos.filtro': {
+          window.open('https://smrsoftware.wordpress.com/2017/08/06/contab-saldos-contables-consulta/', '_blank');
+          break;
+        }
+        case 'contab.consulta_saldos.lista': {
+          window.open('https://smrsoftware.wordpress.com/2017/08/06/contab-saldos-contables-consulta/', '_blank');
+          break;
+        }
         default:
     };
 };

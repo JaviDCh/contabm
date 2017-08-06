@@ -182,11 +182,11 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) {
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
 
-
-            // actualizamos el collection en mongo ... 
+            // actualizamos el collection en mongo ...
             CuentasContables.remove({ _id: item._id });
         });
 

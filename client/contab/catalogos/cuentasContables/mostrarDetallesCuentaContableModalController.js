@@ -1,5 +1,5 @@
 ﻿
-AngularApp.controller('MostrarDetallesCuentaContable_Modal_Controller',
+angular.module("contabM.contab.catalogos").controller('MostrarDetallesCuentaContable_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaSeleccionadaDoc', 'cuentaContableSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, companiaSeleccionadaDoc, cuentaContableSeleccionada) {
 
@@ -22,7 +22,7 @@ function ($scope, $modalInstance, $modal, $meteor, companiaSeleccionadaDoc, cuen
     $scope.grupoContableNombre = grupoContable ? grupoContable.descripcion : "Indefinido (?)";
 
     let companiaContab = Companias.findOne({ numero: cuentaContableSeleccionada.cia });
-    $scope.companiaContab = companiaContab ? companiaContab.nombre : "Indefinida (?)"; 
+    $scope.companiaContab = companiaContab ? companiaContab.nombre : "Indefinida (?)";
 
     $scope.companiaSeleccionadaDoc = companiaSeleccionadaDoc;
     $scope.cuentaContableSeleccionada = cuentaContableSeleccionada;

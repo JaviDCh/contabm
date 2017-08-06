@@ -2,11 +2,9 @@
 
 import lodash from 'lodash';
 
-// Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_Companias_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...

@@ -1,7 +1,6 @@
 
 
-// Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_Monedas_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_Monedas_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

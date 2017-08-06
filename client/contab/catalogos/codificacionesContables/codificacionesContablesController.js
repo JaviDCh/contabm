@@ -1,7 +1,6 @@
 
 
-// Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_Contab_CodificacionesContables_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$interval', function ($scope, $meteor, $modal, uiGridConstants, $interval) {
 
     //   debugger;

@@ -2,7 +2,7 @@ import numeral from 'numeral';
 import moment from 'moment';
 import lodash from 'lodash';
 
-AngularApp.controller("ProveedoresClientes_Lista_Controller",
+angular.module("contabM.bancos.catalogos").controller("ProveedoresClientes_Lista_Controller",
 ['$stateParams', '$scope', '$meteor', '$modal', function ($stateParams, $scope, $meteor, $modal) {
 
       $scope.showProgress = false;
@@ -865,7 +865,7 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
                 x.ultAct = x.ultAct ? moment(x.ultAct).toDate() : null;
             })
         }
-        
+
         // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
         $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
 

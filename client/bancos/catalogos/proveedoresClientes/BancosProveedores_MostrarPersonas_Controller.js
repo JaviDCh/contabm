@@ -2,7 +2,7 @@
 
 import lodash from 'lodash';
 
-AngularApp.controller('BancosProveedores_MostrarPersonas_Controller',
+angular.module("contabM.bancos.catalogos").controller('BancosProveedores_MostrarPersonas_Controller',
 ['$scope', '$modalInstance', '$modal', 'proveedor', 'cargos', 'departamentos', 'titulos',
 function ($scope, $modalInstance, $modal, proveedor, cargos, departamentos, titulos) {
 

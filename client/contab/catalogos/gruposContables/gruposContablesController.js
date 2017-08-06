@@ -1,10 +1,8 @@
 
 
-// Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_GruposContables_Controller",
+angular.module("contabM.contab.catalogos").controller("Catalogos_GruposContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
