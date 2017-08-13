@@ -75,7 +75,7 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-10 col-sm-offset-1" style="text-align: left; ">
+            <div class="col-sm-12 col-sm-offset-0" style="text-align: left; ">
                 <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">
                     <span ng-bind-html="alert.msg | unsafe"></span>
                 </alert>
@@ -755,6 +755,8 @@
             <fieldset class="scheduler-border" style="text-align: left; ">
                 <legend class="scheduler-border">Definición de la base para el cálculo del bono vacacional: </legend>
 
+                <br />
+
                 <div class="row row-centered">
                     <!-- bonoVacAgregarSueldoFlag -->
                     <div class="col-sm-4 col-centered">
@@ -816,6 +818,32 @@
                                    ng-change="setIsEdited()"
                                    ng-required="true"
                                    ng-model-options="{ updateOn: 'blur' }" />
+                        </div>
+                    </div>
+                </div>
+
+            </fieldset>
+          </tab>
+
+          <tab heading="Prestaciones">
+            <br />
+
+            <fieldset class="scheduler-border" style="text-align: left; ">
+                <legend class="scheduler-border">Configuración del proceso de prestaciones para el empleado: </legend>
+
+                <br />
+
+                <div class="row row-centered">
+                    <!-- prestacionesAgregarMontoCestaTicketsFlag -->
+                    <div class="col-sm-10 col-centered">
+                        <div class="form-group" style="text-align: center; ">
+                            <!-- <br /> -->
+                            <label>
+                                <input type="checkbox"
+                                       ng-model="empleado.prestacionesAgregarMontoCestaTicketsFlag"
+                                       ng-change="setIsEdited()">
+                                Agregar el monto de cesta tickets al proceso de cálculo de prestaciones
+                            </label>
                         </div>
                     </div>
                 </div>

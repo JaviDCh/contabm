@@ -51,10 +51,13 @@ Empleados_sql = sequelize.define('empleados', {
     bonoVacAgregarMontoCestaTicketsFlag: { type: Sequelize.BOOLEAN, field: 'BonoVacAgregarMontoCestaTicketsFlag', allowNull: true,  },
     bonoVacacionalMontoAdicional: { type: Sequelize.DECIMAL(10, 2), field: 'BonoVacacionalMontoAdicional', allowNull: true,  },
     bonoVacAgregarMontoAdicionalFlag: { type: Sequelize.BOOLEAN, field: 'BonoVacAgregarMontoAdicionalFlag', allowNull: true,  },
+    prestacionesAgregarMontoCestaTicketsFlag: { type: Sequelize.BOOLEAN, field: 'PrestacionesAgregarMontoCestaTicketsFlag', allowNull: true,  },
+
     cia: { type: Sequelize.INTEGER, field: 'Cia', allowNull: false, },
 }, {
      tableName: 'tEmpleados'
 });
+
 
 
  EmpleadosFaltas_sql = sequelize.define('empleadosFaltas', {

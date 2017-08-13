@@ -81,6 +81,7 @@ let simpleSchema = new SimpleSchema({
     bonoVacAgregarMontoCestaTicketsFlag: { type: Boolean, label: "Bono vac: agregar monto cesta tickets?", optional: true, },
     bonoVacacionalMontoAdicional: { type: Number, label: "Bono vac: monto adicional", optional: true, decimal: true, },
     bonoVacAgregarMontoAdicionalFlag: { type: Boolean, label: "Bono vac: agregar monto adicional", optional: true, },
+    prestacionesAgregarMontoCestaTicketsFlag: { type: Boolean, label: "Prestaciones: agregar monto de cesta tickets", optional: true, },
     cia: { type: Number, label: "Cia Contab", optional: false, },
 
     docState: { type: Number, optional: true },
