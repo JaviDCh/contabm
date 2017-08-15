@@ -1,21 +1,16 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import numeral from 'numeral';
-import lodash from 'lodash'; 
+import lodash from 'lodash';
 
 Meteor.methods(
 {
     contab_consulta_saldos_LeerDesdeSql: function (filtro, ciaContab) {
 
-        // debugger;
         let filtro2 = JSON.parse(filtro);
 
         check(filtro2, Object);
         check(ciaContab, Number);
-
-        // if (!asientoContable || !asientoContable.docState) {
-        //     throw new Meteor.Error("Aparentemente, no se han editado los datos en la forma. No hay nada que actualizar.");
-        // };
 
         let where = "";
 
@@ -148,10 +143,9 @@ Meteor.methods(
         let query = `Select s.CuentaContableID as cuentaContableID,
                     c.Cuenta as cuentaContable, c.Descripcion as nombreCuentaContable,
                     s.Ano as ano, s.Moneda as moneda, s.MonedaOriginal as monedaOriginal,
-                    Inicial as inicial, Mes01 as mes01, Mes02 as mes02, Mes03 as mes03, Mes04 as mes04,
-                    Mes05 as mes05, Mes06 as mes06, Mes07 as mes07, Mes08 as mes08, Mes09 as mes09,
-                    Mes10 as mes10, Mes11 as mes11,
-                    Mes12 as mes12, Anual as anual,
+                    s.Inicial as inicial, s.Mes01 as mes01, s.Mes02 as mes02, s.Mes03 as mes03, s.Mes04 as mes04,
+                    s.Mes05 as mes05, s.Mes06 as mes06, s.Mes07 as mes07, s.Mes08 as mes08, s.Mes09 as mes09,
+                    s.Mes10 as mes10, s.Mes11 as mes11, s.Mes12 as mes12, s.Anual as anual,
                     m.Simbolo as simboloMoneda, m.Descripcion As descripcionMoneda,
                     mo.Simbolo as simboloMonedaOriginal, mo.Descripcion as descripcionMonedaOriginal,
                     s.Cia as cia
@@ -160,6 +154,14 @@ Meteor.methods(
                     Inner Join Monedas mo On s.MonedaOriginal = mo.Moneda
                     Where c.TotDet = 'D' And ${where} And ${filtroDefinidoUsuario}
                     `;
+
+        if (filtro2.excluirCuentasContables_saldosMesesEnCero) {
+            // el usuario puede indicar que solo desea cuentas con, al menos un saldo, diferente a cero
+            let where_noCero = `s.Inicial <> 0 Or s.Mes01 <> 0 Or s.Mes02 <> 0 Or s.Mes03 <> 0 Or s.Mes04 <> 0 Or
+            s.Mes05 <> 0 Or s.Mes06 <> 0 Or s.Mes07 <> 0 Or s.Mes08 <> 0 Or s.Mes09 <> 0 Or
+            s.Mes10 <> 0 Or s.Mes11 <> 0 Or s.Mes12 <> 0 Or s.Anual <> 0`;
+            query += ` And (${where_noCero})`
+        }
 
         response = null;
         response = Async.runSync(function(done) {
