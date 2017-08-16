@@ -374,8 +374,20 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   `Ud. debe seleccionar la partida que será ajustada, para <em>cuadrar</em> el asiento contable.`,
                                  false).then();
               return;
-          };
+          }
 
+          // primero recorremos las partidas y redondeamos a 2 decimales; si existe algún monto con más de dos decimales,
+          // al redondear, el resultado final será siempre de dos decimales
+          if ($scope.asientoContable && _.isArray($scope.asientoContable.partidas)) {
+              $scope.asientoContable.partidas.forEach((partida) => {
+                  partida.debe = partida.debe ? lodash.round(partida.debe, 2) : 0;
+                  partida.haber = partida.haber ? lodash.round(partida.haber, 2) : 0;
+              })
+          }
+
+
+          // ya nos aseguramos que las partidas no tienen, ninguna, más de 2 decimales; ahora continuamos y cuadramos
+          // contra la partida seleccionada ...
           let sumOfDebe = 0;
           let sumOfHaber = 0;
 
@@ -384,25 +396,33 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                   if (partida._id && partidaSeleccionada._id && (partida._id != partidaSeleccionada._id)) {
                       sumOfDebe += partida.debe ? partida.debe : 0;
                       sumOfHaber += partida.haber ? partida.haber : 0;
-                  };
-              });
-          };
+                  }
+              })
+          }
+
+          // por si acaso, redondeamos la suma de ambas columnas
+          sumOfDebe = lodash.round(sumOfDebe, 2);
+          sumOfHaber = lodash.round(sumOfHaber, 2);
 
           partidaSeleccionada.debe = 0;
           partidaSeleccionada.haber = 0;
 
-          if (sumOfDebe >= sumOfHaber)
-             partidaSeleccionada.haber = sumOfDebe - sumOfHaber;
-          else
-             partidaSeleccionada.debe = sumOfHaber - sumOfDebe;
+          if (sumOfDebe >= sumOfHaber) {
+              partidaSeleccionada.haber = sumOfDebe - sumOfHaber;
+          }
+          else {
+              partidaSeleccionada.debe = sumOfHaber - sumOfDebe;
+          }
 
-         if (!$scope.asientoContable.docState)
+         if (!$scope.asientoContable.docState) {
              $scope.asientoContable.docState = 2;
+         }
 
          $scope.partidas_ui_grid.data = [];
-         if (_.isArray($scope.asientoContable.partidas))
-            $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-      };
+         if (_.isArray($scope.asientoContable.partidas)) {
+             $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
+         }
+      }
 
       $scope.renumerarPartidas = () => {
 
@@ -736,7 +756,22 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Aparentemente, <em>no se han efectuado cambios</em> en el registro. No hay nada que grabar.",
                                  false).then();
               return;
-          };
+          }
+
+          // ninguna de las partidas debe tener un monto con más de 2 decimales
+          if ($scope.asientoContable && $scope.asientoContable.partidas) {
+              if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
+                  DialogModal($modal, "<em>Asientos contables</em>",
+                                      `Aparentemente, al menos una de las partidas en el asiento contable,
+                                       tiene un monto con <b>más de dos decimales</b>.<br /><br />
+                                       Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
+                                       hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
+                                       Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
+                                       Luego puede regresar e intentar grabar el asiento contable.`,
+                                     false).then();
+                  return;
+              }
+          }
 
           $scope.showProgress = true;
 
@@ -850,7 +885,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
           if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico) {
               DialogModal($modal, "<em>Asientos contables</em>",
@@ -858,7 +893,22 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
+
+          // ninguna de las partidas debe tener un monto con más de 2 decimales
+          if ($scope.asientoContable && $scope.asientoContable.partidas) {
+              if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
+                  DialogModal($modal, "<em>Asientos contables</em>",
+                                      `Aparentemente, al menos una de las partidas en el asiento contable,
+                                       tiene un monto con <b>más de dos decimales</b>.<br /><br />
+                                       Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
+                                       hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
+                                       Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
+                                       Luego puede regresar e intentar grabar el asiento contable.`,
+                                     false).then();
+                  return;
+              }
+          }
 
           $scope.showProgress = true;
 
@@ -915,7 +965,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
           if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico || !$scope.asientoContable.numero) {
               DialogModal($modal, "<em>Asientos contables</em>",
@@ -923,7 +973,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
                                  false).then();
               return;
-          };
+          }
 
           if ($scope.asientoContable.numero < 0) {
               DialogModal($modal, "<em>Asientos contables</em>",
@@ -931,7 +981,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                   "Solo asientos contables con números <b><em>Contab</b></em> pueden ser convertidos.",
                                  false).then();
               return;
-          };
+          }
 
           if ($scope.asientoContable.moneda != $scope.asientoContable.monedaOriginal) {
               DialogModal($modal, "<em>Asientos contables</em>",
@@ -940,7 +990,22 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                                    Solo asientos contables registrados en <em>moneda original</em> pueden ser convertidos.`,
                                  false).then();
               return;
-          };
+          }
+
+          // ninguna de las partidas debe tener un monto con más de 2 decimales
+          if ($scope.asientoContable && $scope.asientoContable.partidas) {
+              if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
+                  DialogModal($modal, "<em>Asientos contables</em>",
+                                      `Aparentemente, al menos una de las partidas en el asiento contable,
+                                       tiene un monto con <b>más de dos decimales</b>.<br /><br />
+                                       Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
+                                       hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
+                                       Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
+                                       Luego puede regresar e intentar grabar el asiento contable.`,
+                                     false).then();
+                  return;
+              }
+          }
 
           $scope.showProgress = true;
 
@@ -1088,3 +1153,21 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
       inicializarItem();
   }
 ]);
+
+function montoConMasDeDosDecimales(partidas) {
+    // verificamos que ninguna de las partidas en el array, tenga más de dos decimales en su monto
+
+    let montoMas2Decimales = false;
+
+    partidas.forEach((x) => {
+        if (x.debe != lodash.round(x.debe, 2)) {
+            montoMas2Decimales = true;
+        }
+
+        if (x.haber != lodash.round(x.haber, 2)) {
+            montoMas2Decimales = true;
+        }
+    })
+
+    return montoMas2Decimales;
+}

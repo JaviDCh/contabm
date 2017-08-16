@@ -188,10 +188,23 @@ Meteor.methods(
 
             provieneDeLista += ")";
             where += ` (a.ProvieneDe In ${provieneDeLista})`;
-        };
+        }
 
-        if (!where)
+
+        // el usuario puede seleccionar solo asientos con debe o haber con más de dos decimales
+        let whereMontosConMasDeDosDecimales = `(1 = 1)`;
+        if (filtro2.soloConMontosConMasDeDosDecimales) {
+            whereMontosConMasDeDosDecimales = `
+            (
+                (((abs(d.debe)*100) - CONVERT(bigint,(abs(d.debe)*100))) <> 0) Or
+                (((abs(d.haber)*100) - CONVERT(bigint,(abs(d.haber)*100))) <> 0)
+            )
+            `;
+        }
+
+        if (!where) {
             where = "1 = 1";            // esto nunca va a ocurrir aquí ...
+        }
 
         // ---------------------------------------------------------------------------------------------------
         // leemos los movimientos bancarios para el período seleccionado. Además, leemos la chequera y la
@@ -202,7 +215,7 @@ Meteor.methods(
                     a.asientoTipoCierreAnualFlag, a.FactorDeCambio as factorDeCambio,
                     COUNT(d.NumeroAutomatico) As cantidadPartidas, SUM(d.debe) As totalDebe, SUM(d.Haber) As totalHaber
                     From Asientos a Left Outer Join dAsientos d On a.NumeroAutomatico = d.NumeroAutomatico
-                    Where ${where}
+                    Where ${where} And ${whereMontosConMasDeDosDecimales}
                     Group by a.NumeroAutomatico, a.Numero, a.Fecha, a.Tipo, a.Descripcion,
                     a.Moneda, a.MonedaOriginal, a.ProvieneDe, a.Ingreso, a.UltAct, a.Cia,
                     a.asientoTipoCierreAnualFlag, a.FactorDeCambio`;

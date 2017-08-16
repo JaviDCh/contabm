@@ -41,6 +41,7 @@ Meteor.methods(
         let mesesConAsientosDescuadrados = [];
 
         // nota: mesACerrar es un array que puede tener más de un mes a cerrar (ej: [ 01, 02, 03, 04, ...])
+        // revisamos cada mes a cerrar, para saber si hay asientos descuadrados o asientos con montos con más de 2 decimales ...
         mesesArray.forEach((mesFiscal) => {
 
             // pasamos 12 cuando el mes fiscal es 13, pues debemos efectuar el cierre anual, pero el período calendario
@@ -74,6 +75,52 @@ Meteor.methods(
                      los que no estén cuadrados.<br /><br /> Luego regrese y ejecute nuevamente el cierre contable para este mes.`);
                 }
             }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // validamos que el mes a cerrar no contenga asientos con más de 2 decimales ...
+            let verificarAsientosConMas2DecimalesEnPeriodo = ContabFunctions.verificarAsientosConMas2DecimalesEnPeriodo(primerDiaMes,
+                                                                                                                        ultimoDiaMes,
+                                                                                                                        ciaContab);
+
+            if (verificarAsientosConMas2DecimalesEnPeriodo.error) {
+                throw new Meteor.Error("asientos-conMas2Decimales",
+                `Existen asientos contables con montos con <b>más de dos decimales</b> en el mes
+                 <em><b>${nombreMesCalendario}</b></em>.
+                 Por favor revise los asientos contables registrados para el mes mencionado y corrija esta situación.<br /><br />
+                 Para corregir estos asientos, Ud. debe seleccionarlos en el <em>registro de asientos contables</em>, usando la
+                 opción específica que existe para ello en el filtro. Luego: 1) abrir cada uno; 2) seleccionar una partida en la
+                 lista y 3) hacer un <em>click</em> en el <em>link cuadrar asiento</em>.<br /><br /> 
+                 Solo entonces debe regresar y continuar con el cierre contable del mes <em><b>${nombreMesCalendario}</b></em>.
+                 `);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             // -------------------------------------------------------------------------------------------------------------
@@ -261,7 +308,7 @@ Meteor.methods(
                         };
             methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
-        });
+        })
 
         // solo cuando se permite cerrar con asientos descuadrados, construimos un mensaje que informe al usuario la existencia de
         // éstos ...
