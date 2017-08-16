@@ -1,4 +1,15 @@
 
+import lodash from 'lodash';
+import moment from 'moment';
+
+import JSZip from 'jszip';
+import XlsxInjector from 'xlsx-injector';
+import fs from 'fs';
+import path from 'path';
+
+// para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
+// para poder hacer un download (usando el url) desde el client ...
+import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/grabarDatosACollectionFS_regresarUrl';
 
 Meteor.methods(
 {
@@ -6,12 +17,6 @@ Meteor.methods(
                                                                     codificacionContable,
                                                                     ciaSeleccionada)
     {
-        // debugger;
-        let Future = Npm.require('fibers/future');
-        let XlsxInjector = Meteor.npmRequire('xlsx-injector');
-        let fs = Npm.require('fs');
-        let path = Npm.require('path');
-
         check(ciaSeleccionada, Object);
 
         // ----------------------------------------------------------------------------------------------------
@@ -173,74 +178,19 @@ Meteor.methods(
         // Save the workbook
         workbook.writeFile(outputPath);
 
-        let future = new Future();
+        // leemos el archivo que resulta de la instrucción anterior; la idea es pasar este 'nodebuffer' a la función que sigue para:
+        // 1) grabar el archivo a collectionFS; 2) regresar su url (para hacer un download desde el client) ...
+        let buf = fs.readFileSync(outputPath);      // no pasamos 'utf8' como 2do. parámetro; readFile regresa un buffer
 
-        // Load an XLSX file into memory
-        fs.readFile(outputPath, Meteor.bindEnvironment(function(err, content) {
+        // el meteor method *siempre* resuelve el promise *antes* de regresar al client; el client recive el resultado del
+        // promise y no el promise object; en este caso, el url del archivo que se ha recién grabado (a collectionFS) ...
 
-            if(err)
-                throw new Meteor.Error('error-leer-plantilla-excel',
-                    `Error: se ha producido un error al intentar leer el <em>archivo resultado</em> de este
-                     proceso en el servidor.
-                     El nombre del archivo que se ha intentado leer es: ${outputPath}.
-                     El mensaje de error recibido es: ${err.toString()}.
-                    `);
-
-            // el método regresa *antes* que la ejecución de este código que es asyncrono. Usamos Future para
-            // que el método espere a que todo termine para regresar ...
-            let newFile = new FS.File();
-            let data2 = new Buffer(content);
-
-            newFile.attachData( data2, {type: 'xlsx'}, Meteor.bindEnvironment(function( err ) {
-                if(err)
-                    throw new Meteor.Error('error-grabar-archivo-collectionFS',
-                        `Error: se ha producido un error al intentar grabar el archivo a un directorio en el servidor.
-                         El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
-                         El mensaje de error recibido es: ${err.toString()}.
-                        `);
-
-                newFile.name(outputFileName);
-                // Collections.Builds.insert( file );
-
-                // agregamos algunos valores al file que vamos a registrar con collectionFS
-                newFile.metadata = {
-                    user: Meteor.user().emails[0].address,
-                    nombreArchivo: outputFileName,
-                    aplicacion: 'contab',
-                    cia: ciaSeleccionada._id,
-                };
-
-                // intentamos eliminar el archivo antes de agregarlo nuevamente ...
-                Files_CollectionFS_tempFiles.remove({ 'metadata.nombreArchivo': outputFileName });
-
-                Files_CollectionFS_tempFiles.insert(newFile, Meteor.bindEnvironment(function (err, fileObj) {
-                    // Inserted new doc with ID fileObj._id, and kicked off the data upload using HTTP
-
-                    if (err) {
-                        throw new Meteor.Error('error-grabar-archivo-collectionFS',
-                            `Error: se ha producido un error al intentar grabar el archivo a un directorio en el servidor.
-                             El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
-                             El mensaje de error recibido es: ${err.toString()}.
-                            `);
-                    };
-
-                    // tenemos que esperar que el file efectivamente se guarde, para poder acceder su url ...
-                    // nótese como Meteor indica que debemos agregar un 'fiber' para correr el callback, pues
-                    // su naturaleza es asynchrona ...
-                    Files_CollectionFS_tempFiles.on("stored", Meteor.bindEnvironment(function (fileObj, storeName) {
-                        const url = fileObj.url({store: storeName});
-                        let result = {
-                            linkToFile: url
-                        };
-                        future['return'](result);
-                    }));
-                }));
-            }));
-        }));
-
-        return future.wait();
+        // nótese que en el tipo de plantilla ponemos 'no aplica'; la razón es que esta plantilla no es 'cargada' por el usuario y de las
+        // cuales hay diferentes tipos (islr, iva, facturas, cheques, ...). Este tipo de plantilla es para obtener algún tipo de reporte
+        // en excel y no tiene un tipo definido ...
+        return grabarDatosACollectionFS_regresarUrl(buf, outputFileName, 'no aplica', 'contab', ciaSeleccionada, Meteor.user(), 'xlsx');
     }
-});
+})
 
 
 // ------------------------------------------------------------------------------------------

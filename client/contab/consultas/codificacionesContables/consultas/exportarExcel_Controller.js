@@ -1,4 +1,6 @@
 
+
+
 AngularApp.controller('ContabCodificacionesContablesConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'codificacionContable', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, codificacionContable, ciaSeleccionada) {
@@ -44,7 +46,7 @@ function ($scope, $modalInstance, $modal, $meteor, codificacionContable, ciaSele
                           Haga un <em>click</em> en el <em>link</em> que se muestra para obtenerlo.`,
                 });
 
-                $scope.downLoadLink = data.linkToFile;
+                $scope.downLoadLink = data;
                 $scope.downloadDocument = true;
 
                 // ------------------------------------------------------------------------------------------------------

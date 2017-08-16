@@ -76,22 +76,6 @@ Meteor.methods(
                 }
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             // validamos que el mes a cerrar no contenga asientos con más de 2 decimales ...
             let verificarAsientosConMas2DecimalesEnPeriodo = ContabFunctions.verificarAsientosConMas2DecimalesEnPeriodo(primerDiaMes,
                                                                                                                         ultimoDiaMes,
@@ -104,24 +88,10 @@ Meteor.methods(
                  Por favor revise los asientos contables registrados para el mes mencionado y corrija esta situación.<br /><br />
                  Para corregir estos asientos, Ud. debe seleccionarlos en el <em>registro de asientos contables</em>, usando la
                  opción específica que existe para ello en el filtro. Luego: 1) abrir cada uno; 2) seleccionar una partida en la
-                 lista y 3) hacer un <em>click</em> en el <em>link cuadrar asiento</em>.<br /><br /> 
+                 lista y 3) hacer un <em>click</em> en el <em>link cuadrar asiento</em>.<br /><br />
                  Solo entonces debe regresar y continuar con el cierre contable del mes <em><b>${nombreMesCalendario}</b></em>.
                  `);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             // -------------------------------------------------------------------------------------------------------------
             // valores para reportar el progreso
@@ -137,7 +107,7 @@ Meteor.methods(
             let eventSelector = { myuserId: this.userId, app: 'contab', process: 'cierreContab' };
             let eventData = {
                               current: currentProcess, max: numberOfProcess, progress: '0 %',
-                              message: `Cerrando el mes ${nombreMesCalendario} ... `
+                              message: `Cerrando el mes <b><em>${nombreMesCalendario}</em></b> ... `
                             };
 
             // sync call
@@ -160,7 +130,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `${nombreMesCalendario} - agregando saldos que no existen `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - agregando saldos que no existen `
                         };
 
             // sync call
@@ -183,7 +153,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '20 %',
-                          message: `${nombreMesCalendario} - inicializando saldos `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - inicializando saldos `
                         };
 
             // sync call
@@ -208,7 +178,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '40 %',
-                          message: `${nombreMesCalendario} - actualizando los saldos (con movimientos del mes) `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - actualizando los saldos (con movimientos del mes) `
                         };
 
             // sync call
@@ -241,7 +211,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '60 %',
-                          message: `${nombreMesCalendario} - actualizando saldos de presupuesto `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - actualizando saldos de presupuesto `
                         };
 
             // sync call
@@ -264,7 +234,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '80 %',
-                          message: `${nombreMesCalendario} - actualizando el Ultimo Mes Cerrado `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - actualizando el Ultimo Mes Cerrado `
                         };
             methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
@@ -304,7 +274,7 @@ Meteor.methods(
 
             eventData = {
                           current: currentProcess, max: numberOfProcess, progress: '100 %',
-                          message: `${nombreMesCalendario} - listo!! `
+                          message: `<b><em>${nombreMesCalendario}</em></b> - listo!! `
                         };
             methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 

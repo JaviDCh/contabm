@@ -59,7 +59,6 @@ Meteor.methods(
         let saldo = {};
 
         // agrupamos por moneda ...
-        // debugger;
         let saldosGroupByMoneda = lodash.groupBy(saldosContables, 'simboloMoneda');
 
         // nótese como ordenamos el objeto por su (unica) key ...

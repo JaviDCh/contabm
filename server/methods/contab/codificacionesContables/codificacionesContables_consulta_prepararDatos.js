@@ -1,4 +1,9 @@
 
+import numeral from 'numeral';
+import moment from 'moment';
+
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+
 Meteor.methods(
 {
     codificacionesContables_consulta_prepararDatos: function (filtro, ciaContabSeleccionada) {

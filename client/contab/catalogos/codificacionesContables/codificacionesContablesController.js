@@ -1,9 +1,9 @@
 
+import lodash from 'lodash';
 
 angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$interval', function ($scope, $meteor, $modal, uiGridConstants, $interval) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ------------------------------------------------------------------------------------------------------------------------------
@@ -11,8 +11,9 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_Codifica
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
       let companiaSeleccionadaDoc = {};
 
-      if (companiaSeleccionada)
+      if (companiaSeleccionada) {
           companiaSeleccionadaDoc = Companias.findOne(companiaSeleccionada.companiaID, { fields: { numero: true, nombre: true } });
+      }
 
       $scope.companiaSeleccionada = {};
 
@@ -33,17 +34,11 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_Codifica
                           _.find($scope.codificacionesContables_codigos_cuentasContables, (x) => { return x.docState; })
 
           return itemsEditados;
-      };
+      }
 
       $scope.closeAlert = function (index) {
           $scope.alerts.splice(index, 1);
-      };
-
-
-
-
-
-
+      }
 
       $scope.exportToFile = () => {
           // permitimos grabar la codificación seleccionad, como un json, a un archivo en el PC. Luego, este archivo podrá
@@ -55,7 +50,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_Codifica
                                   "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
                                  false).then();
               return false;
-          };
+          }
 
           if (!codificacionSeleccionada || _.isEmpty(codificacionSeleccionada) || !codificacionSeleccionada.descripcion) {
               DialogModal($modal, "<em>Codificaciones contables - Exportar a un archivo de texto</em>",
@@ -63,7 +58,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_Codifica
                                   "Aparentemente, ahora no hay una codificación seleccionada en la lista.",
                                  false).then();
               return false;
-          };
+          }
 
           DialogModal($modal, "<em>Codificaciones contables - Exportar a un archivo de texto</em>",
                               `Esta función le permite exportar la codificación que Ud. ha seleccionado en la lista, a un
@@ -78,7 +73,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_Codifica
                                      return false;
                                  },
                              );
-      };
+      }
 
       let exportToFile2 = () => {
           let message = "";

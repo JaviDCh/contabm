@@ -1,4 +1,5 @@
 
+import lodash from 'lodash';
 
 // Este controller (angular) se carga con la página primera del programa
 AngularApp.controller("Contab_Consultas_CodificacionesContables_PrepararDatos_Controller",

@@ -14,7 +14,7 @@
                 ({{ processProgress.current }}/{{ processProgress.max }} - {{ processProgress.progress }})
             </div>
             <div ng-show="processProgress.message" style="font-size: x-small; font-weight: bold; ">
-                ({{ processProgress.message }})
+                <span ng-bind-html="processProgress.message | unsafe"></span>
             </div>
         </div>
     </div>
