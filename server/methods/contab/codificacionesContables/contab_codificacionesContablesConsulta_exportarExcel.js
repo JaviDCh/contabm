@@ -7,6 +7,8 @@ import XlsxInjector from 'xlsx-injector';
 import fs from 'fs';
 import path from 'path';
 
+import { Monedas } from '/imports/collections/monedas';
+
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
 import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/grabarDatosACollectionFS_regresarUrl';

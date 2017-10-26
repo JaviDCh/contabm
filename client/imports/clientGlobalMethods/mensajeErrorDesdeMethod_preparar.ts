@@ -1,10 +1,8 @@
 
 
-let mensajeErrorDesdeMethod_preparar = (errorFromMeteorMethod) => {
-
+export function mensajeErrorDesdeMethod_preparar(errorFromMeteorMethod) {
     // preparamos el mensaje de error que debe ser mostrado al usuario, cuando un Meteor Method falla
     // con un objeto 'error' ...
-
     let err = errorFromMeteorMethod;
 
     let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.<br />";
@@ -39,8 +37,6 @@ let mensajeErrorDesdeMethod_preparar = (errorFromMeteorMethod) => {
         errorMessage += `${err.message}`;
         algo = true;
     }
-    
+
     return errorMessage;
 }
-
-ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar = mensajeErrorDesdeMethod_preparar;

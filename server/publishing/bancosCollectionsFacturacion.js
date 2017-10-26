@@ -1,4 +1,7 @@
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 Meteor.publish("bancosCollectionsFacturacion", function () {
 
     // facturas puede abrirse 'desde pagos'; cuando eso ocurre, muchos collections (catálogos) no están en el

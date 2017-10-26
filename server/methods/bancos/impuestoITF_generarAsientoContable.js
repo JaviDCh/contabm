@@ -1,4 +1,5 @@
 
+import { Monedas } from '/imports/collections/monedas';
 
 Meteor.methods(
 {
@@ -7,10 +8,10 @@ Meteor.methods(
         let currentUser = Meteor.user();
         let movimientosTipoITF_count = MovimientosBancarios.find({ docState: 1, user: currentUser._id }).count();
 
-        if (movimientosTipoITF_count == 0)
-        throw new Meteor.Error("no-existen-registros",
-            `Error: aparentemente, no se han agregado movimientos del tipo ITF, para los cuales construir un asiento contable. `);
-
+        if (movimientosTipoITF_count == 0) {
+            throw new Meteor.Error("no-existen-registros",
+                `Error: aparentemente, no se han agregado movimientos del tipo ITF, para los cuales construir un asiento contable. `);
+        }
         // ----------------------------------------------------------------------------------------------------------------------------
         // leemos parametrosGlobalBancos (pero en mongo) ...
         let parametrosGlobalBancos = ParametrosGlobalBancos.findOne();

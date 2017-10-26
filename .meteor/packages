@@ -16,7 +16,6 @@ es5-shim@4.6.15                # ECMAScript 5 compatibility for older browsers.
 shell-server@0.2.4            # Server-side component of the `meteor shell` command
 
 alanning:roles@=1.2.16
-aldeed:collection2@=2.10.0
 angularui:angular-ui-bootstrap@=0.13.0
 cfs:filesystem@=0.1.2
 cfs:standard-packages@=0.5.9
@@ -38,3 +37,5 @@ check@1.2.5
 dynamic-import@0.1.1
 angular-templates
 ecmascript
+barbatus:typescript
+aldeed:collection2-core@2.0.1

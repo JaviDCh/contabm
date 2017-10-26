@@ -5,7 +5,6 @@ AngularApp.controller("Bancos_Facturas_List_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
-    //debugger;
     $scope.showProgress = false;
 
     // ui-bootstrap alerts ...

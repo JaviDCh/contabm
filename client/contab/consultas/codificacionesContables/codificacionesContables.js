@@ -4,8 +4,6 @@
 AngularApp.controller("Contab_Consultas_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$reactive', function ($scope, $meteor, $modal, uiGridConstants, $reactive) {
 
-        // debugger;
-
         $scope.showProgress = false;
 
         // ui-bootstrap alerts ...

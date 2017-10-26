@@ -2,7 +2,7 @@
 AngularApp.controller("Contab_Consultas_CuentasYMovimientos_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
-    //   debugger; 
+
       // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });

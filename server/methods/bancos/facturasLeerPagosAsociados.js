@@ -1,13 +1,14 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods({
    facturasLeerPagosAsociados: function (claveUnicaFactura) {
 
         // leemos las facturas (en realidad las cuotas) asociadas a un pago en particular
         new SimpleSchema({
-           claveUnicaFactura: { type: Number, decimal: false, optional: false, },
+           claveUnicaFactura: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ claveUnicaFactura, });
 
         let query = "";

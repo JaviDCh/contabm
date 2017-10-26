@@ -2,6 +2,10 @@
 import lodash from 'lodash';
 import moment from 'moment';
 import numeral from 'numeral';
+import { Monedas } from '/imports/collections/monedas.js';
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 AngularApp.controller("Bancos_Facturas_Factura_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'leerTablasImpuestosRetenciones', 'tablasImpuestosRetenciones',
@@ -1535,7 +1539,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                   } else {
                       $scope.proveedor = JSON.parse(result);;
                       $scope.showProgress = false;
-                      
+
                       $scope.$apply();
                   }
               })

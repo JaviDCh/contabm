@@ -1,4 +1,5 @@
 
+import SimpleSchema from 'simpl-schema';
 
 Meteor.publish("temp.Bancos.Consulta.movimientosBancarios", function (cantRecords) {
     // nótese como en estos casos de consultas, siempre regresamos, simplemente, los items que coresponden al usuario

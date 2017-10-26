@@ -1,6 +1,7 @@
 
 import moment from 'moment';
-import numeral from 'numeral'; 
+import numeral from 'numeral';
+import { Monedas } from '/imports/collections/monedas';
 
 let imprimirListadoAsientosContables = (asientosContables, companiaContab, opciones) => {
 

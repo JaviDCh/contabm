@@ -1,6 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods({
    'bancos.pagos.agregarMovimientoBancario': function (pagoID) {
@@ -8,7 +9,7 @@ Meteor.methods({
        // agregamos el asiento que corresponde al registro de una entidad, por ejemplo: factura, pago, nómina,
        // movimiento bancario, etc.
         new SimpleSchema({
-           pagoID: { type: Number, decimal: false, optional: false, },
+           pagoID: { type: SimpleSchema.Integer, optional: false, },
        }).validate({ pagoID });
 
        let currentUser = Meteor.user();

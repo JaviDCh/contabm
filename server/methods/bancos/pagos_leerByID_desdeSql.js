@@ -1,12 +1,13 @@
 
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     'pago.leerByID.desdeSql': function (pk) {
 
         new SimpleSchema({
-            pk: { type: Number, decimal: false, optional: false, }
+            pk: { type: SimpleSchema.Integer, optional: false, }
           }).validate({ pk });
 
         let response = null;

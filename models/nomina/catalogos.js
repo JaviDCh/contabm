@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 // ----------------------------------------
 // Cargos
 // ----------------------------------------
@@ -114,7 +117,10 @@ let gruposEmpleados_SimpleSchema = new SimpleSchema({
     nombre: { type: String, label: "Nombre del grupo", optional: false, },
     descripcion: { type: String, label: "Descripcion del grupo", optional: false, },
     grupoNominaFlag: { type: Boolean, label: "Grupo de nómina?", optional: false, },
-    empleados: { type: [gruposEmpleados_Empleados_SimpleSchema], optional: true, minCount: 0, },
+
+    empleados: { type: Array, optional: true, minCount: 0, },
+    'empleados.$': { type: gruposEmpleados_Empleados_SimpleSchema },
+
     cia:  { type: Number, label: "Cia Contab", optional: false },
 });
 
@@ -144,7 +150,7 @@ let diasFiestaNacional_SimpleSchema = new SimpleSchema({
     claveUnica: { type: Number, label: "Id", optional: false, },
     fecha: { type: Date, label: "Fecha", optional: false },
     tipo: { type: String, label: "Tipo", optional: false },
-    docState: { type: Number, optional: true, }, 
+    docState: { type: Number, optional: true, },
 });
 
 DiasFiestaNacional = new Mongo.Collection("diasFiestaNacional");

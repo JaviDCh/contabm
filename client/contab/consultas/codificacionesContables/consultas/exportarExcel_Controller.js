@@ -5,7 +5,6 @@ AngularApp.controller('ContabCodificacionesContablesConsultaExportarExcel_Contro
 ['$scope', '$modalInstance', '$modal', '$meteor', 'codificacionContable', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, codificacionContable, ciaSeleccionada) {
 
-    // debugger;
     // ui-bootstrap alerts ...
     $scope.alerts = [];
 

@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
  let schema = new SimpleSchema({
      _id: { type: String, optional: false },
 
@@ -10,7 +13,7 @@
      empleado: { type: Number, label: "Empleado", optional: false },
      fechaIngreso: { type: Date, label: "Fecha de ingreso", optional: true, },
      grupoNomina: { type: Number, label: "Grupo de nómina", optional: false },
-     sueldo: { type: Number, label: "Sueldo", optional: true, decimal: true, },
+     sueldo: { type: Number, label: "Sueldo", optional: true, },
 
      // disfrute de las vacaciones
      salida: { type: Date, label: "Fecha salida", optional: false, },
@@ -30,8 +33,8 @@
      cantDiasPago_YaTrabajados: { type: Number, label: "Pago nómina - Cant días ya trabajados", optional: true },
      cantDiasPago_Total: { type: Number, label: "Pago nómina - Cant días totales", optional: true },
      cantDiasPago_Bono: { type: Number, label: "Pago nómina - Cant días bono", optional: true },
-     baseBonoVacacional: { type: Number, label: "Base para el cálculo del bono", optional: true, decimal: true, },
-     montoBono: { type: Number, label: "Monto del bono vacacional", optional: true, decimal: true, },
+     baseBonoVacacional: { type: Number, label: "Base para el cálculo del bono", optional: true, },
+     montoBono: { type: Number, label: "Monto del bono vacacional", optional: true, },
      aplicarDeduccionesFlag: { type: Boolean, label: "pago nómina: aplicar deducciones de nómina?", optional: true, },
      cantDiasDeduccion: { type: Number, label: "pago nómina: deducciones nómina: cant días", optional: true },
 

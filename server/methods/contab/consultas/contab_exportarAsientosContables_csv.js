@@ -1,6 +1,7 @@
 
 import moment from 'moment';
 import numeral from 'numeral';
+import { Monedas } from '/imports/collections/monedas';
 
 Meteor.methods(
 {

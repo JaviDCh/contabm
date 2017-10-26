@@ -1,12 +1,13 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     leerDatosCompaniaParaFactura: function (pk) {
 
         new SimpleSchema({
-            pk: { type: Number, decimal: false, optional: false }
+            pk: { type: Number, optional: false }
           }).vali
 
         let query = `Select Ciudad as ciudad, AplicaIvaFlag as aplicaIvaFlag,

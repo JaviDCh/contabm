@@ -1,4 +1,6 @@
 
+import SimpleSchema from 'simpl-schema';
+
 Meteor.publish("temp.nomina.consulta.cuentasContablesEmpleadoRubro.list", function (cantRecords) {
     // nótese como en estos casos de consultas, siempre regresamos, simplemente, los items que coresponden al usuario
 

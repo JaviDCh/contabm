@@ -1,4 +1,5 @@
-﻿
+
+import { Companias } from '/imports/collections/companias';﻿
 
 AngularApp.controller("UsuariosCompaniasController",
  ['$scope', '$stateParams', '$meteor', '$modal',

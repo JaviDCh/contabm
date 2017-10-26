@@ -1,5 +1,8 @@
 
 // DefinicionCuentasContables
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 let simpleSchema = new SimpleSchema({
     _id: { type: String, optional: false },
 

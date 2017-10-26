@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 let cuentasBancarias_SimpleSchema = new SimpleSchema({
     _id: { type: String, optional: false, },
@@ -6,7 +8,7 @@ let cuentasBancarias_SimpleSchema = new SimpleSchema({
     cuentaBancaria: { type: String, label: "Cuenta bancaria", optional: false, },
     tipo: { type: String, label: 'Tipo cuenta', optional: false, },
     moneda: { type: Number, label: 'Moneda cuenta', optional: false, },
-    lineaCredito: { type: Number, label: "Línea de crédito", optional: true, decimal: true, },
+    lineaCredito: { type: Number, label: "Línea de crédito", optional: true,  },
     estado: { type: String, label: "Estado", optional: false, },
     cuentaContable: { type: Number, label: "Cuenta contable", optional: true, },
     cuentaContableGastosIDB: { type: Number, label: "Cuenta contable IDB", optional: true, },
@@ -25,7 +27,8 @@ let agencias_SimpleSchema = new SimpleSchema({
     fax: { type: String, label: "Fax", optional: true, },
     contacto1: { type: String, label: "Contacto en la agencia", optional: true, },
     contacto2: { type: String, label: "Contacto en la agencia", optional: true, },
-    cuentasBancarias: { type: [cuentasBancarias_SimpleSchema], optional: true, minCount: 0 },
+    cuentasBancarias: { type: Array, optional: true, minCount: 0 },
+    'cuentasBancarias.$': { type: cuentasBancarias_SimpleSchema },
 });
 
 let bancos_SimpleSchema = new SimpleSchema({
@@ -35,7 +38,8 @@ let bancos_SimpleSchema = new SimpleSchema({
     nombreCorto: { type: String, label: 'Nombre corto', optional: true },
     abreviatura: { type: String, label: 'Abreviatura', optional: false },
     codigo: { type: String, label: "Debe", optional: true, },
-    agencias: { type: [agencias_SimpleSchema], optional: true, minCount: 0 },
+    agencias: { type: Array, optional: true, minCount: 0 },
+    'agencias.$': { type: agencias_SimpleSchema },
 });
 
 Bancos = new Mongo.Collection("bancos");

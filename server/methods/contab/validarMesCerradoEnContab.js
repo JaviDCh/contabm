@@ -3,7 +3,7 @@
 Meteor.methods(
 {
     validarMesAnteriorCerradoEnContab: function (fecha, ciaContab) {
-        // debugger;
+
         check(fecha, Date);
         check(ciaContab, Match.Integer);
 

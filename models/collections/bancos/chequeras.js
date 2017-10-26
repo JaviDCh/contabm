@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 let validarChequera = function () {
     // las chequeras del tipo Genérica tienen muchos de sus fields vacíos ...
 

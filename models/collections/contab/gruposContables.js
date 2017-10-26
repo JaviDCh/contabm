@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 GruposContables = new Mongo.Collection("gruposContables");
 
 let schema = new SimpleSchema({

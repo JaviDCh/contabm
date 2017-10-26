@@ -6,6 +6,7 @@ import JSZip from 'jszip';
 import XlsxInjector from 'xlsx-injector';
 import fs from 'fs';
 import path from 'path';
+import SimpleSchema from 'simpl-schema';
 
 // para grabar el contenido (doc word/excel creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...

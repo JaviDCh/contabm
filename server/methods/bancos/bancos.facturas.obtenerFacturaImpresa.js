@@ -5,6 +5,9 @@ import numeral from 'numeral';
 import JSZip from 'jszip';
 import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
+import SimpleSchema from 'simpl-schema';
+
+import { Companias } from '/imports/collections/companias';
 
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
@@ -126,7 +129,7 @@ Meteor.methods(
             facturaItem = {};
             facturaItem = {
                 numeroFactura: factura.numeroFactura,
-                fechaEmision: factura.fechaEmision ? moment(factura.fechaEmision).format('DD-MMM-YYYY') : '',
+                fechaEmision: factura.fechaEmision ? moment(factura.fechaEmision).format('DD-MM-YYYY') : '',
                 nombreCompania: factura.nombreCompania,
                 rifCompania: factura.rifCompania,
                 domicilioCompania: factura.domicilioCompania,

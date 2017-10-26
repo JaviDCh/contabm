@@ -1,6 +1,11 @@
 
 import lodash from 'lodash';
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
+import { Companias } from '/imports/collections/companias';
+
 validarCuenta = function() {
     if (this.isSet && this.value) {
         let intValue = parseInt(this.value);
@@ -62,7 +67,7 @@ let schema = new SimpleSchema({
     grupo: { type: Number, label: "Grupo", optional: false },
     cia: { type: Number, label: "Cia contab", optional: false },
     docState: { type: Number, optional: true },
-    existeEnOrigen: { type: Boolean, optional: true },      // cuando el usuario elmina un registro en sql server, lo eliminamos en mongo ... 
+    existeEnOrigen: { type: Boolean, optional: true },      // cuando el usuario elmina un registro en sql server, lo eliminamos en mongo ...
 });
 
 

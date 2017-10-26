@@ -1,17 +1,18 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import moment from 'moment'; 
+import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     bancosPagosLeerFacturasPendientes: function (proveedor, moneda, fecha, anticipoFlag, cia) {
 
         new SimpleSchema({
-            proveedor: { type: Number, decimal: false, optional: false, },
-            moneda: { type: Number, decimal: false, optional: false, },
+            proveedor: { type: SimpleSchema.Integer, optional: false, },
+            moneda: { type: SimpleSchema.Integer, optional: false, },
             fecha: { type: Date, optional: false, },
             anticipoFlag: { type: Boolean, optional: false, },
-            cia: { type: Number, decimal: false, optional: false, },
+            cia: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ proveedor, moneda, fecha, anticipoFlag, cia, });
 
         // ---------------------------------------------------------------------------------------------------

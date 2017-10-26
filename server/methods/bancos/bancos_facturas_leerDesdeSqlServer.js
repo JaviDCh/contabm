@@ -3,6 +3,7 @@ import moment from 'moment';
 import lodash from 'lodash';
 import numeral from 'numeral';
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -194,17 +195,6 @@ Meteor.methods(
             where += `(f.Estado In ${lista})`;
         };
 
-
-
-
-
-
-
-
-
-
-
-
         // cxcCxPFlag (CxC, CxP, ...)
         if (_.isArray(filtro2.cxcCxP) && filtro2.cxcCxP.length > 0) {
 
@@ -225,18 +215,6 @@ Meteor.methods(
             lista += ")";
             where += `(f.CxCCxPFlag In ${lista})`;
         };
-
-
-
-
-
-
-
-
-
-
-
-
 
         // compañías
         if (_.isArray(filtro2.proveedores) && filtro2.proveedores.length > 0) {

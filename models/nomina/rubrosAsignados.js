@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 let simpleSchema = new SimpleSchema({
     _id: { type: String, optional: false },
@@ -15,7 +17,7 @@ let simpleSchema = new SimpleSchema({
     hasta: { type: Date, label: "Hasta", optional: true },
     siempre: { type: Boolean, label: "Siempre?", optional: true },
     periodicidad: { type: String, label: "Periodicidad (1q/2q/siempre)", optional: true },
-    montoAAplicar: { type: Number, label: "Monto", decimal: true, optional: false },
+    montoAAplicar: { type: Number, label: "Monto", optional: false },
 
     docState: { type: Number, optional: true },
 });

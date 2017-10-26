@@ -1,4 +1,7 @@
 
+import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
+
 // ---------------------------------------------------------------------------------------------------
 // tal como existe en mongodb, Bancos contiene Agencias y, cada agencia, contiene Cuentas bancarias
 // la función que sigue intenta crear un array en el cual cada item es una cuenta bancaria con sus
@@ -37,7 +40,7 @@ let flattenBancos = function (ciaContab) {
                             let cuentaBancaria = {
                                 cuentaInterna: cuenta.cuentaInterna,
                                 cuentaBancaria: cuenta.cuentaBancaria,
-                                cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null, 
+                                cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null,
                                 moneda: cuenta.moneda,
                                 simboloMoneda: _.find(monedas, (x) => { return x.moneda === cuenta.moneda; }).simbolo,
                                 banco: banco.banco,

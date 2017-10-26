@@ -2,6 +2,7 @@
 import lodash from 'lodash';
 import moment from 'moment';
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -11,7 +12,7 @@ Meteor.methods(
             factura: { type: Object, blackbox: true, optional: false, },
             fechaEmisionOriginal: { type: Date, optional: true, },
             fechaRecepcionOriginal: { type: Date, optional: true, },
-            ciaContabID: { type: Number, decimal: false, optional: false, },
+            ciaContabID: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ factura, fechaEmisionOriginal, fechaRecepcionOriginal, ciaContabID, });
 
         if (!factura || !factura.docState) {

@@ -1,4 +1,6 @@
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
   function ($urlRouterProvider, $stateProvider, $locationProvider) {
@@ -196,9 +198,10 @@ AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
 
                     if (Meteor.userId()) {
                         ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
-                        if (ciaSeleccionada)
+                        if (ciaSeleccionada) {
                             ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
-                    };
+                        }
+                    }
 
                     if (ciaContabSeleccionada) {
                         // Ok, los catálogos están en el client
@@ -208,7 +211,7 @@ AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
                             // Ok, los catálogos están en el client
                             deferred.resolve('okey');
                         });
-                    };
+                    }
 
                     return deferred.promise;
                 },

@@ -28,8 +28,7 @@
                     <ul class="nav navbar-nav">
                         <li><a class="navbar_custom_small_header">Compañías </a></li>
                         <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li>
-                        <!-- <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevo()">Nuevo <span class="fa fa-file-o"></span></a></li>
-                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li> -->
+                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevo()">Nuevo <span class="fa fa-file-o"></span></a></li>
                     </ul>
 
                 </div>
@@ -37,12 +36,10 @@
         </nav>
 
         <div ui-grid="companias_ui_grid"
-        ui-grid-edit
-        ui-grid-cellnav
-        ui-grid-resize-columns
-        ui-grid-selection
-             class="angularGrid"
-             style="height: 250px; width: 100%; ">
+            ui-grid-resize-columns
+            ui-grid-selection
+            class="angularGrid"
+            style="height: 250px; width: 100%; ">
         </div>
     </div>
 </div>

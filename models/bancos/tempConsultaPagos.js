@@ -1,5 +1,6 @@
 
-
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 let schema = new SimpleSchema({
     _id: { type: String, optional: false },
@@ -10,7 +11,7 @@ let schema = new SimpleSchema({
     simboloMoneda: { type: String, label: "Moneda", optional: false, },
     miSuFlag: { type: String, label: "Mi/Su", optional: false, },
     concepto: { type: String, label: "Concepto", optional: true, },
-    monto: { type: Number, label: "Monto", decimal: true, optional: true, },
+    monto: { type: Number, label: "Monto", optional: true, },
     user: { type: String, label: 'Mongo user', optional: false, },
 });
 

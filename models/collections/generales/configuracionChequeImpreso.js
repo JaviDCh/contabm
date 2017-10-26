@@ -1,4 +1,6 @@
-﻿
+
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';﻿
 
 // -----------------------------------------------------------------------
 // Datos de configuración para el proceso de impresión de cheques

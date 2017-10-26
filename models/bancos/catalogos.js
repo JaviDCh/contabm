@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 // Formas de pago
 let formasDePago_SimpleSchema = new SimpleSchema({

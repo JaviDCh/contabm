@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 let schema = new SimpleSchema({
     _id: { type: String, optional: false },
@@ -15,15 +17,15 @@ let schema = new SimpleSchema({
     nombreFormaPago: { type: String, label: "Forma pago", optional: false },
     nombreTipoServicio: { type: String, label: "Tipo servicio", optional: false },
     numeroComprobanteSeniat: { type: String, label: "Comp seniat", optional: true },
-    montoNoImponible: { type: Number, label: "Monto no imp", decimal: true, optional: true },
-    montoImponible: { type: Number, label: "Monto imp", decimal: true, optional: true },
-    ivaPorc: { type: Number, label: "Iva%", decimal: true, optional: true },
-    iva: { type: Number, label: "Iva", decimal: true, optional: true },
-    totalFactura: { type: Number, label: "Total factura", decimal: true, optional: false },
-    retencionIslr: { type: Number, label: "Ret Islr", decimal: true, optional: true },
-    retencionIva: { type: Number, label: "Ret Iva", decimal: true, optional: true },
-    anticipo: { type: Number, label: "Anticipo", decimal: true, optional: true },
-    saldo: { type: Number, label: "Saldo", decimal: true, optional: false },
+    montoNoImponible: { type: Number, label: "Monto no imp", optional: true },
+    montoImponible: { type: Number, label: "Monto imp", optional: true },
+    ivaPorc: { type: Number, label: "Iva%", optional: true },
+    iva: { type: Number, label: "Iva", optional: true },
+    totalFactura: { type: Number, label: "Total factura", optional: false },
+    retencionIslr: { type: Number, label: "Ret Islr", optional: true },
+    retencionIva: { type: Number, label: "Ret Iva", optional: true },
+    anticipo: { type: Number, label: "Anticipo", optional: true },
+    saldo: { type: Number, label: "Saldo", optional: false },
     estadoFactura: { type: String, label: "Estado", optional: false },
     user: { type: String, label: 'Mongo user', optional: false },
 });

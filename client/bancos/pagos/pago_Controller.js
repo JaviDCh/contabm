@@ -1,5 +1,6 @@
 
-import moment from 'moment'; 
+import moment from 'moment';
+import { Monedas } from '/imports/collections/monedas';
 
 AngularApp.controller("Bancos_Pagos_Pago_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',

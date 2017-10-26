@@ -3,8 +3,6 @@ Meteor.methods(
 {
     parametrosBancosSave: function (parametrosBancos) {
 
-        // debugger;
-
         if (!_.isArray(parametrosBancos) || parametrosBancos.length == 0) {
             throw new Meteor.Error("Aparentemente, no se han editado los datos en la forma. No hay nada que actualizar.");
         }

@@ -1,6 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import moment from 'moment'; 
+import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -9,7 +10,7 @@ Meteor.methods(
         new SimpleSchema({
             pago: { type: Object, blackbox: true, optional: false, },
             fechaOriginal: { type: Date, optional: true, },
-            ciaContabID: { type: Number, decimal: false, optional: false, },
+            ciaContabID: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ pago, fechaOriginal, ciaContabID, });
 
         if (!pago || !pago.docState) {

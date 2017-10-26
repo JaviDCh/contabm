@@ -1,6 +1,8 @@
 
 import lodash from 'lodash';
 import numeral from 'numeral';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Companias } from '/imports/collections/companias';
 
 angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -58,7 +60,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
 
           // para abrir un modal que permita al usuario leer un doc excel desde el cliente e importar cada row
           // como una cuenta contable
-
           let modalInstance = $modal.open({
               templateUrl: 'client/contab/catalogos/cuentasContables/importarDesdeExcelModal.html',
               controller: 'ContabCatalogosCuentasContablesImportarDesdeExcel_Controller',
@@ -81,7 +82,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
                 function (cancel) {
                     // refrescamos el ui-grid, pues agregamos todas las cuentas desde Excel ..
                     // $scope.cuentasContables_ui_grid.data = [];
-                    // if (_.isArray($scope.cuentasContables))
+                    // if (lodash.isArray($scope.cuentasContables))
                     //    $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
 
                     return true;
@@ -113,7 +114,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
               cuentasContables_ui_grid_api = gridApi;
 
               gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                  //debugger;
                   itemSeleccionado = {};
                   if (row.isSelected) {
                       itemSeleccionado = row.entity;
@@ -134,12 +134,10 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
           rowIdentity: function (row) {
               return row._id;
           },
-
           getRowIdentity: function (row) {
               return row._id;
           }
       };
-
 
       // arrays para llenar los ddl en el ui-grid
       $scope.gruposContables = GruposContables.find({}, { sort: { descripcion: 1 }}).fetch();
@@ -287,7 +285,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
       $scope.deleteItem = function (item) {
           if (item.docState && item.docState === 1)
               // si el item es nuevo, simplemente lo eliminamos del array
-              _.remove($scope.cuentasContables, (x) => { return x._id === item._id; });
+              lodash.remove($scope.cuentasContables, (x) => { return x._id === item._id; });
           else
               item.docState = 3;
       };
@@ -304,16 +302,15 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
           $scope.cuentasContables.push(item);
 
           $scope.cuentasContables_ui_grid.data = [];
-          if (_.isArray($scope.cuentasContables))
+          if (lodash.isArray($scope.cuentasContables))
              $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
       };
 
       $scope.save = function () {
-         //   debugger;
            $scope.showProgress = true;
 
            // eliminamos los items eliminados; del $scope y del collection
-           let editedItems = _.filter($scope.cuentasContables, function (item) { return item.docState; });
+           let editedItems = lodash.filter($scope.cuentasContables, function (item) { return item.docState; });
 
            // determinamos la cuenta y sus niveles, en base a la cuenta 'editada' que el usuario indica
            determinarNivelesCuentaContable(editedItems);
@@ -414,13 +411,13 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
       cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
             onError: function( error ) {
                 // if the sub terminates with an error
-                scope.alerts.length = 0;
-                scope.alerts.push({
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
                     type: 'danger',
                     msg: "Error: se ha producido un error al intentar leer las cuentas contables para la <em>compañía Contab seleccionada</em>.<br />" +
                          "Por favor revise."
                 });
-                scope.showProgress = false;
+                $scope.showProgress = false;
             },
             onReady: function() {
 
@@ -448,7 +445,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
 
       $scope.mostrarDetallesCuentaContable = () => {
 
-          if (!itemSeleccionado || _.isEmpty(itemSeleccionado)) {
+          if (!itemSeleccionado || lodash.isEmpty(itemSeleccionado)) {
               DialogModal($modal, "<em>Cuentas contables - Mostrar detalles</em>",
                                   `Ud. debe seleccionar una cuenta contable en la lista.`,
                                  false).then();
@@ -490,7 +487,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContable
 
 function determinarNivelesCuentaContable(cuentasContables) {
 
-    if (!cuentasContables || !_.isArray(cuentasContables))
+    if (!cuentasContables || !lodash.isArray(cuentasContables))
         return;
 
     cuentasContables.forEach((cuenta) => {
@@ -562,4 +559,4 @@ function determinarNivelesCuentaContable(cuentasContables) {
 
         cuenta.numNiveles = cantidadNiveles;
     });
-};
+}

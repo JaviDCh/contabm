@@ -127,7 +127,6 @@ export default angular.module("categoriasRetencion", [ angularMeteor, uiRouter ]
           }
 
           $scope.nuevo = function () {
-
               // cómo leemos los items directamente desde sql, no vienen con _id, sino el pk propio de sql. Lo usamos en el ui-grid para
               // identificar los items en la lista; por eso debemos actualizarlo aquí para que se muestre correctamente en la lista. Claro que
               // al grabar en sql, éste asignará el pk apropiado (que corresponda)

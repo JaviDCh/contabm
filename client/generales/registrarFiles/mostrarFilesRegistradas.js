@@ -1,30 +1,29 @@
 
+
 AngularApp.controller('MostrarFilesRegistradasController',
 ['$scope', '$modalInstance', '$modal', 'aplicacion', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, aplicacion, ciaSeleccionada) {
 
-    // debugger;
     $scope.companiaSeleccionada = ciaSeleccionada;
 
     $scope.ok = function () {
         $modalInstance.close("Ok");
-    };
+    }
 
     $scope.cancel = function () {
         $modalInstance.dismiss("Cancel");
-    };
+    }
 
     $scope.helpers({
         template_files: () => {
             return Files_CollectionFS_Templates.find({ 'metadata.aplicacion': aplicacion });
         },
-    });
+    })
 
     $scope.fileURL_toString = (file) => {
-        // debugger;
         let urlString = Files_CollectionFS_Templates.findOne({ _id: file._id }).url().toString();
         return urlString;
-    };
+    }
 
     $scope.removeFile = function(file) {
 
@@ -39,7 +38,7 @@ function ($scope, $modalInstance, $modal, aplicacion, ciaSeleccionada) {
                 function (cancel) {
                     return true;
                 }
-            );
-    };
+            )
+    }
 }
-]);
+])

@@ -1,5 +1,8 @@
 
-// NOTA: por ahora no tenemos un collection en mongo para los empleados; sin embargo,
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
+// NOTA: por ahora *no* tenemos un collection en mongo para los empleados; sin embargo,
 // agregamos este schema para validar fácilmente cuando el usuario intenta editar un
 // empleado ...
 
@@ -26,7 +29,7 @@ let empleadoSueldos_simpleSchema = new SimpleSchema({
     id: { type: Number, label: "ID", optional: false, },
     empleadoID: { type: Number, label: "EmpleadoID", optional: false, },
     desde: { type: Date, label: "Desde", optional: false, },
-    sueldo: { type: Number, label: "Sueldo", optional: false, decimal: true, },
+    sueldo: { type: Number, label: "Sueldo", optional: false, },
     docState: { type: Number, optional: true },
 });
 
@@ -42,8 +45,11 @@ let simpleSchema = new SimpleSchema({
     edoCivil: { type: String, label: "Edo civil", optional: false },
 
     // nota importante: cuando el empleado sea registrado en mongo, estos items estarían en collections separados (ie: no arrays)
-    faltas: { type: [empleadoFaltas_simpleSchema], optional: true, minCount: 0 },
-    sueldos: { type: [empleadoSueldos_simpleSchema], optional: true, minCount: 0 },
+    faltas: { type: Array, optional: true, minCount: 0 },
+    'faltas.$': { type: empleadoFaltas_simpleSchema },
+
+    sueldos: { type: Array, optional: true, minCount: 0 },
+    'sueldos.$': { type: empleadoSueldos_simpleSchema },
 
     sexo: { type: String, label: "Sexo", optional: false, },
     nacionalidad: { type: String, label: "Nacionalidad", optional: false },
@@ -76,10 +82,10 @@ let simpleSchema = new SimpleSchema({
     telefonoCon3: { type: String, label: "Teléfono contacto 3", optional: true },
 
     empleadoObreroFlag: { type: Number, label: "Empleado/Obrero", optional: true, },
-    montoCestaTickets: { type: Number, label: "Monto cesta tickets", optional: true, decimal: true, },
+    montoCestaTickets: { type: Number, label: "Monto cesta tickets", optional: true, },
     bonoVacAgregarSueldoFlag: { type: Boolean, label: "Bono vac: agregar sueldo?", optional: true, },
     bonoVacAgregarMontoCestaTicketsFlag: { type: Boolean, label: "Bono vac: agregar monto cesta tickets?", optional: true, },
-    bonoVacacionalMontoAdicional: { type: Number, label: "Bono vac: monto adicional", optional: true, decimal: true, },
+    bonoVacacionalMontoAdicional: { type: Number, label: "Bono vac: monto adicional", optional: true, },
     bonoVacAgregarMontoAdicionalFlag: { type: Boolean, label: "Bono vac: agregar monto adicional", optional: true, },
     prestacionesAgregarMontoCestaTicketsFlag: { type: Boolean, label: "Prestaciones: agregar monto de cesta tickets", optional: true, },
     cia: { type: Number, label: "Cia Contab", optional: false, },

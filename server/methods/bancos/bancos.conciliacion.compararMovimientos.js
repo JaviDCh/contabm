@@ -1,6 +1,7 @@
 
 import numeral from 'numeral';
 import lodash from 'lodash';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {

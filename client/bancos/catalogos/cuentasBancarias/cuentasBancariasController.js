@@ -1,5 +1,8 @@
 
 
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Companias } from '/imports/collections/companias';
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabM.bancos.catalogos").controller("Catalogos_CuentasBancarias_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -11,22 +14,26 @@ angular.module("contabM.bancos.catalogos").controller("Catalogos_CuentasBancaria
 
       $scope.closeAlert = function (index) {
           $scope.alerts.splice(index, 1);
-      };
+      }
 
       // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
       let companiaSeleccionadaDoc = {};
 
-      if (companiaSeleccionada)
-          companiaSeleccionadaDoc = Companias.findOne(companiaSeleccionada.companiaID, { fields: { numero: true, nombre: true, nombreCorto: true } });
+      if (companiaSeleccionada) { 
+        companiaSeleccionadaDoc = Companias.findOne(companiaSeleccionada.companiaID, { fields: { numero: true, nombre: true, nombreCorto: true } });
+      }
+          
 
       $scope.companiaSeleccionada = {};
 
-      if (companiaSeleccionadaDoc)
-          $scope.companiaSeleccionada = companiaSeleccionadaDoc;
-      else
-          $scope.companiaSeleccionada.nombre = "No hay una compañía seleccionada ...";
+      if (companiaSeleccionadaDoc) { 
+        $scope.companiaSeleccionada = companiaSeleccionadaDoc;
+      }
+      else { 
+        $scope.companiaSeleccionada.nombre = "No hay una compañía seleccionada ...";
+      }
       // ------------------------------------------------------------------------------------------------
 
       let bancos_ui_grid_api = null;
@@ -65,11 +72,10 @@ angular.module("contabM.bancos.catalogos").controller("Catalogos_CuentasBancaria
           rowIdentity: function (row) {
               return row._id;
           },
-
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
       $scope.bancos_ui_grid.columnDefs = [
           {
@@ -108,7 +114,7 @@ angular.module("contabM.bancos.catalogos").controller("Catalogos_CuentasBancaria
               enableSorting: true,
               type: 'string'
           },
-      ];
+      ]
 
 
       let agencias_ui_grid_api = null;

@@ -3,7 +3,6 @@ AngularApp.controller('CuentasContablesYMovimientos_MostrarMovimientos_Modal_Con
 ['$scope', '$modalInstance', '$modal', '$meteor', 'uiGridConstants', 'movimientos', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, movimientos, ciaSeleccionada) {
 
-    // debugger;
     $scope.showProgress = false;
     // ui-bootstrap alerts ...
     $scope.alerts = [];

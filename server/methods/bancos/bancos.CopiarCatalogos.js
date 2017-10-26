@@ -1,6 +1,10 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import numeral from 'numeral';
+import SimpleSchema from 'simpl-schema';
+import { Monedas } from '/imports/collections/monedas';
+import { Monedas_sql } from '/server/imports/sqlModels/monedas';
+import { Companias } from '/imports/collections/companias';
 
 Meteor.methods(
 {
@@ -53,7 +57,15 @@ Meteor.methods(
                 telefono1: item.telefono1,
                 telefono2: item.telefono2,
                 fax: item.fax,
+
+                emailServerName: item.emailServerName,
+                emailServerPort: item.emailServerPort, 
+                emailServerSSLFlag: item.emailServerSSLFlag,
+                emailServerCredentialsUserName: item.emailServerCredentialsUserName,
+                emailServerCredentialsPassword: item.emailServerCredentialsPassword,
+
                 monedaDefecto: item.monedaDefecto,
+                suspendidoFlag: item.suspendidoFlag, 
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
@@ -115,11 +127,11 @@ Meteor.methods(
         response.result.rows.forEach((item) => {
             // para cada catálogos, hacemos un 'upsert'; primero leemos a ver si existe; de ser así, usamos el _id del doc que existe ...
 
-            let itemExisteID = Monedas.findOne({ moneda: item.id }, { fields: { _id: true }});
+            let itemExisteID = Monedas.findOne({ moneda: item.moneda }, { fields: { _id: true }});
 
             let moneda = {
                 _id: itemExisteID ? itemExisteID._id : new Mongo.ObjectID()._str,
-                moneda: item.id,
+                moneda: item.moneda,
                 descripcion: item.descripcion,
                 simbolo: item.simbolo,
                 nacionalFlag: item.nacionalFlag,
@@ -127,11 +139,12 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) {
                 Monedas.update({ _id: itemExisteID._id }, { $set: moneda });
-            else
+            }
+            else {
                 Monedas.insert(moneda);
-
+            }
 
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
@@ -403,7 +416,7 @@ Meteor.methods(
                         chequeras: [],
                     };
 
-                    agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo); 
+                    agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo);
                 });
 
                 document.agencias.push(agenciaMongo);

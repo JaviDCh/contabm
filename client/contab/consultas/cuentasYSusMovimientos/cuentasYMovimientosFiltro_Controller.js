@@ -1,11 +1,12 @@
 
 import moment from 'moment';
+import lodash from 'lodash';
+import { Monedas } from '/imports/collections/monedas';
 
 AngularApp.controller("Contab_Consultas_CuentasYMovimientos_Filtro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 
-    // debugger;
     $scope.showProgress = false;
 
     // para reportar el progreso de la tarea en la página

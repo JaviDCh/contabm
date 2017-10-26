@@ -18,23 +18,3 @@ if (Meteor.isServer) {
     }
   });
 };
-
-// al menos por ahora esto no es neceasario, pues estos files en 'temp' serán
-// accedidos *solo* desde el servidor ...
-
-// if (Meteor.isServer) {
-//     Files_CollectionFS_Templates.allow({
-//     insert: function (userId) {
-//       return (userId ? true : false);
-//     },
-//     remove: function (userId) {
-//       return (userId ? true : false);
-//     },
-//     download: function () {
-//       return true;
-//     },
-//     update: function (userId) {
-//       return (userId ? true : false);
-//     }
-//   });
-// };

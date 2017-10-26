@@ -1,5 +1,6 @@
 
-let mostrarHelp = (currentStateName) => {
+
+export function mostrarHelp(currentStateName) {
     // abrimos un página, en un tab separado, que muestra un help para el state actual.
     // NOta: normalmente, el help para cada state será un post en el blog que mantenemos para contab ...
     switch (currentStateName) {
@@ -70,7 +71,5 @@ let mostrarHelp = (currentStateName) => {
           break;
         }
         default:
-    };
-};
-
-ClientGlobal_Methods.mostrarHelp = mostrarHelp;
+    }
+}

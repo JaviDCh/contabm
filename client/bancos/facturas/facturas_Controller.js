@@ -1,4 +1,7 @@
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 AngularApp.controller("Bancos_Facturas_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'leerTablasImpuestosRetenciones',
 function ($scope, $stateParams, $state, $meteor, $modal, leerTablasImpuestosRetenciones) {
@@ -107,7 +110,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, leerTablasImpuestosRete
           }
 
           if (proveedores_subscriptionHandle) {
-            proveedores_subscriptionHandle.stop(); 
+            proveedores_subscriptionHandle.stop();
           }
         })
   }

@@ -1,4 +1,6 @@
 ﻿
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 Meteor.publish(null, function () {
     // nótese como la idea es regresar aquí todos los catálogos ...
@@ -11,9 +13,10 @@ Meteor.publish(null, function () {
 
     if (this.userId) {
         ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId });
-        if (ciaSeleccionada)
+        if (ciaSeleccionada) {
             ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
-    };
+        }
+    }
 
     // solo regresamos las cuentas contables que corresponden a la compañía Contab seleccionada por el usuario ...
     // dejamos de regresar las cuentas contables; la razón es que son demasiadas; las persistimos al cliente con
@@ -29,6 +32,6 @@ Meteor.publish(null, function () {
              CompaniaSeleccionada.find({ userID: this.userId }),
              Parentescos.find(),
              TiposDeCuentaBancaria.find(),
-             MaestraRubros.find(), 
-    ];
-});
+             MaestraRubros.find(),
+    ]
+})

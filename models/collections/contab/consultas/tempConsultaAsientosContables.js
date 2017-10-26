@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 Temp_Consulta_AsientosContables = new Mongo.Collection("temp_consulta_asientosContables");
 
@@ -13,10 +15,10 @@ let schema = new SimpleSchema({
     monedaOriginal: { type: Number, label: "Moneda original", optional: false },
     provieneDe: { type: String, label: 'Proviene de', optional: true },
     asientoTipoCierreAnualFlag: { type: Boolean, label: "Cierre anual?", optional: true },
-    factorDeCambio: { type: Number, optional: false, decimal: true, },
+    factorDeCambio: { type: Number, optional: false, },
     cantidadPartidas: { type: Number, optional: false, },
-    totalDebe: { type: Number, optional: true, decimal: true, },
-    totalHaber: { type: Number, optional: true, decimal: true,  },
+    totalDebe: { type: Number, optional: true, },
+    totalHaber: { type: Number, optional: true, },
     ingreso: { type: Date, label: "Ingreso", optional: false },
     ultAct: { type: Date, label: "UltAct", optional: false },
     cia: { type: Number, label: "Cia Contab", optional: false },

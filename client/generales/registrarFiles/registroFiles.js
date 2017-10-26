@@ -1,4 +1,7 @@
 ﻿
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 AngularApp.controller("RegistroFiles_Controller",
 ['$scope', '$state', '$stateParams', '$meteor', '$modal',
   function ($scope, $state, $stateParams, $meteor, $modal) {
@@ -10,47 +13,50 @@ AngularApp.controller("RegistroFiles_Controller",
 
       $scope.closeAlert = function (index) {
           $scope.alerts.splice(index, 1);
-      };
+      }
 
       // para agregar la aplicación (contab, nomina, bancos, etc.), al 'metadata' del archivo que cargue
       // el usuario ...
       let stateParams_aplicacion = $stateParams.aplicacion;
 
-      // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada
       var companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
 
       let companiaSeleccionadaDoc = null;
-      if (companiaSeleccionada)
-          companiaSeleccionadaDoc = Companias.findOne(companiaSeleccionada.companiaID, { fields: { nombre: 1 } });
-
+      if (companiaSeleccionada) { 
+        companiaSeleccionadaDoc = Companias.findOne(companiaSeleccionada.companiaID, { fields: { nombre: 1 } });
+      }
+          
       $scope.companiaSeleccionada = {};
 
-      if (companiaSeleccionadaDoc)
-          $scope.companiaSeleccionada = companiaSeleccionadaDoc;
-      else
-          $scope.companiaSeleccionada.nombre = "No hay una compañía seleccionada ...";
-      // ------------------------------------------------------------------------------------------------
-
+      if (companiaSeleccionadaDoc) { 
+        $scope.companiaSeleccionada = companiaSeleccionadaDoc;
+      }  
+      else { 
+        $scope.companiaSeleccionada.nombre = "No hay una compañía seleccionada ...";
+      }
+          
       $scope.fileTypes_List = [];
 
       switch (stateParams_aplicacion) {
-          case "bancos":
-                $scope.fileTypes_List.push({ id: 'BANCOS-CHEQUES', descripcion: 'Bancos - Cheques impresos', });
-                $scope.fileTypes_List.push({ id: 'BANCOS-FACTURAS', descripcion: 'Bancos - Facturas (impresas)', });
-                $scope.fileTypes_List.push({ id: 'BANCOS-RET-IMP-IVA', descripcion: 'Bancos - Retención de impuestos Iva', });
-                $scope.fileTypes_List.push({ id: 'BANCOS-RET-IMP-ISLR', descripcion: 'Bancos - Retención de impuestos Islr', });
-              break;
-          case "nomina":
-              $scope.fileTypes_List.push(
-                  {
-                      id: 'NOMINA-CONSTANCIA-TRABAJO',
-                      descripcion: 'Nómina - constancias de trabajo de empleados'
-                  }
-              );
-              break;
+          case "bancos": { 
+            $scope.fileTypes_List.push({ id: 'BANCOS-CHEQUES', descripcion: 'Bancos - Cheques impresos', });
+            $scope.fileTypes_List.push({ id: 'BANCOS-FACTURAS', descripcion: 'Bancos - Facturas (impresas)', });
+            $scope.fileTypes_List.push({ id: 'BANCOS-RET-IMP-IVA', descripcion: 'Bancos - Retención de impuestos Iva', });
+            $scope.fileTypes_List.push({ id: 'BANCOS-RET-IMP-ISLR', descripcion: 'Bancos - Retención de impuestos Islr', });
+          break;
+          } 
+          case "nomina": { 
+            $scope.fileTypes_List.push(
+                {
+                    id: 'NOMINA-CONSTANCIA-TRABAJO',
+                    descripcion: 'Nómina - constancias de trabajo de empleados'
+                }
+            );
+            break;
+          }
           default:
-      };
+      }
 
 
     // $scope.subscribe('images');
@@ -59,7 +65,7 @@ AngularApp.controller("RegistroFiles_Controller",
 
     $scope.uploadFile = function(files) {
       userSelectedFile = files[0];
-    };
+    }
 
     $scope.submitted = false;
 
@@ -107,7 +113,7 @@ AngularApp.controller("RegistroFiles_Controller",
             $(":file").filestyle('disabled', false);
         else
             $(":file").filestyle('disabled', true);
-    };
+    }
 
     $scope.submitGrabarFilesForm = function () {
 
@@ -125,7 +131,7 @@ AngularApp.controller("RegistroFiles_Controller",
 
               $scope.showProgress = true;
               return;
-          };
+          }
 
           if ($scope.grabarFilesForm.$valid) {
               $scope.submitted = false;
@@ -169,7 +175,7 @@ AngularApp.controller("RegistroFiles_Controller",
 
                       $scope.showProgress = false;
                       return;
-                  };
+                  }
 
                   userSelectedFile = null;
                   $scope.tipoArchivo = "";
@@ -184,9 +190,9 @@ AngularApp.controller("RegistroFiles_Controller",
                       false).then();
 
                   $scope.showProgress = false;
-              });
-        };
-    };
+              })
+        }
+    }
 
 
     // --------------------------------------------------------------------------------------------------------------------
@@ -203,7 +209,7 @@ AngularApp.controller("RegistroFiles_Controller",
             $scope.showProgress = false;
             // $scope.$apply();
       }
-    });
+    })
   // --------------------------------------------------------------------------------------------------------------------
 }
-]);
+])

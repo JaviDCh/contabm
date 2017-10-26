@@ -1,4 +1,7 @@
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 Meteor.publish("proveedores", function (proveedorID) {
 
     // con los proveedores, nos aseguramos de regresar la compañía seleccionada; es importante pues

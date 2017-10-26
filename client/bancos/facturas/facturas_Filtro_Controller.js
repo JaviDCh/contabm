@@ -1,4 +1,7 @@
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 AngularApp.controller("Bancos_Facturas_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
@@ -92,7 +95,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
                 $scope.showProgress = false;
                 $scope.$apply();
                 return;
-            };
+            }
 
             // ------------------------------------------------------------------------------------------------------
             // guardamos el filtro indicado por el usuario
@@ -109,7 +112,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
                     userId: Meteor.userId(),
                     nombre: 'bancos.facturas',
                     filtro: $scope.filtro
-                });
+                })
             // ------------------------------------------------------------------------------------------------------
 
             // // suscribimos a los asientos que se han leído desde sql y grabado a mongo para el usuario

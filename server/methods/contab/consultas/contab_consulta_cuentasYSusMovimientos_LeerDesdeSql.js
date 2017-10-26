@@ -2,13 +2,13 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
 import numeral from 'numeral';
-import lodash from 'lodash'; 
+import lodash from 'lodash';
+import { Monedas } from '/imports/collections/monedas';
 
 Meteor.methods(
 {
     contab_consulta_cuentasYSusMovimientos_LeerDesdeSql: function (filtro, ciaContab)
     {
-        // debugger;
         let filtro2 = JSON.parse(filtro);
 
         check(filtro2, Object);

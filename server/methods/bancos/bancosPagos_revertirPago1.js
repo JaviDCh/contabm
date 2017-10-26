@@ -1,12 +1,13 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     bancosPagos_revertirPago1: function (claveUnicaPago) {
 
         new SimpleSchema({
-            claveUnicaPago: { type: Number, decimal: false, optional: false, },
+            claveUnicaPago: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ claveUnicaPago, });
 
         let query = '';

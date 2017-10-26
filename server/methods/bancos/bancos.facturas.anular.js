@@ -2,13 +2,14 @@
 
 import moment from 'moment';
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     'bancos.facturas.anular': function (facturaID, noModificarAsientoContableAsociado) {
 
         new SimpleSchema({
-            facturaID: { type: Number, decimal: false, optional: false, },
+            facturaID: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ facturaID, });
 
         // una factura con pagos no puede ser alterada
@@ -108,7 +109,7 @@ Meteor.methods(
               }
           }
         }
-        
+
 
         // ponemos todos los montos en cero
         anularFactura(factura.claveUnica);

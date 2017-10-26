@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 let schema = new SimpleSchema({
     _id: { type: String, optional: false },
     conciliacionID: { type: String, optional: false },

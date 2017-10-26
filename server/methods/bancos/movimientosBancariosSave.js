@@ -1,6 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -9,7 +10,7 @@ Meteor.methods(
         new SimpleSchema({
             movimientoBancario: { type: Object, blackbox: true, optional: false, },
             fechaOriginalMovimientoBancario: { type: Date, optional: true, },
-            ciaContab: { type: Number, decimal: false, optional: false, },
+            ciaContab: { type: SimpleSchema.Integer, optional: false, },
         }).validate({ movimientoBancario, fechaOriginalMovimientoBancario, ciaContab, });
 
         if (!movimientoBancario || !movimientoBancario.docState) {

@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 // solo para registrar movimientos bancarios para el proceso de agregar itf a movimientos que existen
 
 MovimientosBancarios = new Mongo.Collection("movimientosBancarios");
@@ -16,10 +19,10 @@ let schema = new SimpleSchema({
     beneficiario: { type: String, label: 'Beneficiario', optional: false, },
     concepto: { type: String, label: 'Concepto', optional: false, },
     signo: { type: Boolean, label: 'Signo', optional: false, },
-    montoBase: { type: Number, label: 'Monto base', decimal: true, optional: true, },
-    comision: { type: Number, label: 'Comisión', decimal: true, optional: true, },
-    impuestos: { type: Number, label: 'Impuesto', decimal: true, optional: true, },
-    monto: { type: Number, label: 'Monto', optional: false, decimal: true, },
+    montoBase: { type: Number, label: 'Monto base', optional: true, },
+    comision: { type: Number, label: 'Comisión', optional: true, },
+    impuestos: { type: Number, label: 'Impuesto', optional: true, },
+    monto: { type: Number, label: 'Monto', optional: false, },
     ingreso: { type: Date, label: 'Fecha de ingreso', optional: false, },
     ultMod: { type: Date, label: 'Fecha de ult mod', optional: false, },
     usuario: { type: String, label: 'Usuario', optional: false, },

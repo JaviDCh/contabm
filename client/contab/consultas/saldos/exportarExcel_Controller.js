@@ -3,7 +3,6 @@ AngularApp.controller('ContabSaldosConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, ciaSeleccionada) {
 
-    // debugger;
     // ui-bootstrap alerts ...
     $scope.alerts = [];
 

@@ -2,6 +2,9 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
 import lodash from 'lodash';
+import SimpleSchema from 'simpl-schema';
+
+import { Monedas } from '/imports/collections/monedas';
 
 Meteor.methods({
    'generales.agregarAsientoContableAEntidad': function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {
@@ -10,8 +13,8 @@ Meteor.methods({
        // movimiento bancario, etc.
         new SimpleSchema({
            provieneDe: { type: String, optional: false, },
-           provieneDe_ID: { type: Number, decimal: false, optional: false, },
-           ciaContabSeleccionada_ID: { type: Number, decimal: false, optional: false, },
+           provieneDe_ID: { type: SimpleSchema.Integer, optional: false, },
+           ciaContabSeleccionada_ID: { type: SimpleSchema.Integer, optional: false, },
        }).validate({ provieneDe, provieneDe_ID, ciaContabSeleccionada_ID, });
 
        let currentUser = Meteor.user();

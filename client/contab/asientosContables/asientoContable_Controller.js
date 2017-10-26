@@ -1,6 +1,10 @@
 
 import lodash from 'lodash';
 import saveAs from 'save-as'
+import { Monedas } from '/imports/collections/monedas';
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 AngularApp.controller("Contab_AsientoContable_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'catalogosContab',
@@ -301,10 +305,25 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                   // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
 
                   $scope.asientoContable.tipo = asientoContable.tipo ? asientoContable.tipo : "";
-                  $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.fecha : "";
+                  $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
                   $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
                   $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
                   $scope.asientoContable.factorDeCambio = asientoContable.factorDeCambio ? asientoContable.factorDeCambio : 0;
+
+                  // si no viene la moneda, puede venir su simbolo (scrwebm)
+                  if (!$scope.asientoContable.moneda && asientoContable.monedaSimbolo) {
+                      let moneda = Monedas.findOne({ simbolo: asientoContable.monedaSimbolo });
+                      if (moneda) {
+                          $scope.asientoContable.moneda = moneda.moneda;
+                      }
+                  }
+
+                  if (!$scope.asientoContable.monedaOriginal && asientoContable.monedaOriginalSimbolo) {
+                      let monedaOriginal = Monedas.findOne({ simbolo: asientoContable.monedaOriginalSimbolo });
+                      if (monedaOriginal) {
+                          $scope.asientoContable.monedaOriginal = monedaOriginal.moneda;
+                      }
+                  }
 
                   if (_.isArray(asientoContable.partidas)) {
 
@@ -328,6 +347,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                               partida.partida = ultimaPartida.partida + 10;
                           };
 
+                          // TODO: modificar para que, si el valor cuentaContableID no viene con la partida, y si viene
+                          // cuentaContable, buscar el id de la cuenta en el catálogo de cuenta y resolver.
+
+                          // la idea es resolver: el asiento que viene desde scrwebm no trae una cuentaContableID (ej: 2500) sino,
+                          // más bien, la cuenta contable (ej: cuentaContable: '1 001 001 01')
+
                           partida.cuentaContableID = p.cuentaContableID ? p.cuentaContableID : null;
                           partida.descripcion = p.descripcion ? p.descripcion : "";
                           partida.referencia = p.referencia ? p.referencia : "";
@@ -335,6 +360,17 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                           partida.haber = p.haber ? p.haber : 0;
                           partida.centroCosto = p.centroCosto ? p.centroCosto : null;
                           partida.docState = 1;
+
+                          // puede venir el código de la cuenta (scrwebm)
+                          if (!partida.cuentaContableID && p.cuentaContable) {
+                              let codigoCuenta = p.cuentaContable.trim();
+                              codigoCuenta = codigoCuenta.replace(/ /g, '');
+                              let cuentaContable = CuentasContables2.findOne({ cuenta: codigoCuenta });
+
+                              if (cuentaContable) {
+                                 partida.cuentaContableID = cuentaContable.id;
+                              }
+                          }
 
                           $scope.asientoContable.partidas.push(partida);
                       });

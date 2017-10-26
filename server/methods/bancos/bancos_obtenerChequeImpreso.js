@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import JSZip from 'jszip';
 import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
+import SimpleSchema from 'simpl-schema';
 
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
@@ -23,7 +24,7 @@ Meteor.methods(
             tipoArchivo: { type: String, optional: false, },
             ciaSeleccionada: { type: Object, blackbox: true, optional: false, },
             userID: { type: String, optional: false, },
-            movimientoBancarioID: { type: Number, decimal: false, optional: false, },
+            movimientoBancarioID: { type: SimpleSchema.Integer, optional: false, },
             nombreArchivo: { type: String, optional: false, },
         }).validate({ fileID, tipoArchivo, ciaSeleccionada, userID, movimientoBancarioID, nombreArchivo, });
 

@@ -1,5 +1,6 @@
 
 import lodash from 'lodash';
+import { Monedas } from '/imports/collections/monedas';
 
 angular.module("contabM.contab.catalogos").controller("Catalogos_ParametrosContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

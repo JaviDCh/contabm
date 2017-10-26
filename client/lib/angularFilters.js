@@ -1,6 +1,8 @@
 
 import numeral from "numeral";
-import moment from "moment"; 
+import moment from "moment";
+import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
 
 // ---------------------------------------------------------------------------------------
 // ui-grid: para formatear fields numéricos y dates

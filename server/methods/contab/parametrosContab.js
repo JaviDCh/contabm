@@ -1,4 +1,5 @@
 
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {

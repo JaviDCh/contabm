@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 TiposAsientoContable = new Mongo.Collection("tiposAsientoContable");
 

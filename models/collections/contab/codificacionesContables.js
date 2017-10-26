@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 // -------------------------------------------------------------------------------------------------------
 // *** CodificacionesContables_codigos_cuentasContables ***
@@ -13,19 +15,6 @@ let cuentaContable_SimpleSchema = new SimpleSchema({
 
 CodificacionesContables_codigos_cuentasContables = new Mongo.Collection("codificacionesContables_codigos_cuentasContables");
 CodificacionesContables_codigos_cuentasContables.attachSchema(cuentaContable_SimpleSchema);
-
-// -------------------------------------------------------------------------------------------------------
-// *** CodificacionesContables_codigos ***
-// let resumen_SimpleSchema = new SimpleSchema({
-//     _id: { type: String, optional: false },
-//     moneda: { type: Number, label: 'moneda', optional: false },
-//     simboloMoneda: { type: String, label: "Simbolo moneda", optional: false },
-//     cantidadMovimientos: { type: Number, label: 'Debe', decimal: false, optional: false },
-//     saldoInicial: { type: Number, label: 'Saldo inicial', decimal: true, optional: false },
-//     debe: { type: Number, label: 'Debe', decimal: true, optional: false },
-//     haber: { type: Number, label: 'Haber', decimal: true, optional: false },
-//     saldoActual: { type: Number, label: 'Saldo actual', decimal: true, optional: false },
-// });
 
 let codigoContable_SimpleSchema = new SimpleSchema({
     _id: { type: String, optional: false },
@@ -82,10 +71,10 @@ let movimientos_SimpleSchema = new SimpleSchema({
     comprobante: { type: Number, label: 'Comprobante', optional: true },
     descripcion: { type: String, label: 'Descripción', optional: true },
     referencia: { type: String, label: 'Referencia', optional: true },
-    saldoInicial: { type: Number, label: 'Saldo inicial', decimal: true, optional: false },
-    debe: { type: Number, label: 'Debe', decimal: true, optional: false },
-    haber: { type: Number, label: 'Haber', decimal: true, optional: false },
-    saldo: { type: Number, label: 'Saldo', decimal: true, optional: false },
+    saldoInicial: { type: Number, label: 'Saldo inicial', optional: false },
+    debe: { type: Number, label: 'Debe', optional: false },
+    haber: { type: Number, label: 'Haber', optional: false },
+    saldo: { type: Number, label: 'Saldo', optional: false },
 
     cia: { type: Number, label: "Cia Contab", optional: false },
     user: { type: String, label: "Usuario", optional: false },

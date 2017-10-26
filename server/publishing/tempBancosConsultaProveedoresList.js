@@ -1,4 +1,5 @@
 
+import SimpleSchema from 'simpl-schema';
 
 Meteor.publish("temp.bancos.consulta.proveedores.list", function (cantRecords) {
     // nótese como en estos casos de consultas, siempre regresamos, simplemente,

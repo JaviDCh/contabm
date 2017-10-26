@@ -1,6 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import numeral from 'numeral'; 
+import numeral from 'numeral';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {

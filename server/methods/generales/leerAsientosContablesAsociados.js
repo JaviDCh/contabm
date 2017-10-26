@@ -1,6 +1,7 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import moment from 'moment'; 
+import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods({
    leerAsientosContablesAsociados: function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {
@@ -10,8 +11,8 @@ Meteor.methods({
 
         new SimpleSchema({
            provieneDe: { type: String, optional: false, },
-           provieneDe_ID: { type: Number, decimal: false, optional: false, },
-           ciaContabSeleccionada_ID: { type: Number, decimal: false, optional: false, },
+           provieneDe_ID: { type: SimpleSchema.Integer, optional: false, },
+           ciaContabSeleccionada_ID: { type: SimpleSchema.Integer, optional: false, },
        }).validate({ provieneDe, provieneDe_ID, ciaContabSeleccionada_ID, });
 
 

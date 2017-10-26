@@ -1,12 +1,13 @@
 
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
     'factura.leerByID.desdeSql': function (pk) {
 
         new SimpleSchema({
-            pk: { type: Number, decimal: false }
+            pk: { type: SimpleSchema.Integer, }
           }).validate({ pk });
 
         let response = null;

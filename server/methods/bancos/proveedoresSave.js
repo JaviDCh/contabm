@@ -2,6 +2,7 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
 import lodash from 'lodash';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -58,7 +59,7 @@ Meteor.methods(
             // finalmente, actualizamos el array de personas
             proveedor.personas.forEach((persona) => {
                 persona.compania = savedItem.proveedor;
-                delete persona.persona; 
+                delete persona.persona;
 
                 response = Async.runSync(function(done) {
                     Personas_sql.create(persona)

@@ -1,4 +1,6 @@
 
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Companias } from '/imports/collections/companias';
 
 Meteor.publish("chequeras", function (filtro) {
 
@@ -7,15 +9,15 @@ Meteor.publish("chequeras", function (filtro) {
 
     if (filtro._id) {
         selector._id = { $eq: filtro._id };
-    };
+    }
 
     if (filtro.numeroCuenta) {
         selector.numeroCuenta = { $eq: filtro.numeroCuenta };
-    };
+    }
 
     if (filtro.user) {
         selector.user = { $eq: filtro.user };
-    };
+    }
 
     // siempre regresamos las chequeras de las compañía contab seleccionada
     let ciaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId });
@@ -27,7 +29,7 @@ Meteor.publish("chequeras", function (filtro) {
         // desde copiar catálogos, agregamos la cia a cada chequera, para poder filtrar en forma
         // fácil (como hacemos abajo) ...
         selector.cia = { $eq: companiaSeleccionada.numero };
-    };
+    }
 
     return Chequeras.find(selector);
 });

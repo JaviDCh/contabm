@@ -1,4 +1,7 @@
 
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Companias } from '/imports/collections/companias';
+
 Meteor.publish('cuentasContables', function (todasLasCiasContab) {
 
     // determinamos la compañía seleccionada, pues algunos catálogos que se publiquen deben corresponder a ésta ...
@@ -7,17 +10,20 @@ Meteor.publish('cuentasContables', function (todasLasCiasContab) {
 
     if (this.userId) {
         ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId });
-        if (ciaSeleccionada)
+        if (ciaSeleccionada) {
             ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
-    };
+        }
+    }
 
     // solo regresamos las cuentas contables que corresponden a la compañía Contab seleccionada por el usuario ...
-    if (todasLasCiasContab)
+    if (todasLasCiasContab) {
         return [
             CuentasContables.find(),
         ];
-    else
+    }
+    else {
         return [
             CuentasContables.find({ cia: ciaContabSeleccionada && ciaContabSeleccionada.numero ? ciaContabSeleccionada.numero : -9999 }),
         ];
-});
+    }
+})

@@ -1,6 +1,13 @@
 
 
-import lodash from 'lodash';
+import * as angular from 'angular';
+import * as lodash from 'lodash';
+
+import { Companias } from '/imports/collections/companias';
+import { Monedas } from '/imports/collections/monedas';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -17,10 +24,11 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
       // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada; solo para impedir eliminarla ...
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
-      let companiaContabSeleccionada = {};
+      let companiaContabSeleccionada:any = {};
 
-      if (companiaSeleccionada)
+      if (companiaSeleccionada) {
           companiaContabSeleccionada = Companias.findOne(companiaSeleccionada.companiaID);
+      }
       // ------------------------------------------------------------------------------------------------
 
       let companias_ui_grid_api = null;
@@ -30,8 +38,8 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
 
           enableSorting: true,
           showColumnFooter: false,
-          enableCellEdit: false,
-          enableCellEditOnFocus: true,
+          showGridFooter: false,
+          enableFiltering: false,
           enableRowSelection: true,
           enableRowHeaderSelection: false,
           multiSelect: false,
@@ -44,33 +52,25 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               companias_ui_grid_api = gridApi;
 
               gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                  //debugger;
                   itemSeleccionado = {};
                   if (row.isSelected) {
                       itemSeleccionado = row.entity;
+
+                      // abrimos un modal para mostrar los detalles de la compañía 
+                      abrirModalDetallesCompania(itemSeleccionado); 
                   }
                   else
                       return;
-              });
-
-              gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
-                  if (newValue != oldValue) {
-                      if (!rowEntity.docState) {
-                          rowEntity.docState = 2;
-                      };
-                  };
-              });
+              })
           },
           // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
           rowIdentity: function (row) {
               return row._id;
           },
-
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
-
+      }
 
       $scope.companias_ui_grid.columnDefs = [
           {
@@ -78,10 +78,9 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               field: 'docState',
               displayName: '',
               cellTemplate:
-              '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
-              '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
+              '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: blue; font: xx-small; padding-top: 8px; "></span>' +
+              '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: brown; font: xx-small; padding-top: 8px; "></span>' +
               '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
-              enableCellEdit: false,
               enableColumnMenu: false,
               enableSorting: false,
               width: 25
@@ -94,7 +93,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               headerCellClass: 'ui-grid-centerCell',
               cellClass: 'ui-grid-centerCell',
               enableColumnMenu: false,
-              enableCellEdit: false,
               enableSorting: true,
               type: 'number'
           },
@@ -106,7 +104,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
               enableColumnMenu: false,
-              enableCellEdit: false,
               enableSorting: true,
               type: 'string'
           },
@@ -118,7 +115,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
               enableColumnMenu: false,
-              enableCellEdit: false,
               enableSorting: true,
               type: 'string'
           },
@@ -130,7 +126,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
               enableColumnMenu: false,
-              enableCellEdit: false,
               enableSorting: true,
               type: 'string'
           },
@@ -142,7 +137,6 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
               enableColumnMenu: false,
-              enableCellEdit: false,
               enableSorting: true,
               type: 'string'
           },
@@ -154,36 +148,51 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
               enableSorting: false,
               width: 25
           },
-      ];
+      ]
 
       $scope.deleteItem = function (item) {
-          if (item.docState && item.docState === 1)
+          if (item.docState && item.docState === 1) {
               // si el item es nuevo, simplemente lo eliminamos del array
-              _.remove($scope.companias, (x) => { return x._id === item._id; });
-          else
+              lodash.remove($scope.companias, (x:any) => { return x._id === item._id; });
+          }
+          else if (item.docState && item.docState === 3) {
+              // permitimos hacer un 'undelete' de un item que antes se había eliminado en la lista (antes de grabar) ...
+              delete item.docState;
+          }
+          else {
               item.docState = 3;
-      };
+          }
+      }
 
+      $scope.nuevo = function () {
+          let item = {
+              // "new Mongo.ObjectID()._str" produce un error en TS (no está en la definición?),
+              _id: new Mongo.ObjectID()._str,
+              numero: 0,
+              suspendidoFlag: false,
+              docState: 1
+          };
 
+          $scope.companias.push(item);
+      }
 
 
       $scope.save = function () {
 
            $scope.showProgress = true;
 
-           // eliminamos los items eliminados; del $scope y del collection
-           let editedItems = _.filter($scope.companias, function (item) { return item.docState; });
+           let editedItems = lodash.filter($scope.companias, function (item:any) { return item.docState; });
 
            // nótese como validamos cada item antes de intentar guardar (en el servidor)
            let isValid = false;
-           let errores = [];
+           let errores: string[] = [];
 
            editedItems.forEach((item) => {
                if (item.docState != 3) {
                    isValid = Companias.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       Companias.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       Companias.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + Companias.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }
@@ -192,7 +201,7 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
 
 
            // impedimos que el usuario intente eliminar la compañía que está ahora seleccionada ...
-           if (lodash.some(editedItems, (x) => { return x._id === companiaContabSeleccionada._id; })) {
+           if (lodash.some(editedItems, (x) => { return (x.docState === 3) && (x._id === companiaContabSeleccionada._id); })) {
              $scope.alerts.push({
                  type: 'danger',
                  msg: "Error: Ud. no puede eliminar la compañia que está ahora seleccionada."
@@ -219,12 +228,12 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
 
                $scope.showProgress = false;
                return;
-           };
+           }
 
            Meteor.call('generales.companiasSave', editedItems, (err, result) => {
 
              if (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                  $scope.alerts.length = 0;
                  $scope.alerts.push({
@@ -238,105 +247,84 @@ angular.module("contabM.contab.catalogos").controller("Catalogos_Companias_Contr
                  return;
              }
 
-             // por alguna razón, que aún no entendemos del todo, si no hacemos el subscribe nuevamente,
-             // se queda el '*' para registros nuevos en el ui-grid ...
+            $scope.companias = [];
 
-             // NOTA: el publishing de este collection es 'automático'; muchos 'catálogos' se publican
-             // de forma automática para que estén siempre en el cliente ...
+            $scope.helpers({
+                    companias: () => {
+                    return Companias.find(companiasFilter, { sort: { nombre: 1 } });
+                    }, 
+                    monedas: () => { 
+                        return Monedas.find({}, { sort: { descripcion: 1 }}); 
+                    }
+                });
 
-             // TODO: revisar éste código; Compañías viene en forma automática; debe venir al cliente y refrescar todo en forma
-             // automática ...
+                $scope.companias_ui_grid.data = [];
+                $scope.companias_ui_grid.data = $scope.companias;
 
-            //  cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
-            //      onReady: function () {
-             //
-            //        $scope.helpers({
-            //            companias: () => {
-            //              return Companias.find(companiasFilter, { sort: { nombre: 1 } });
-            //            }
-            //        });
-             //
-            //        $scope.companias_ui_grid.data = [];
-            //        $scope.companias_ui_grid.data = $scope.companias;
-             //
-            //        $scope.showProgress = false;
-            //        $scope.$apply();
-            //      },
-            //    })
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: result
+                });
 
-                $scope.companias = [];
-                $scope.helpers({
-                     companias: () => {
-                       return Companias.find(companiasFilter, { sort: { nombre: 1 } });
-                     }
-                 });
-
-                 $scope.companias_ui_grid.data = [];
-                 $scope.companias_ui_grid.data = $scope.companias;
-
-                 $scope.alerts.length = 0;
-                 $scope.alerts.push({
-                     type: 'info',
-                     msg: result
-                 });
-
-                $scope.showProgress = false;
-                $scope.$apply();
-             })
-           }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            $scope.showProgress = false;
+            $scope.$apply();
+            })
+        }
 
       // -------------------------------------------------------------------------------------------------
       // compañías permitidas: para algunas usuarios, el administrador puede asignar solo algunas compañías; el
       // resto estarían restringidas para el mismo. Las agregamos en un array y regeresamos solo éstas, para que
       // el usuario solo pueda seleccionar en ese grupo ...
-      let companiasPermitidas = [];
-      let currentUser = Meteor.users.findOne(Meteor.userId());
+      let companiasPermitidas:string[] = [];
+      let currentUser:any = Meteor.users.findOne(Meteor.userId());
 
       if (currentUser) {
           if (currentUser.companiasPermitidas) {
-              currentUser.companiasPermitidas.forEach((companiaID) => {
+              currentUser.companiasPermitidas.forEach((companiaID:string) => {
                   companiasPermitidas.push(companiaID)
               });
-          };
-      };
+          }
+      }
 
       let companiasFilter = companiasPermitidas.length ?
                             { _id: { $in: companiasPermitidas }} :
                             { _id: { $ne: "xyz_xyz" }};
-      // -------------------------------------------------------------------------------------------------
+      
 
-      $scope.helpers({
-          companias: () => {
+        $scope.helpers({
+            companias: () => {
             return Companias.find(companiasFilter, { sort: { nombre: 1 } });
-          }
-      });
+            }, 
+            monedas: () => { 
+                return Monedas.find({}, { sort: { descripcion: 1 }}); 
+            }
+        });
 
       $scope.companias_ui_grid.data = $scope.companias;
+
+      function abrirModalDetallesCompania(companiaSeleccionada) { 
+
+        $modal.open({
+            templateUrl: 'client/contab/catalogos/companias/companiaDetallesModal.html',
+            controller: 'CompaniaDetalles_Modal_Controller',
+            size: 'lg',
+            resolve: {
+                companiaSeleccionada: () => {
+                    return companiaSeleccionada;
+                },
+                monedas: () => {
+                    return $scope.monedas;
+                },
+            }
+        }).result.then(
+            function (resolve) {
+                return true;
+            },
+            function (cancel) {
+                return true;
+            })
+    }
+
 }
 ]);

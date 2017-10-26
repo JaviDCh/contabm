@@ -4,7 +4,6 @@
 AngularApp.controller("Contab_Consultas_CodificacionesContables_Consultas_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$interval', function ($scope, $meteor, $modal, uiGridConstants, $interval) {
 
-    // debugger;
     $scope.processProgress = {
         current: 0,
         max: 0,

@@ -1,5 +1,6 @@
 
 import numeral from 'numeral';
+import { Companias } from '/imports/collections/companias';
 
 Meteor.methods(
 {
@@ -59,7 +60,15 @@ Meteor.methods(
                 telefono1: item.telefono1,
                 telefono2: item.telefono2,
                 fax: item.fax,
+
+                emailServerName: item.emailServerName,
+                emailServerPort: item.emailServerPort, 
+                emailServerSSLFlag: item.emailServerSSLFlag,
+                emailServerCredentialsUserName: item.emailServerCredentialsUserName,
+                emailServerCredentialsPassword: item.emailServerCredentialsPassword,
+
                 monedaDefecto: item.monedaDefecto,
+                suspendidoFlag: item.suspendidoFlag, 
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si

@@ -1,4 +1,6 @@
 
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 Meteor.publish('template_files', function(aplicacion, tiposArchivo) {
     // debugger;
     // regresamos registros solo para la cia seleccionada ...

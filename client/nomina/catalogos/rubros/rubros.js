@@ -242,7 +242,7 @@ AngularApp.controller("Catalogos_Rubros_Controller",
                    isValid = MaestraRubros.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       MaestraRubros.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       MaestraRubros.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + MaestraRubros.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }

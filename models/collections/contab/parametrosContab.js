@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 // NOTA IMPORTANTE: nótese que, al menos por ahora, este collection no existe en mongo; lo leemos y actualizamos en forma
 // directa desde sql server; sin embargo, agregamos un schema para validar cuando el usuario edita el registro  ...
 ParametrosContab = new Mongo.Collection("parametrosContab");

@@ -2,6 +2,8 @@ import numeral from 'numeral';
 import moment from 'moment';
 import lodash from 'lodash';
 
+import { Monedas } from '/imports/collections/monedas.js';
+
 angular.module("contabM.bancos.catalogos").controller("ProveedoresClientes_Lista_Controller",
 ['$stateParams', '$scope', '$meteor', '$modal', function ($stateParams, $scope, $meteor, $modal) {
 

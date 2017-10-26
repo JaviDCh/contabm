@@ -1,11 +1,11 @@
 
 import lodash from 'lodash';
+import { Monedas } from '/imports/collections/monedas';
 
 // Este controller (angular) se carga con la página primera del programa
 AngularApp.controller("Contab_Consultas_CodificacionesContables_PrepararDatos_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-        // debugger;
         $scope.processProgress = {
             current: 0,
             max: 0,

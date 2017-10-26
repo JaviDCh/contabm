@@ -1,3 +1,5 @@
+
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 ﻿
 CompaniaSeleccionada.allow({
     insert: function (userId, doc) {

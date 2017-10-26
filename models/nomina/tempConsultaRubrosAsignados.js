@@ -1,4 +1,6 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 validarPeriodo = function() {
     let siempre = this.isSet ? this.value : false;
@@ -52,7 +54,7 @@ let simpleSchema = new SimpleSchema({
     hasta: { type: Date, label: "Hasta", optional: true, },
     siempre: { type: Boolean, label: "Siempre?", optional: true, custom: validarPeriodo, },
     periodicidad: { type: String, label: "Periodicidad (1q/2q/siempre)", optional: true, },
-    montoAAplicar: { type: Number, label: "Monto", decimal: true, optional: false, },
+    montoAAplicar: { type: Number, label: "Monto", optional: false, },
 
     user: { type: String, label: 'Mongo user', optional: false, },
     docState: { type: Number, optional: true, }

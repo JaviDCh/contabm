@@ -1,4 +1,6 @@
 
+import SimpleSchema from 'simpl-schema';
+
 Meteor.methods({
    getCollectionCount: function (collectionName) {
 

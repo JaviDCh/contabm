@@ -1,4 +1,7 @@
 ﻿
+import { Monedas } from '/imports/collections/monedas.js';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 Meteor.publish("catalogosContab", function () {
     // estos catálogos se publican en forma automática desde 'catalogos.js'; sin embargo, cuando abrimos
@@ -11,8 +14,9 @@ Meteor.publish("catalogosContab", function () {
 
     if (this.userId) {
         ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId });
-        if (ciaSeleccionada)
+        if (ciaSeleccionada) {
             ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
+        }
     };
 
     // solo regresamos las cuentas contables que corresponden a la compañía Contab seleccionada por el usuario ...
@@ -24,12 +28,7 @@ Meteor.publish("catalogosContab", function () {
              TiposAsientoContable.find(),
              GruposContables.find(),
              Monedas.find(),
-            //  Bancos.find(),
              CompaniaSeleccionada.find({ userID: this.userId }),
-            //  ParametrosBancos.find(),
-            //  ParametrosGlobalBancos.find(),
              MesesDelAnoFiscal.find(),
-            //  Empleados.find(),
-            //  GruposEmpleados.find(),
-    ];
-});
+    ]
+})

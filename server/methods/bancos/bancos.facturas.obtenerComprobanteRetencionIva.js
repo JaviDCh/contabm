@@ -6,6 +6,8 @@ import JSZip from 'jszip';
 import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
 
+import { Companias } from '/imports/collections/companias';
+
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
 import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/grabarDatosACollectionFS_regresarUrl';
@@ -26,7 +28,7 @@ Meteor.methods(
             tipoArchivo: { type: String, optional: false, },
             ciaSeleccionada: { type: Object, blackbox: true, optional: false, },
             userID: { type: String, optional: false, },
-            proveedorID: { type: Number, decimal: false, optional: false, },
+            proveedorID: { type: SimpleSchema.Integer, optional: false, },
             numeroComprobante: { type: String, optional: false, },
             periodoRetencion: { type: String, optional: false, },
             nombreArchivo: { type: String, optional: false, },

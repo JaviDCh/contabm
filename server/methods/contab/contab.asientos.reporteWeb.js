@@ -61,7 +61,7 @@ Meteor.methods(
         // leemos los movimientos bancarios para el período seleccionado. Además, leemos la chequera y la
         // cuenta bancaria (associations en model - include en query)
         let query = `Select m.Descripcion as nombreMoneda, m.Simbolo as simboloMoneda, a.Fecha as fecha, a.Numero as numero,
-                     a.Descripcion as descripcionComprobante, d.Partida as numeroPartida, 
+                     a.Descripcion as descripcionComprobante, d.Partida as numeroPartida,
             		 c.Cuenta as cuentaContable, c.CuentaEditada as cuentaEditada, c.Descripcion as nombreCuenta,
                      d.Descripcion as descripcionPartida, d.Referencia as referencia, d.Debe as debe, d.Haber as haber
                      From dAsientos d Inner Join Asientos a On a.NumeroAutomatico = d.NumeroAutomatico

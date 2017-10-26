@@ -1,8 +1,10 @@
-﻿
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 AngularApp.controller("SeleccionarCompaniaController", ['$scope', '$stateParams', '$meteor', '$modal',
 function ($scope, $stateParams, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -87,7 +89,7 @@ function ($scope, $stateParams, $meteor, $modal) {
             companias: () => {
               return Companias.find(companiasFilter);
             },
-        });
+        })
 
       $scope.seleccionarCompania_ui_grid.data = $scope.companias;
 
@@ -105,8 +107,8 @@ function ($scope, $stateParams, $meteor, $modal) {
                       msg: "La compañía <b><em>" + compania.nombre + "</em></b> está ahora seleccionada."
                   });
               }
-          });
-      };
+          })
+      }
 
 
       $scope.seleccionarCompania = function () {
@@ -116,12 +118,12 @@ function ($scope, $stateParams, $meteor, $modal) {
                   type: 'danger',
                   msg: "Ud. debe seleccionar una compañía en la lista.<br />" +
                        "Aparentemente, Ud. no ha seleccionado aún una compañía en la lista."
-              });
+              })
           }
           else {
 
               // eliminamos cualquier cia seleccionada que pueda tener ahora el usuario
-              var companiasAhoraSeleccionadas = CompaniaSeleccionada.find({ userID: Meteor.userId() }).fetch();         // debería ser una sola!
+              var companiasAhoraSeleccionadas = CompaniaSeleccionada.find({ userID: Meteor.userId() }).fetch();  // debería ser una sola!
               companiasAhoraSeleccionadas.forEach(function (item) {
                   CompaniaSeleccionada.remove(item._id);
               });
@@ -142,4 +144,4 @@ function ($scope, $stateParams, $meteor, $modal) {
           }
       }
   }
-]);
+])

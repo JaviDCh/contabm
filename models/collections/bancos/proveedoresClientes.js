@@ -1,4 +1,7 @@
 
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
+
 Proveedores = new Mongo.Collection("proveedores");
 
 let schema = new SimpleSchema({
@@ -9,7 +12,7 @@ let schema = new SimpleSchema({
     rif: { type: String, label: 'Rif', optional: true, min: 1, max: 20 },
     beneficiario: { type: String, label: 'Beneficiario', optional: true, min: 1, max: 50 },
     concepto: { type: String, label: 'Concepto', optional: true, min: 1, max: 250 },
-    montoCheque: { type: Number, label: 'Monto cheque', decimal: true, optional: true },
+    montoCheque: { type: Number, label: 'Monto cheque', optional: true },
 
     monedaDefault: { type: Number, label: 'Moneda por defecto', optional: true },
     formaDePagoDefault: { type: Number, label: 'Forma de pago por defecto', optional: true },
@@ -66,12 +69,12 @@ Proveedores_SimpleSchema = new SimpleSchema({
     nit: { type: String, label: 'Nit', optional: true, min: 1, max: 20, },
     contribuyenteFlag: { type: Boolean, label: 'ContribuyenteFlag', optional: true },
     contribuyenteEspecialFlag: { type: Boolean, label: 'ContribuyenteEspecialFlag', optional: true },
-    retencionSobreIvaPorc: { type: Number, label: 'RetencionSobreIvaPorc', optional: true, decimal: true, },
-    nuestraRetencionSobreIvaPorc: { type: Number, label: 'NuestraRetencionSobreIvaPorc', optional: true, decimal: true, },
+    retencionSobreIvaPorc: { type: Number, label: 'RetencionSobreIvaPorc', optional: true, },
+    nuestraRetencionSobreIvaPorc: { type: Number, label: 'NuestraRetencionSobreIvaPorc', optional: true, },
     afectaLibroComprasFlag: { type: Boolean, label: 'AfectaLibroComprasFlag', optional: true },
     beneficiario: { type: String, label: 'Beneficiario', optional: true, min: 0, max: 50, },
     concepto: { type: String, label: 'Concepto', optional: true, min: 0, max: 250, },
-    montoCheque: { type: Number, label: 'MontoCheque', optional: true, decimal: true, },
+    montoCheque: { type: Number, label: 'MontoCheque', optional: true, },
     direccion: { type: String, label: 'Direccion', optional: true, min: 0, max: 255, },
     ciudad: { type: String, label: 'Ciudad', optional: false, },
     telefono1: { type: String, label: 'Telefono1', optional: true, min: 0, max: 14, },
@@ -82,12 +85,12 @@ Proveedores_SimpleSchema = new SimpleSchema({
     nacionalExtranjeroFlag: { type: Number, label: 'Nac/Ext', optional: false },
     sujetoARetencionFlag: { type: Boolean, label: 'SujetoARetencionFlag', optional: true },
     codigoConceptoRetencion: { type: String, label: 'CodigoConceptoRetencion', optional: true, min: 0, max: 6, },
-    retencionISLRSustraendo: { type: Number, label: 'RetencionISLRSustraendo', optional: true, decimal: true, },
-    baseRetencionISLR: { type: Number, label: 'BaseRetencionISLR', optional: true, decimal: true, },
+    retencionISLRSustraendo: { type: Number, label: 'RetencionISLRSustraendo', optional: true, },
+    baseRetencionISLR: { type: Number, label: 'BaseRetencionISLR', optional: true, },
     monedaDefault: { type: Number, label: 'Moneda', optional: false },
     formaDePagoDefault: { type: Number, label: 'Forma de pago', optional: false, },
     proveedorClienteFlag: { type: Number, label: 'Proveedor/Cliente', optional: false },
-    porcentajeDeRetencion: { type: Number, label: 'PorcentajeDeRetencion', optional: true, decimal: true, },
+    porcentajeDeRetencion: { type: Number, label: 'PorcentajeDeRetencion', optional: true, },
     aplicaIvaFlag: { type: Boolean, label: 'AplicaIvaFlag', optional: true },
     categoriaProveedor: { type: Number, label: 'CategoriaProveedor', optional: true },
     montoChequeEnMonExtFlag: { type: Boolean, label: 'MontoChequeEnMonExtFlag', optional: true },
@@ -96,10 +99,8 @@ Proveedores_SimpleSchema = new SimpleSchema({
     ultAct: { type: Date, label: 'UltAct', optional: false },
     usuario: { type: String, label: 'Usuario', optional: false, min: 1, max: 125, },
 
-    personas: {
-        type: [Personas_SimpleSchema],
-        minCount: 0,
-    },
+    personas: { type: Array, optional: true, minCount: 0 },
+    'personas.$': { type: Personas_SimpleSchema },
 
     docState: { type: Number, optional: true, },
 });

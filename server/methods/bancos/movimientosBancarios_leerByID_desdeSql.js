@@ -1,6 +1,7 @@
 
 import moment from 'moment';
 import lodash from 'lodash';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {
@@ -8,7 +9,7 @@ Meteor.methods(
 
         // debugger;
         new SimpleSchema({
-            pk: { type: Number, decimal: false }
+            pk: { type: SimpleSchema.Integer, }
           }).validate({ pk });
 
         let response = null;

@@ -1,4 +1,6 @@
 
+import { Monedas } from '/imports/collections/monedas';
+
 AngularApp.controller("Bancos_Pagos_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
