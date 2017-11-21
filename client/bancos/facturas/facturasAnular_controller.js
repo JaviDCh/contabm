@@ -2,7 +2,7 @@
 
 import moment from 'moment';
 
-AngularApp.controller('FacturasAnular_Controller',
+angular.module("contabm").controller('FacturasAnular_Controller',
 ['$scope', '$modalInstance', '$modal', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, ciaSeleccionada) {
 

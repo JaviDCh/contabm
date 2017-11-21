@@ -1,7 +1,7 @@
 
 import lodash from 'lodash';
 
-AngularApp.controller('ImprimirListadoAsientosContablesModalController',
+angular.module("contabm").controller('ImprimirListadoAsientosContablesModalController',
 ['$scope', '$modalInstance', '$modal', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, ciaSeleccionada) {
 

@@ -5,7 +5,7 @@ import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.controller("Contab_AsientoContableFiltro_Controller",
+angular.module("contabm").controller("Contab_AsientoContableFiltro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

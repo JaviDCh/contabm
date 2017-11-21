@@ -1,6 +1,6 @@
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Utilitarios_EliminarCompaniaContab_Controller",
+angular.module("contabm").controller("Utilitarios_EliminarCompaniaContab_Controller",
 ['$scope', '$modal', function ($scope, $meteor) {
 
     // para reportar el progreso de la tarea en la página

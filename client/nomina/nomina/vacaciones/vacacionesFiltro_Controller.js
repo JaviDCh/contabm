@@ -1,5 +1,7 @@
 
-AngularApp.controller("Nomina_VacacionesFilter_Controller",
+import { Empleados } from '/models/nomina/empleados'; 
+
+angular.module("contabm").controller("Nomina_VacacionesFilter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

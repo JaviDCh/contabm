@@ -2,9 +2,10 @@
 
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
 // Este controller (angular) se carga con la página primera del programa
-angular.module("contabM.bancos.catalogos").controller("Catalogos_CuentasBancarias_Controller",
+angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancarias_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

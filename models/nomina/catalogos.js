@@ -124,7 +124,7 @@ let gruposEmpleados_SimpleSchema = new SimpleSchema({
     cia:  { type: Number, label: "Cia Contab", optional: false },
 });
 
-GruposEmpleados = new Mongo.Collection("gruposEmpleados");
+export const GruposEmpleados = new Mongo.Collection("gruposEmpleados");
 GruposEmpleados.attachSchema(gruposEmpleados_SimpleSchema);
 
 // ----------------------------------------

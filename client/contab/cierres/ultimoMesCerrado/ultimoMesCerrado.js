@@ -2,7 +2,7 @@
 import lodash from 'lodash';
 import moment from 'moment'; 
 
-AngularApp.controller("Contab_UltimoMesCerrado_Controller",
+angular.module("contabm").controller("Contab_UltimoMesCerrado_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

@@ -6,7 +6,9 @@ import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.controller("Contab_AsientoContable_Controller",
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+angular.module("contabm").controller("Contab_AsientoContable_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'catalogosContab',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalogosContab) {
 

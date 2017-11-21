@@ -1,8 +1,9 @@
 
 import saveAs from 'save-as';
 import numeral from 'numeral'; 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller('ExportarAArchivoTextoModal_Controller',
+angular.module("contabm").controller('ExportarAArchivoTextoModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaContabSeleccionada',
  function ($scope, $modalInstance, $modal, $meteor, companiaContabSeleccionada) {
 

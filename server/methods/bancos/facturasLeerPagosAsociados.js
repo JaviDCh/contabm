@@ -2,6 +2,7 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import moment from 'moment';
 import SimpleSchema from 'simpl-schema';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods({
    facturasLeerPagosAsociados: function (claveUnicaFactura) {

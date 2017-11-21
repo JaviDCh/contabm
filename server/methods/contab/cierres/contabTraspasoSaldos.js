@@ -2,6 +2,7 @@
 import moment from 'moment';
 import numeral from 'numeral';
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods(
 {
@@ -171,10 +172,6 @@ Meteor.methods(
             // -------------------------------------------------------------------------------------------------------
 
         });
-
-
-
-
 
         // ----------------------------------------------------------------------------------------------
         // actualizamos el último mes cerrado, al año próximo y mes 0

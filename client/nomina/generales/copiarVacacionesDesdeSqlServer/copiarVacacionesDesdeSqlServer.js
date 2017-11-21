@@ -1,5 +1,5 @@
 ﻿
-AngularApp.controller("NominaCopiarVacacionesDesdeSqlServer_Controller",
+angular.module("contabm").controller("NominaCopiarVacacionesDesdeSqlServer_Controller",
 ['$scope', '$state', '$stateParams', '$meteor', '$modal',
   function ($scope, $state, $stateParams, $meteor, $modal) {
 

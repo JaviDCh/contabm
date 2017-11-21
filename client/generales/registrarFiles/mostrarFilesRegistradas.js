@@ -1,6 +1,7 @@
 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller('MostrarFilesRegistradasController',
+angular.module("contabm").controller('MostrarFilesRegistradasController',
 ['$scope', '$modalInstance', '$modal', 'aplicacion', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, aplicacion, ciaSeleccionada) {
 

@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 
-AngularApp.controller('Pagos_MovimientoBancarioAsociado_Controller',
+angular.module("contabm").controller('Pagos_MovimientoBancarioAsociado_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'pagoID', 'proveedorID', 'ciaSeleccionada', 'origen',
 function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, ciaSeleccionada, origen) {
 

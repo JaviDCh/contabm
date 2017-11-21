@@ -2,7 +2,7 @@
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.controller("Nomina_EmpleadosFilter_Controller",
+angular.module("contabm").controller("Nomina_EmpleadosFilter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

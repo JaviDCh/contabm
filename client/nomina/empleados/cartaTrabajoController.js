@@ -1,5 +1,5 @@
 
-AngularApp.controller('EmpleadosCartaTrabajoController',
+angular.module("contabm").controller('EmpleadosCartaTrabajoController',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'tiposArchivo', 'aplicacion', 'ciaSeleccionada', 'empleadoID', 'user',
 function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, ciaSeleccionada, empleadoID, user) {
 

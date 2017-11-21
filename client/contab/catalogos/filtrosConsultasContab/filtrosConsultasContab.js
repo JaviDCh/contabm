@@ -1,6 +1,6 @@
 
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_FiltrosConsultasContab_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_FiltrosConsultasContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = true;

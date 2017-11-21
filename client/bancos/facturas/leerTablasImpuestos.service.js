@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 
-AngularApp.factory('leerTablasImpuestos_service', ['$q', function($q) {
+angular.module("contabm").factory('leerTablasImpuestos_service', ['$q', function($q) {
 
     let leerTablasImpuestos = function() {
         let deferred = $q.defer();

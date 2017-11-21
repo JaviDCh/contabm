@@ -1,5 +1,7 @@
 
-AngularApp.controller('AsociarFacturasModal_Controller',
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+angular.module("contabm").controller('AsociarFacturasModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'uiGridConstants', 'companiaContabSeleccionada', 'pago',
 function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaContabSeleccionada, pago) {
 

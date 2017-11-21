@@ -1,5 +1,8 @@
 
-AngularApp.controller('DiasFeriadosAgregarAno_Modal_Controller',
+import moment from 'moment'; 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+angular.module("contabm").controller('DiasFeriadosAgregarAno_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', 'diasFeriados', 'diasFiestaNacional',
 function ($scope, $modalInstance, $modal, diasFeriados, diasFiestaNacional) {
 

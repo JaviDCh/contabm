@@ -1,6 +1,6 @@
 
 
-AngularApp.controller("Bancos_ImpuestoITF_Movimientos_Controller",
+angular.module("contabm").controller("Bancos_ImpuestoITF_Movimientos_Controller",
 ['$scope', '$meteor', '$modal', '$state', 'uiGridConstants', function ($scope, $meteor, $modal, $state, uiGridConstants) {
 
     $scope.showProgress = false;

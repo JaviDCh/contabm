@@ -1,6 +1,7 @@
 
+import moment from 'moment'; 
 
-AngularApp.controller("Catalogos_Nomina_DiasFeriados_Controller",
+angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

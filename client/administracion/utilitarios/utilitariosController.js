@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("AdministracionUtilitarios_Controller",
+angular.module("contabm").controller("AdministracionUtilitarios_Controller",
 ['$scope', function ($scope) {
 
       $scope.showProgress = true;

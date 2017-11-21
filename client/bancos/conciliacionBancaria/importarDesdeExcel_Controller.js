@@ -2,8 +2,9 @@
 import XLSX from "XLSX";
 import lodash from "lodash";
 import moment from "moment";
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller('BancosConciliacionBancariaImportarDesdeExcel_Controller',
+angular.module("contabm").controller('BancosConciliacionBancariaImportarDesdeExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancaria', 'companiaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, companiaSeleccionada) {
 

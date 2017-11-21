@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Catalogos_Nomina_GruposEmpleados_Controller",
+angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
     //   debugger;

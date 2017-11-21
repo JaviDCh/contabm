@@ -1,8 +1,9 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("SeleccionarCompaniaController", ['$scope', '$stateParams', '$meteor', '$modal',
+angular.module("contabm").controller("SeleccionarCompaniaController", ['$scope', '$stateParams', '$meteor', '$modal',
 function ($scope, $stateParams, $meteor, $modal) {
 
       $scope.showProgress = false;

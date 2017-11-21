@@ -7,7 +7,9 @@ import { Monedas } from '/imports/collections/monedas.js';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.controller("Bancos_Facturas_Factura_Controller",
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+angular.module("contabm").controller("Bancos_Facturas_Factura_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'leerTablasImpuestosRetenciones', 'tablasImpuestosRetenciones',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTablasImpuestosRetenciones, tablasImpuestosRetenciones) {
 

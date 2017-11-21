@@ -7,6 +7,7 @@ import numeral from 'numeral';
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 import { Temp_contab_asientos_webReport, Temp_contab_asientos_webReport_config } from '/imports/collections/temp/contab.asientos.webReport.js';
+import { TimeOffset } from '/globals/globals'; 
 
 // grabamos los asientos seleccionados por el usuario a collections en mongo y abrimos una página en ContabSysNet que
 // lee este collection y construye un (asp.net) report

@@ -1,4 +1,5 @@
 
+import { Empleados } from '/models/nomina/empleados'; 
 
 Meteor.publish("vacaciones", function (filtro) {
 

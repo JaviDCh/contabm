@@ -1,6 +1,6 @@
 
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_GruposContables_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

@@ -1,6 +1,6 @@
 
 
-AngularApp.controller("Bancos_Cierre_Controller",
+angular.module("contabm").controller("Bancos_Cierre_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
         $scope.processProgress = {

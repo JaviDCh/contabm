@@ -1,5 +1,8 @@
 
-AngularApp.controller("Nomina_Vacacion_Controller",
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { Empleados } from '/models/nomina/empleados'; 
+
+angular.module("contabm").controller("Nomina_Vacacion_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

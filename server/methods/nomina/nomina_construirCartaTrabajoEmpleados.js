@@ -3,6 +3,7 @@
 import lodash from 'lodash';
 import moment from 'moment';
 import numeral from 'numeral';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods(
 {

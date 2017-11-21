@@ -1,7 +1,8 @@
 
 import lodash from 'lodash';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_Contab_CodificacionesContables_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$interval', function ($scope, $meteor, $modal, uiGridConstants, $interval) {
 
       $scope.showProgress = false;

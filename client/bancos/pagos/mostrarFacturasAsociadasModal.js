@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 
-AngularApp.controller('MostrarFacturasAsociadasModal_Controller',
+angular.module("contabm").controller('MostrarFacturasAsociadasModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'companiaContabSeleccionada', 'pago', 'origen',
 function ($scope, $modalInstance, $modal, $meteor, $state, companiaContabSeleccionada, pago, origen) {
 

@@ -1,6 +1,7 @@
 
 import numeral from 'numeral';
 import moment from 'moment';
+import SimpleSchema from 'simpl-schema';
 
 Meteor.methods(
 {

@@ -1,6 +1,6 @@
 
 // Este controller (angular) se carga con el route /Administracion ...
-AngularApp.controller("Administracion_Main_Controller",
+angular.module("contabm").controller("Administracion_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', '$location',
 function ($rootScope, $scope, $state, $stateParams, $location) {
 

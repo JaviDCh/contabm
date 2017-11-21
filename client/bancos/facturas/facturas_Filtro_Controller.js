@@ -2,7 +2,7 @@
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.controller("Bancos_Facturas_Filter_Controller",
+angular.module("contabm").controller("Bancos_Facturas_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

@@ -1,6 +1,6 @@
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("MainController",
+angular.module("contabm").controller("MainController",
 ['$rootScope', '$scope', '$state', '$meteor', '$reactive', '$location',
   function ($rootScope, $scope, $state, $meteor, $reactive, $location) {
 

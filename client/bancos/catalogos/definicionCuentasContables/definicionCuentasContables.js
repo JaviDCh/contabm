@@ -2,7 +2,7 @@
 import numeral from 'numeral';
 import { Monedas } from '/imports/collections/monedas.js';
 
-angular.module("contabM.bancos.catalogos").controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
+angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

@@ -1,7 +1,7 @@
 
 import lodash from 'lodash';
 
-AngularApp.controller('empleadosSueldos_Modal_Controller',
+angular.module("contabm").controller('empleadosSueldos_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', 'empleado', 'companiaSeleccionadaDoc', 'origen',
 function ($scope, $modalInstance, $modal, empleado, companiaSeleccionadaDoc, origen) {
 

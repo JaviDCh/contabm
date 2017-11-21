@@ -93,7 +93,7 @@ let simpleSchema = new SimpleSchema({
     docState: { type: Number, optional: true },
 });
 
-Empleados = new Mongo.Collection("empleados");
+export const Empleados = new Mongo.Collection("empleados");
 Empleados.attachSchema(simpleSchema);
 
 if (Meteor.isServer) {

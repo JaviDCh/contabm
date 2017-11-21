@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Contab_CopiarCatalogos_Controller",
+angular.module("contabm").controller("Contab_CopiarCatalogos_Controller",
 ['$scope', '$meteor', '$modal', '$reactive', function ($scope, $meteor, $modal, $reactive) {
     // para reportar el progreso de la tarea en la página
     $scope.processProgress = {

@@ -1,5 +1,5 @@
 
-AngularApp.controller("Contab_Consultas_CuentasYMovimientos_Lista_Controller",
+angular.module("contabm").controller("Contab_Consultas_CuentasYMovimientos_Lista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

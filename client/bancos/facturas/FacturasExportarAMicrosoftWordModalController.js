@@ -2,7 +2,7 @@
 import moment from 'moment';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
-AngularApp.controller('FacturasExportarAMicrosoftWordModalController',
+angular.module("contabm").controller('FacturasExportarAMicrosoftWordModalController',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'tiposArchivo', 'aplicacion', 'ciaSeleccionada', 'factura', 'facturasFiltro', 'user',
 function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, ciaSeleccionada, factura, facturasFiltro, user) {
 

@@ -1,8 +1,8 @@
 
 // Este controller (angular) se carga con la página primera del programa
-// AngularApp.controller("Contab_Main_Controller",
+// angular.module("contabm").controller("Contab_Main_Controller",
 
-angular.module("contabM.contab").controller("Contab_Main_Controller",
+angular.module("contabm.contab").controller("Contab_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', '$location',
 function ($rootScope, $scope, $state, $stateParams, $location) {
 

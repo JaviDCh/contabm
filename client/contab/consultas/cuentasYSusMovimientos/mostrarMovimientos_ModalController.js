@@ -1,5 +1,5 @@
 
-AngularApp.controller('CuentasContablesYMovimientos_MostrarMovimientos_Modal_Controller',
+angular.module("contabm").controller('CuentasContablesYMovimientos_MostrarMovimientos_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'uiGridConstants', 'movimientos', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, movimientos, ciaSeleccionada) {
 

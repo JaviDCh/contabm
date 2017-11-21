@@ -3,8 +3,9 @@ import lodash from 'lodash';
 import numeral from 'numeral';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

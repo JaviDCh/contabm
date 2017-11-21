@@ -9,7 +9,7 @@
 //     <option value="0">Text</option>
 // </select>
 
-AngularApp.directive('convertToNumber', function() {
+angular.module("contabm").directive('convertToNumber', function() {
     return {
         require: 'ngModel',
         link: function (scope, element, attrs, ngModel) {

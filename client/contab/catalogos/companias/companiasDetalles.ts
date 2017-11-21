@@ -1,7 +1,7 @@
 
 
 
-angular.module("contabM.contab.catalogos").controller('CompaniaDetalles_Modal_Controller',
+angular.module("contabm.contab.catalogos").controller('CompaniaDetalles_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', 'companiaSeleccionada', 'monedas', 
 function ($scope, $modalInstance, $modal, companiaSeleccionada, monedas) {
 

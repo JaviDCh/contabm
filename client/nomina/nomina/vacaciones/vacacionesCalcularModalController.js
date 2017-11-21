@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 
-AngularApp.controller('VacacionesCalcularModal_Controller',
+angular.module("contabm").controller('VacacionesCalcularModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'vacacion', 'companiaContabSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, $state, vacacion, companiaContabSeleccionada) {
 

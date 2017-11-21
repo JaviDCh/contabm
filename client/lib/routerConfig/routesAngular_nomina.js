@@ -1,6 +1,6 @@
 
 
-AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
+angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
   function ($urlRouterProvider, $stateProvider, $locationProvider) {
 
         $locationProvider.html5Mode(true);
@@ -107,6 +107,29 @@ AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
             templateUrl: 'client/nomina/catalogos/diasFeriados/diasFeriados.html',
             controller: 'Catalogos_Nomina_DiasFeriados_Controller',
             parent: 'nomina'
+        })
+
+
+        // -------------------------------------------------------------------------------------------
+        // Parámetros 
+        // -------------------------------------------------------------------------------------------
+        .state('nomina.parametros', {
+            url: '/parametros',
+            templateUrl: 'client/nomina/catalogos/parametros/parametros.html',
+            controller: 'Catalogos_Nomina_Parametros_Controller',
+            parent: 'nomina'
+        })
+        .state('nomina.parametros.salarioMinimo', {
+            url: '/salarioMinimo',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/salarioMinimo/salarioMinimo.html',
+            controller: 'catalogos_nomina_parametros_salarioMinimo_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.anticipoSueldo1raQuincena', {
+            url: '/anticipoSueldo1raQuincena',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/anticipoSueldo1raQuinc/anticipoSueldo1raQuinc.html',
+            controller: 'catalogos_nomina_parametros_anticipoSueldo1raQuinc_Controller',
+            parent: 'nomina.parametros'
         })
 
         // -------------------------------------------------------------------------------------------

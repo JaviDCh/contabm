@@ -1,6 +1,7 @@
 ﻿
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("UsuariosRolesController",
+angular.module("contabm").controller("UsuariosRolesController",
  ['$scope', '$stateParams', '$meteor', '$modal',
   function ($scope, $stateParams, $meteor, $modal) {
 

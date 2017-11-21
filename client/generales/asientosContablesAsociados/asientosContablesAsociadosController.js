@@ -1,7 +1,8 @@
 
 import moment from 'moment';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller('AsientosContablesAsociados_Controller',
+angular.module("contabm").controller('AsientosContablesAsociados_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
 function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID, ciaSeleccionada, origen, docState) {
 

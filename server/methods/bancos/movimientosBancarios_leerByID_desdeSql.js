@@ -2,6 +2,7 @@
 import moment from 'moment';
 import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods(
 {

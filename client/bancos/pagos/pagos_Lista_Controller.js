@@ -1,7 +1,7 @@
 
 import numeral from 'numeral';
 
-AngularApp.controller("Bancos_Pagos_List_Controller",
+angular.module("contabm").controller("Bancos_Pagos_List_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

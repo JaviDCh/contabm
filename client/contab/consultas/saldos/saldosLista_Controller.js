@@ -1,7 +1,7 @@
 
 import lodash from 'lodash';
 
-AngularApp.controller("Contab_Consultas_Saldos_Lista_Controller",
+angular.module("contabm").controller("Contab_Consultas_Saldos_Lista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

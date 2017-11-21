@@ -1,6 +1,6 @@
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Bancos_Main_Controller",
+angular.module("contabm").controller("Bancos_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', '$location',
 function ($rootScope, $scope, $state, $stateParams, $location) {
 

@@ -1,7 +1,7 @@
 
 
 
-AngularApp.controller('CambiarUMCModal_Controller',
+angular.module("contabm").controller('CambiarUMCModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaSeleccionadaDoc', 'ultimoMesCerrado', 'anosArray',
 function ($scope, $modalInstance, $modal, $meteor, companiaSeleccionadaDoc, ultimoMesCerrado, anosArray) {
 

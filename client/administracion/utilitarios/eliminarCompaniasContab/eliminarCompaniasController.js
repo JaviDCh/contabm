@@ -1,7 +1,8 @@
 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("AdministracionUtilitarios_EliminarCompanias_Controller",
+angular.module("contabm").controller("AdministracionUtilitarios_EliminarCompanias_Controller",
 ['$scope', '$modal', function ($scope, $modal) {
 
       $scope.processProgress = {

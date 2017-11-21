@@ -1,5 +1,5 @@
 
-AngularApp.controller('ChequeImpresoModalController',
+angular.module("contabm").controller('ChequeImpresoModalController',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'tiposArchivo', 'aplicacion', 'ciaSeleccionada', 'movimientoBancarioID', 'user',
 function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, ciaSeleccionada, movimientoBancarioID, user) {
 

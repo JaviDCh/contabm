@@ -1,6 +1,6 @@
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Nomina_Main_Controller",
+angular.module("contabm.nomina").controller("Nomina_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', function ($rootScope, $scope, $state, $stateParams) {
 
   // ui-bootstrap alerts ...

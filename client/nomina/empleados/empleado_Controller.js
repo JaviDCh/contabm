@@ -3,8 +3,11 @@ import moment from 'moment';
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Empleados } from '/models/nomina/empleados'; 
 
-AngularApp.controller("Nomina_Empleado_Controller",
+import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+angular.module("contabm").controller("Nomina_Empleado_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

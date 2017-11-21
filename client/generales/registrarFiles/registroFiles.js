@@ -1,8 +1,9 @@
 ﻿
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("RegistroFiles_Controller",
+angular.module("contabm").controller("RegistroFiles_Controller",
 ['$scope', '$state', '$stateParams', '$meteor', '$modal',
   function ($scope, $state, $stateParams, $meteor, $modal) {
 

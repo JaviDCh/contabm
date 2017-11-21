@@ -1,7 +1,9 @@
 
 import lodash from 'lodash';
+import { Monedas } from '/imports/collections/monedas'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
-AngularApp.controller("Bancos_ConciliacionesBancarias_Filter_Controller",
+angular.module("contabm").controller("Bancos_ConciliacionesBancarias_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 
@@ -66,7 +68,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
           Meteor.call('conciliacionBancariaPrepararLista', JSON.stringify(filtro), companiaContab, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                  let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({

@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
 
 import { Monedas } from '/imports/collections/monedas';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods({
    'generales.agregarAsientoContableAEntidad': function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {

@@ -1,5 +1,5 @@
 
-AngularApp.controller("Contab_Consultas_CuentasYMovimientos_Controller",
+angular.module("contabm").controller("Contab_Consultas_CuentasYMovimientos_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

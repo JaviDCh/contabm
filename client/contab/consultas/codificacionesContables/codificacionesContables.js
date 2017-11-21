@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Contab_Consultas_CodificacionesContables_Controller",
+angular.module("contabm").controller("Contab_Consultas_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$reactive', function ($scope, $meteor, $modal, uiGridConstants, $reactive) {
 
         $scope.showProgress = false;

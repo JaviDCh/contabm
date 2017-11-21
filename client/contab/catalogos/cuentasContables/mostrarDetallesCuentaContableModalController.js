@@ -1,5 +1,5 @@
 ﻿
-angular.module("contabM.contab.catalogos").controller('MostrarDetallesCuentaContable_Modal_Controller',
+angular.module("contabm.contab.catalogos").controller('MostrarDetallesCuentaContable_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaSeleccionadaDoc', 'cuentaContableSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, companiaSeleccionadaDoc, cuentaContableSeleccionada) {
 

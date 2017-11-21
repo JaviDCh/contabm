@@ -1,5 +1,5 @@
 
-AngularApp.controller('BancosConciliacionBancariaExportarExcel_Controller',
+angular.module("contabm").controller('BancosConciliacionBancariaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'movimientosPropiosNoEncontrados',
                                                   'movimientosContablesNoEncontrados',
                                                   'movimientosBancoNoEncontrados',

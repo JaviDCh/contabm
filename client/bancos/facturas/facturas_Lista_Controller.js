@@ -1,7 +1,7 @@
 
 import numeral from 'numeral'; 
 
-AngularApp.controller("Bancos_Facturas_List_Controller",
+angular.module("contabm").controller("Bancos_Facturas_List_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

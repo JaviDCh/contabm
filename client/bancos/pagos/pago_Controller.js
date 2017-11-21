@@ -1,8 +1,9 @@
 
 import moment from 'moment';
 import { Monedas } from '/imports/collections/monedas';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("Bancos_Pagos_Pago_Controller",
+angular.module("contabm").controller("Bancos_Pagos_Pago_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

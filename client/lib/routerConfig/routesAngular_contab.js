@@ -2,7 +2,7 @@
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-AngularApp.config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
+angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
   function ($urlRouterProvider, $stateProvider, $locationProvider) {
 
         // $locationProvider.html5Mode(true);

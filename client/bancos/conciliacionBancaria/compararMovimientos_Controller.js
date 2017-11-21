@@ -1,5 +1,7 @@
 
-AngularApp.controller('BancosConciliacionBancariaComparar_Controller',
+
+
+angular.module("contabm").controller('BancosConciliacionBancariaComparar_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancariaID', 'companiaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, companiaSeleccionada) {
 

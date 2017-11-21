@@ -1,4 +1,6 @@
 
+import { TimeOffset } from '/globals/globals'; 
+
 Meteor.methods(
 {
     bancos_itf_grabarMovimientosITF_ASqlServer: function (ciaContab) {

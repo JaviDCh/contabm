@@ -1,5 +1,5 @@
 
-AngularApp.controller('MostrarCuotasFactura_Modal_Controller',
+angular.module("contabm").controller('MostrarCuotasFactura_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaContabSeleccionada', 'factura',
 function ($scope, $modalInstance, $modal, $meteor, companiaContabSeleccionada, factura) {
 

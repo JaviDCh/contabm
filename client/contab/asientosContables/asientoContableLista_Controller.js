@@ -2,8 +2,9 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("Contab_AsientoContableLista_Controller",
+angular.module("contabm").controller("Contab_AsientoContableLista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

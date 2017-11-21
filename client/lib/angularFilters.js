@@ -3,18 +3,19 @@ import numeral from "numeral";
 import moment from "moment";
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
+import { Empleados } from '/models/nomina/empleados'; 
 
 // ---------------------------------------------------------------------------------------
 // ui-grid: para formatear fields numéricos y dates
 // ---------------------------------------------------------------------------------------
-AngularApp.filter('currencyFilter', function () {
+angular.module("contabm").filter('currencyFilter', function () {
     return function (value) {
         return numeral(value).format('0,0.00');
     };
 });
 
 
-AngularApp.filter('number8decimals', function () {
+angular.module("contabm").filter('number8decimals', function () {
     return function (value) {
         if (_.isFinite(value))
             return numeral(value).format('0.00000000');
@@ -23,7 +24,7 @@ AngularApp.filter('number8decimals', function () {
     };
 });
 
-AngularApp.filter('number6decimals', function () {
+angular.module("contabm").filter('number6decimals', function () {
     return function (value) {
         if (value)
             return numeral(value).format('0.000000');
@@ -32,7 +33,7 @@ AngularApp.filter('number6decimals', function () {
     };
 });
 
-AngularApp.filter('currencyFilterAndNull', function () {
+angular.module("contabm").filter('currencyFilterAndNull', function () {
     return function (value) {
         if (_.isFinite(value))
             return numeral(value).format('0,0.00');
@@ -41,7 +42,7 @@ AngularApp.filter('currencyFilterAndNull', function () {
     };
 });
 
-AngularApp.filter('currencyFilterNorCeroNorNull', function () {
+angular.module("contabm").filter('currencyFilterNorCeroNorNull', function () {
     return function (value) {
         if (value)
             return numeral(value).format('0,0.00');
@@ -50,7 +51,7 @@ AngularApp.filter('currencyFilterNorCeroNorNull', function () {
     };
 });
 
-AngularApp.filter('currencyFilterNorCeroNorNull4decimals', function () {
+angular.module("contabm").filter('currencyFilterNorCeroNorNull4decimals', function () {
     return function (value) {
         if (value)
             return numeral(value).format('0,0.0000');
@@ -60,7 +61,7 @@ AngularApp.filter('currencyFilterNorCeroNorNull4decimals', function () {
 });
 
 
-AngularApp.filter('dateFilter', function () {
+angular.module("contabm").filter('dateFilter', function () {
     return function (value) {
         if (value)
             return moment(value).format('DD-MM-YY');
@@ -69,7 +70,7 @@ AngularApp.filter('dateFilter', function () {
     };
 });
 
-AngularApp.filter('dateTimeFilter', function () {
+angular.module("contabm").filter('dateTimeFilter', function () {
     return function (value) {
         if (value)
             return moment(value).format('DD-MM-YY h:m a');
@@ -78,7 +79,7 @@ AngularApp.filter('dateTimeFilter', function () {
     };
 });
 
-AngularApp.filter('dateTimeShortFilter', function () {
+angular.module("contabm").filter('dateTimeShortFilter', function () {
     return function (value) {
         if (value)
             return moment(value).format('DD-MM-YY h a');
@@ -94,27 +95,27 @@ let estadosFactura = [
     { estado: 4, descripcion: 'Anulada', },
 ];
 
-AngularApp.filter('nombreEstadoFactura', function () {
+angular.module("contabm").filter('nombreEstadoFactura', function () {
     return function (estadoFactura) {
         var found = _.find(estadosFactura, function (x) { return x.estado === estadoFactura; });
         return found ? found.descripcion : "Indefinido";
     };
 });
 
-AngularApp.filter('boolFilter', function () {
+angular.module("contabm").filter('boolFilter', function () {
     return function (value) {
         return value ? "Ok" : "";
     };
 });
 
-AngularApp.filter('grupoContableFilter', function () {
+angular.module("contabm").filter('grupoContableFilter', function () {
     return function (grupoContableID) {
         var grupoContable = GruposContables.findOne({ grupo: grupoContableID });
         return !grupoContable || _.isEmpty(grupoContable) ? "Indefinido" : grupoContable.descripcion;
     };
 });
 
-AngularApp.filter('tipoCompania2Filter', function () {
+angular.module("contabm").filter('tipoCompania2Filter', function () {
     // la diferencia con el anterior es que aquí recibimos una compañía, la buscamos; buscamos su tipo y lo regresamos
     return function (companiaID) {
 
@@ -134,7 +135,7 @@ AngularApp.filter('tipoCompania2Filter', function () {
 
 // para mostrar las chequeras en el Select en la página que permite agregar mov bancarios;
 // la idea es mostrar: banco + mon + cuenta + etc.
-AngularApp.filter('formatChequera', function () {
+angular.module("contabm").filter('formatChequera', function () {
     return function (chequera) {
         let descripcionChequera = "";
         if (chequera.generica) {
@@ -172,14 +173,14 @@ AngularApp.filter('formatChequera', function () {
 });
 
 
-AngularApp.filter('empresaUsuariaSeleccionadaFilter', function () {
+angular.module("contabm").filter('empresaUsuariaSeleccionadaFilter', function () {
     return function (companiaID) {
         var compania = Companias.findOne(companiaID, { fields: { nombre: 1 } });
         return !compania || _.isEmpty(compania) ? "Indefinido" : compania.nombre;
     };
 });
 
-AngularApp.filter('companiaAbreviaturaFilter', function () {
+angular.module("contabm").filter('companiaAbreviaturaFilter', function () {
     return function (companiaID) {
         var compania = Companias.findOne({ numero: companiaID }, { fields: { abreviatura: 1 } });
         return !compania || _.isEmpty(compania) ? "Indefinido" : compania.abreviatura;
@@ -187,14 +188,14 @@ AngularApp.filter('companiaAbreviaturaFilter', function () {
 });
 
 
-AngularApp.filter('companiaNombreCortoFilter', function () {
+angular.module("contabm").filter('companiaNombreCortoFilter', function () {
     return function (companiaID) {
         var compania = Companias.findOne({ _id: companiaID }, { fields: { nombreCorto: 1 } });
         return !compania || _.isEmpty(compania) ? "Indefinido" : compania.nombreCorto;
     };
 });
 
-AngularApp.filter('companiaNombreCortoFilter_byNumeroContab', function () {
+angular.module("contabm").filter('companiaNombreCortoFilter_byNumeroContab', function () {
     return function (companiaID) {
         var compania = Companias.findOne({ numero: companiaID }, { fields: { nombreCorto: 1 } });
         return !compania || _.isEmpty(compania) ? "Indefinido" : compania.nombreCorto;
@@ -202,28 +203,28 @@ AngularApp.filter('companiaNombreCortoFilter_byNumeroContab', function () {
 });
 
 
-AngularApp.filter('companiaNombreFilter', function () {
+angular.module("contabm").filter('companiaNombreFilter', function () {
     return function (companiaID) {
         var compania = Companias.findOne({ _id: companiaID }, { fields: { nombre: 1 } });
         return !compania || _.isEmpty(compania) ? "Indefinido" : compania.nombre;
     };
 });
 
-AngularApp.filter('monedaDescripcionFilter', function () {
+angular.module("contabm").filter('monedaDescripcionFilter', function () {
     return function (monedaID) {
         var moneda = Monedas.findOne({ moneda: monedaID });
         return !moneda || _.isEmpty(moneda) ? "Indefinido" : moneda.descripcion;
     };
 });
 
-AngularApp.filter('monedaSimboloFilter', function () {
+angular.module("contabm").filter('monedaSimboloFilter', function () {
     return function (monedaID) {
         var moneda = Monedas.findOne({ moneda: monedaID });
         return !moneda || _.isEmpty(moneda) ? "Indefinido" : moneda.simbolo;
     };
 });
 
-AngularApp.filter('cuentasContables_cuentaDescripcionCia', function () {
+angular.module("contabm").filter('cuentasContables_cuentaDescripcionCia', function () {
     return function (cuentaContableID) {
         // debugger;
         if (!cuentaContableID)
@@ -237,7 +238,7 @@ AngularApp.filter('cuentasContables_cuentaDescripcionCia', function () {
     };
 });
 
-AngularApp.filter('cuentasContables_soloCuenta', function () {
+angular.module("contabm").filter('cuentasContables_soloCuenta', function () {
     return function (cuentaContableID) {
         // debugger;
         if (!cuentaContableID)
@@ -251,13 +252,13 @@ AngularApp.filter('cuentasContables_soloCuenta', function () {
     };
 });
 
-AngularApp.filter('mesesAnoFiscal_ano', function () {
+angular.module("contabm").filter('mesesAnoFiscal_ano', function () {
     return function (ano) {
         return ano == 0 ? "Mismo año" : "Próximo año";
     };
 });
 
-AngularApp.filter('empleadoFilter', function () {
+angular.module("contabm").filter('empleadoFilter', function () {
     return function (empleado) {
         const empleadoItem = Empleados.findOne({ empleado: empleado });
         return empleadoItem ? empleadoItem.alias : "Indefinido";
@@ -266,7 +267,7 @@ AngularApp.filter('empleadoFilter', function () {
 
 
 //
-// AngularApp.filter('banco_fromChequeraID', function () {
+// angular.module("contabm").filter('banco_fromChequeraID', function () {
 //     return function (chequeraID) {
 //         debugger;
 //         if (!chequeraID)
@@ -300,7 +301,7 @@ AngularApp.filter('empleadoFilter', function () {
 // });
 
 
-AngularApp.filter('userNameOrEmailFilter', function () {
+angular.module("contabm").filter('userNameOrEmailFilter', function () {
     return function (userID) {
         if (!userID)
             return "";
@@ -322,7 +323,7 @@ AngularApp.filter('userNameOrEmailFilter', function () {
 // para mostrar información de pagos para las cuotas de contratos, fac, sntros, etc.
 // ---------------------------------------------------------------------------------------
 
-AngularApp.filter('origenCuota_Filter', function () {
+angular.module("contabm").filter('origenCuota_Filter', function () {
     return function (value) {
         //debugger;
         var source = value;
@@ -330,7 +331,7 @@ AngularApp.filter('origenCuota_Filter', function () {
     };
 });
 
-AngularApp.filter('cuotaTienePagos_Filter', function () {
+angular.module("contabm").filter('cuotaTienePagos_Filter', function () {
     return function (value, scope) {
         //debugger;
         var row = scope.row.entity;
@@ -340,7 +341,7 @@ AngularApp.filter('cuotaTienePagos_Filter', function () {
     };
 });
 
-AngularApp.filter('cuotaTienePagoCompleto_Filter', function () {
+angular.module("contabm").filter('cuotaTienePagoCompleto_Filter', function () {
     return function (value, scope) {
         //debugger;
         var row = scope.row.entity;
@@ -358,7 +359,7 @@ AngularApp.filter('cuotaTienePagoCompleto_Filter', function () {
 // ---------------------------------------------------------------------------------------
 // para mostrar 'unsafe' strings (with embedded html) in ui-bootstrap alerts ....
 // ---------------------------------------------------------------------------------------
-AngularApp.filter('unsafe',
+angular.module("contabm").filter('unsafe',
 ['$sce',
 function ($sce) {
     return function (value) {
@@ -373,11 +374,11 @@ function ($sce) {
 // nota: lo que sigue es para lograr implementar el comportamiento del dropdownlist en el ui-grid ...
 // -----------------------------------------------------------------------------------------------------------
 
-AngularApp.filter('mapDropdown', ['uiGridFactory', function (uiGridFactory) {
+angular.module("contabm").filter('mapDropdown', ['uiGridFactory', function (uiGridFactory) {
     return uiGridFactory.getMapDrowdownFilter()
 }]);
 
-AngularApp.factory('uiGridFactory', ['$http', '$rootScope', function ($http, $rootScope) {
+angular.module("contabm").factory('uiGridFactory', ['$http', '$rootScope', function ($http, $rootScope) {
 
     var factory = {};
 

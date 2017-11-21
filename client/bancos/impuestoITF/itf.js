@@ -1,6 +1,6 @@
 
 
-AngularApp.controller("Bancos_ImpuestoITF_Controller",
+angular.module("contabm").controller("Bancos_ImpuestoITF_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
       // ------------------------------------------------------------------------------------------------------------------------------

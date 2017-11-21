@@ -1,2 +1,2 @@
 
-angular.module("contabM.bancos.catalogos", []);
+angular.module("contabm.bancos.catalogos", []);

@@ -1,6 +1,6 @@
 
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_MesesDelAnoFiscal_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_MesesDelAnoFiscal_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$reactive',
  function ($scope, $meteor, $modal, uiGridConstants, $reactive) {
 

@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import lodash from 'lodash';
 import moment from 'moment';
 import SimpleSchema from 'simpl-schema';
+import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods(
 {

@@ -1,5 +1,5 @@
 
-AngularApp.controller("Bancos_ImpuestoITF_Filtro_Controller",
+angular.module("contabm").controller("Bancos_ImpuestoITF_Filtro_Controller",
 ['$scope', '$meteor', '$modal', '$state', function ($scope, $meteor, $modal, $state) {
 
       $scope.showProgress = false;

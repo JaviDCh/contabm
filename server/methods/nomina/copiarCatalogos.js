@@ -1,6 +1,8 @@
 
 import numeral from 'numeral';
 import { Companias } from '/imports/collections/companias';
+import { GruposEmpleados } from '/models/nomina/catalogos';
+import { Empleados } from '/models/nomina/empleados'; 
 
 Meteor.methods(
 {

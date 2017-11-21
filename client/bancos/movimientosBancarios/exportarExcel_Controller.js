@@ -1,5 +1,5 @@
 
-AngularApp.controller('BancosMovimientosBancariosExportarExcel_Controller',
+angular.module("contabm").controller('BancosMovimientosBancariosExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, ciaSeleccionada) {
 

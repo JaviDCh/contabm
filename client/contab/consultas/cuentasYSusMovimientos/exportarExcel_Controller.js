@@ -1,5 +1,5 @@
 
-AngularApp.controller('ContabCuentasYSusMovimientosConsultaExportarExcel_Controller',
+angular.module("contabm").controller('ContabCuentasYSusMovimientosConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'desde', 'hasta', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, desde, hasta, ciaSeleccionada) {
 

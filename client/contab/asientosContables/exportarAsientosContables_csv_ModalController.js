@@ -2,8 +2,9 @@
 import Papa from 'papaparse';
 import numeral from 'numeral';
 import saveAs from 'save-as'; 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller('ExportarAsientosContables_csv_ModalController',
+angular.module("contabm").controller('ExportarAsientosContables_csv_ModalController',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaContabSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, companiaContabSeleccionada) {
 

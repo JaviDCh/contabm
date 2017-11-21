@@ -1,7 +1,7 @@
 
 
 
-AngularApp.controller('ContabCodificacionesContablesConsultaExportarExcel_Controller',
+angular.module("contabm").controller('ContabCodificacionesContablesConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'codificacionContable', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, codificacionContable, ciaSeleccionada) {
 

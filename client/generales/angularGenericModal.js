@@ -3,7 +3,7 @@
 // modal (popup) para pedir confirmación al usuario
 // -----------------------------------------------------------------------------
 
-DialogModal = function ($modal, titulo, message, showCancelButton) {
+export const DialogModal = function ($modal, titulo, message, showCancelButton) {
 
     var modalInstance = $modal.open({
         templateUrl: 'client/generales/genericUIBootstrapModal.html',
@@ -26,7 +26,7 @@ DialogModal = function ($modal, titulo, message, showCancelButton) {
 };
 
 
-AngularApp.controller('DialogModalController',
+angular.module("contabm").controller('DialogModalController',
 ['$scope', '$modalInstance', 'titulo', 'mensaje', 'showCancelButton',
 function ($scope, $modalInstance, titulo, mensaje, showCancelButton) {
 

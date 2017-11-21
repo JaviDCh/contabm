@@ -1,8 +1,9 @@
 
 import numeral from 'numeral'; 
+import { Empleados } from '/models/nomina/empleados'; 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("RubrosAsignados_Controller",
+angular.module("contabm").controller("RubrosAsignados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

@@ -264,12 +264,6 @@ function construirFiltroComparacion(mov, criteriosSeleccionadosArray) {
     }
 
     if (lodash.find(criteriosSeleccionadosArray, (x) => { return x === 'fecha'; })) {
-        // nótese como 'globalizamos' la fecha para que se encuentre en mongo
-        // let fecha = mov.fecha;
-        //
-        // if (fecha && lodash.isDate(fecha)) {
-        //     fecha = moment(fecha).add(TimeOffset, 'hours').toDate();
-        // };
         filtro.fecha = mov.fecha;
     }
 
@@ -306,12 +300,7 @@ function construirFiltroComparacion_registroContab(mov, criteriosSeleccionadosAr
     }
 
     if (lodash.find(criteriosSeleccionadosArray, (x) => { return x === 'fecha'; })) {
-        // nótese como 'globalizamos' la fecha para que se encuentre en mongo
-        // let fecha = mov.fecha;
-        //
-        // if (fecha && lodash.isDate(fecha)) {
-        //     fecha = moment(fecha).add(TimeOffset, 'hours').toDate();
-        // };
+
         filtro.fecha = mov.fecha;
     }
 

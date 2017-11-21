@@ -1,6 +1,7 @@
 
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("Bancos_ImpuestoITF_resultados_Controller",
+angular.module("contabm").controller("Bancos_ImpuestoITF_resultados_Controller",
 ['$scope', '$meteor', '$modal', '$state', '$stateParams', 'uiGridConstants',
 function ($scope, $meteor, $modal, $state, $stateParams, uiGridConstants) {
 

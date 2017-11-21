@@ -1,6 +1,8 @@
 
 import moment from 'moment';
 import numeral from 'numeral'; 
+import { GruposEmpleados } from '/models/nomina/catalogos';
+import { Empleados } from '/models/nomina/empleados'; 
 
 Meteor.methods(
 {

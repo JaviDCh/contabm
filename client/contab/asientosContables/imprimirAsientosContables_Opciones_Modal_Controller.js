@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 
-AngularApp.controller('ImprimirAsientosContables_Opciones_Modal_Controller',
+angular.module("contabm").controller('ImprimirAsientosContables_Opciones_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', 'companiaSeleccionadaDoc',
 function ($scope, $modalInstance, $modal, companiaSeleccionadaDoc) {
 

@@ -5,7 +5,7 @@ import * as angular from 'angular';
 import * as lodash from 'lodash';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
-angular.module("contabM.contab.catalogos").controller("Catalogos_Monedas_Controller",
+angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
       $scope.showProgress = false;

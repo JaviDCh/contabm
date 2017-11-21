@@ -2,7 +2,7 @@
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
 
-AngularApp.controller("Contab_Consultas_Saldos_Filtro_Controller",
+angular.module("contabm").controller("Contab_Consultas_Saldos_Filtro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

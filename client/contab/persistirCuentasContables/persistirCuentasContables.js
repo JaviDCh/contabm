@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Contab_PersistirCuentasContables_Controller",
+angular.module("contabm").controller("Contab_PersistirCuentasContables_Controller",
 ['$scope', '$meteor', '$modal', '$reactive', function ($scope, $meteor, $modal, $reactive) {
 
     $scope.showProgress = false;

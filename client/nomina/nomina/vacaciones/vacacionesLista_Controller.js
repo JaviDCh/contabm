@@ -1,7 +1,7 @@
 
 import numeral from 'numeral'; 
 
-AngularApp.controller("Nomina_VacacionesList_Controller",
+angular.module("contabm").controller("Nomina_VacacionesList_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

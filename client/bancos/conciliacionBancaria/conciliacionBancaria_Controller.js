@@ -1,7 +1,8 @@
 
 import lodash from 'lodash';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("Bancos_ConciliacionesBancarias_ConciliacionBancaria_Controller",
+angular.module("contabm").controller("Bancos_ConciliacionesBancarias_ConciliacionBancaria_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

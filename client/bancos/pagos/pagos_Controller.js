@@ -1,5 +1,5 @@
 
-AngularApp.controller("Bancos_Pagos_Controller",
+angular.module("contabm").controller("Bancos_Pagos_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 

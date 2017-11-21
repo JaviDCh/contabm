@@ -1,6 +1,6 @@
 ﻿
 
-AngularApp.controller("RolesController",
+angular.module("contabm").controller("RolesController",
  ['$scope', '$stateParams', '$meteor',
   function ($scope, $stateParams, $meteor) {
 

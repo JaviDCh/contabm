@@ -1,7 +1,8 @@
 
 import moment from 'moment';
+import { DialogModal } from '/client/generales/angularGenericModal'; 
 
-AngularApp.controller("Bancos_MovimientosBancarios_MovimientoBancario_Controller",
+angular.module("contabm").controller("Bancos_MovimientosBancarios_MovimientoBancario_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 

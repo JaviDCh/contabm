@@ -1,7 +1,7 @@
 
 
 // Este controller (angular) se carga con la página primera del programa
-AngularApp.controller("Nomina_CopiarCatalogos_Controller",
+angular.module("contabm").controller("Nomina_CopiarCatalogos_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
     // debugger;
