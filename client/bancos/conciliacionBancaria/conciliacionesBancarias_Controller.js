@@ -1,6 +1,7 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm").controller("Bancos_ConciliacionesBancarias_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',

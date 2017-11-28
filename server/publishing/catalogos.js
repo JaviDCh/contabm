@@ -4,6 +4,7 @@ import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { GruposEmpleados } from '/models/nomina/catalogos';
 import { Empleados } from '/models/nomina/empleados'; 
+import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
 
 Meteor.publish(null, function () {
     // nótese como la idea es regresar aquí todos los catálogos ...

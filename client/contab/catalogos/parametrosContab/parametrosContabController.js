@@ -2,6 +2,7 @@
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_ParametrosContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

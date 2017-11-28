@@ -2,7 +2,7 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-TiposAsientoContable = new Mongo.Collection("tiposAsientoContable");
+export const TiposAsientoContable: any = new Mongo.Collection("tiposAsientoContable");
 
 let schema = new SimpleSchema({
     _id: { type: String, optional: false },

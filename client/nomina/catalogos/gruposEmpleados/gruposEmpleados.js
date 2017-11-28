@@ -1,10 +1,13 @@
 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { GruposEmpleados } from '/models/nomina/catalogos'; 
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
-    //   debugger;
       $scope.showProgress = false;
 
       // ui-bootstrap alerts ...
@@ -19,8 +22,9 @@ angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controlle
       let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
       $scope.companiaSeleccionada = {};
 
-      if (companiaSeleccionada)
-          $scope.companiaSeleccionada = Companias.findOne(companiaSeleccionada.companiaID, { fields: { numero: true, nombre: true, nombreCorto: true } });
+      if (companiaSeleccionada) { 
+        $scope.companiaSeleccionada = Companias.findOne(companiaSeleccionada.companiaID, { fields: { numero: true, nombre: true, nombreCorto: true } });
+      }
       // ------------------------------------------------------------------------------------------------
 
       let grupoEmpleadosSeleccionado = {};
@@ -125,16 +129,7 @@ angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controlle
           },
       ];
 
-
-
-
-
-
-
-
-
-
-
+      
       $scope.empleados_ui_grid = {
 
           enableSorting: true,

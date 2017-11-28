@@ -1,6 +1,7 @@
 
 import numeral from 'numeral';
 import { Monedas } from '/imports/collections/monedas.js';
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

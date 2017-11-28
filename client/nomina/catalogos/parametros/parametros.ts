@@ -12,6 +12,18 @@ import '../../../imports/nomina/catalogos/parametros/salarioMinimo/salarioMinimo
 import '../../../imports/nomina/catalogos/parametros/anticipoSueldo1raQuinc/anticipoSueldo1raQuinc.html'; 
 import '../../../imports/nomina/catalogos/parametros/anticipoSueldo1raQuinc/anticipoSueldo1raQuinc'; 
 
+import '../../../imports/nomina/catalogos/parametros/diasVacacionesPorAno/diasVacacionesPorAno.html'; 
+import '../../../imports/nomina/catalogos/parametros/diasVacacionesPorAno/diasVacacionesPorAno'; 
+
+import '../../../imports/nomina/catalogos/parametros/deduccionesIslr/deduccionesIslr.html'; 
+import '../../../imports/nomina/catalogos/parametros/deduccionesIslr/deduccionesIslr'; 
+
+import '../../../imports/nomina/catalogos/parametros/deduccionesNomina/deduccionesNomina.html'; 
+import '../../../imports/nomina/catalogos/parametros/deduccionesNomina/deduccionesNomina'; 
+
+import '../../../imports/nomina/catalogos/parametros/parametrosNomina/parametrosNomina.html'; 
+import '../../../imports/nomina/catalogos/parametros/parametrosNomina/parametrosNomina'; 
+
 angular.module("contabm.nomina").controller("Catalogos_Nomina_Parametros_Controller", ['$scope', function ($scope) {
 
     $scope.showProgress = true; 

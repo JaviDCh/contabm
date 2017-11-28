@@ -2,6 +2,7 @@
 import { Monedas } from '/imports/collections/monedas.js';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
 
 Meteor.publish("catalogosContab", function () {
     // estos catálogos se publican en forma automática desde 'catalogos.js'; sin embargo, cuando abrimos

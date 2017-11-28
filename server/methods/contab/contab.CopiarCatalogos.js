@@ -3,6 +3,7 @@ import numeral from 'numeral';
 import { Monedas } from '/imports/collections/monedas';
 import { Monedas_sql } from '/server/imports/sqlModels/monedas';
 import { Companias } from '/imports/collections/companias';
+import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
 
 Meteor.methods(
 {

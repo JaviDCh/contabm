@@ -4,13 +4,13 @@
 import { sequelize } from '../../../server/sqlModels/_globals/_loadThisFirst/_globals'; 
 import * as moment from 'moment';
 import * as lodash from 'lodash'; 
-import { Parametros_Nomina_SalarioMinimo_sql } from '../../../server/imports/sqlModels/nomina/parametros/salarioMinimo'; 
+import { DeduccionesNomina_sql } from '../../../server/imports/sqlModels/nomina/parametros/deduccionesNomina'; 
 import * as AppGlobalValues from '../../../imports/globals/globalValues'; 
 import '../../../imports/globals/tsDeclares'; 
 
 Meteor.methods(
 {
-    'nomina.parametros.salarioMinimo.save': function (items) {
+    'nomina.parametros.deduccionesNomina.save': function (items) {
         
 
         if (!lodash.isArray(items) || items.length == 0) {
@@ -30,7 +30,7 @@ Meteor.methods(
             item.desde = item.desde ? moment(item.desde).subtract(AppGlobalValues.TimeOffset, 'hours').toDate() : null;
 
             response = Async.runSync(function(done) {
-                Parametros_Nomina_SalarioMinimo_sql.create(item)
+                DeduccionesNomina_sql.create(item)
                     .then(function(result) { done(null, result); })
                     .catch(function (err) { done(err, null); })
                     .done();
@@ -61,7 +61,7 @@ Meteor.methods(
 
             // actualizamos el registro en sql ...
             response = Async.runSync(function(done) {
-                Parametros_Nomina_SalarioMinimo_sql.update(item.object, { where: { id: item.id }})
+                DeduccionesNomina_sql.update(item.object, { where: { id: item.id }})
                     .then(function(result) { done(null, result); })
                     .catch(function (err) { done(err, null); })
                     .done();
@@ -85,7 +85,7 @@ Meteor.methods(
             let response: any = null;
 
             response = Async.runSync(function(done) {
-                Parametros_Nomina_SalarioMinimo_sql.destroy({ where: { id: item.id }})
+                DeduccionesNomina_sql.destroy({ where: { id: item.id }})
                     .then(function(result) { done(null, result); })
                     .catch(function (err) { done(err, null); })
                     .done();
@@ -98,4 +98,4 @@ Meteor.methods(
 
         return "Ok, los registros han sido actualizados en la base de datos.";
     }
-})
+});

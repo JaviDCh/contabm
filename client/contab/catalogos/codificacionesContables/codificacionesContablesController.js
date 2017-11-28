@@ -1,6 +1,7 @@
 
 import lodash from 'lodash';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$interval', function ($scope, $meteor, $modal, uiGridConstants, $interval) {

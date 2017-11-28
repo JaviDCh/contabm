@@ -4,6 +4,8 @@ import { Monedas } from '/imports/collections/monedas';
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm").controller("Contab_AsientoContableFiltro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',

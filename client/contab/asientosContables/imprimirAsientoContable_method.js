@@ -2,6 +2,7 @@
 import numeral from 'numeral';
 import moment from 'moment';
 import { Monedas } from '/imports/collections/monedas';
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 // import pdfMake from '/pdfMake_from_bower/imports/build/pdfmake.min.js';
 

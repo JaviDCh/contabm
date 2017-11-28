@@ -96,19 +96,6 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             controller: 'Catalogos_Nomina_GruposEmpleados_Controller',
             parent: 'nomina'
         })
-        .state('nomina.cuentasContablesEmpleadoRubro', {
-            url: '/cuentasContablesEmpleadoRubro',
-            templateUrl: 'client/nomina/catalogos/cuentasContablesEmpleadoRubro/cuentasContablesEmpleadoRubro.html',
-            controller: 'Catalogos_Nomina_CuentasContablesEmpleadoRubro_Controller',
-            parent: 'nomina'
-        })
-        .state('nomina.diasFeriados', {
-            url: '/diasFeriados',
-            templateUrl: 'client/nomina/catalogos/diasFeriados/diasFeriados.html',
-            controller: 'Catalogos_Nomina_DiasFeriados_Controller',
-            parent: 'nomina'
-        })
-
 
         // -------------------------------------------------------------------------------------------
         // Parámetros 
@@ -129,6 +116,42 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             url: '/anticipoSueldo1raQuincena',
             templateUrl: 'client/imports/nomina/catalogos/parametros/anticipoSueldo1raQuinc/anticipoSueldo1raQuinc.html',
             controller: 'catalogos_nomina_parametros_anticipoSueldo1raQuinc_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.diasVacacionesPorAno', {
+            url: '/diasVacacionesPorAno',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/diasVacacionesPorAno/diasVacacionesPorAno.html',
+            controller: 'catalogos_nomina_parametros_diasVacacionesPorAno_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.deduccionesIslr', {
+            url: '/deduccionesIslr',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/deduccionesIslr/deduccionesIslr.html',
+            controller: 'catalogos_nomina_parametros_deduccionesIslr_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.deduccionesNomina', {
+            url: '/deduccionesNomina',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/deduccionesNomina/deduccionesNomina.html',
+            controller: 'catalogos_nomina_parametros_deduccionesNomina_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.parametrosNomina', {
+            url: '/parametrosNomina',
+            templateUrl: 'client/imports/nomina/catalogos/parametros/parametrosNomina/parametrosNomina.html',
+            controller: 'catalogos_nomina_parametros_parametrosNomina_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.cuentasContablesEmpleadoRubro', {
+            url: '/cuentasContablesEmpleadoRubro',
+            templateUrl: 'client/nomina/catalogos/cuentasContablesEmpleadoRubro/cuentasContablesEmpleadoRubro.html',
+            controller: 'Catalogos_Nomina_CuentasContablesEmpleadoRubro_Controller',
+            parent: 'nomina.parametros'
+        })
+        .state('nomina.parametros.diasFeriados', {
+            url: '/diasFeriados',
+            templateUrl: 'client/nomina/catalogos/diasFeriados/diasFeriados.html',
+            controller: 'Catalogos_Nomina_DiasFeriados_Controller',
             parent: 'nomina.parametros'
         })
 
