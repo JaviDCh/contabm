@@ -1,9 +1,16 @@
 
 
+
 <div class="row">
-    <div class="col-sm-12 col-sm-offset-0">
-        <div class="col-sm-4 col-sm-offset-4" style="text-align: center; vertical-align: middle; ">
-            <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
+    <div class="col-sm-6 col-sm-offset-3" style="text-align: center; vertical-align: middle; ">
+        <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
+        <div ng-show="showProgress">
+            <div ng-show="processProgress.current != null" style="font-size: small; font-weight: bold; ">
+                ({{ processProgress.current }}/{{ processProgress.max }} - {{ processProgress.progress }})
+            </div>
+            <div ng-show="processProgress.message" style="font-size: x-small; font-weight: bold; ">
+                <span ng-bind-html="processProgress.message | unsafe"></span>
+            </div>
         </div>
     </div>
 </div>
@@ -26,13 +33,15 @@
                     <ul class="nav navbar-nav">
                         <li><a href="#" class="navbar_custom_small_header">Asientos contables seleccionados </a></li>
                         <li><a href="#" ng-click="imprimir()" class="navbar_custom_small_node_withBackground">Imprimir&nbsp;&nbsp;<span class="fa fa-print"></span></a></li>
-                        <li><a href="#" ng-click="exportarAsientosContables_csv()" class="navbar_custom_small_node_withBackground">Exportar (csv)&nbsp;&nbsp;<span class="fa fa-file-text-o"></span></a></li>
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle navbar_custom_small_node_withBackground" data-toggle="dropdown" role="button" aria-expanded="false">Copiar <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle navbar_custom_small_node_withBackground" data-toggle="dropdown" role="button" aria-expanded="false">Otros <span class="caret"></span></a>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="#" ng-click="exportarAsientosContables()" class="navbar_custom_small_node">Exportar&nbsp;&nbsp;<span class="fa fa-share"></span></a></li>
-                                <li><a href="#" ng-click="importarAsientosContables()" class="navbar_custom_small_node">Importar&nbsp;&nbsp;<span class="fa fa-reply"></span></a></li>
+                                <li><a href="#" ng-click="exportarAsientosContables()" class="navbar_custom_small_node_withBackground">Exportar (texto) &nbsp;&nbsp;<span class="fa fa-share"></span></a></li>
+                                <li><a href="#" ng-click="importarAsientosContables()" class="navbar_custom_small_node_withBackground">Importar (texto) &nbsp;&nbsp;<span class="fa fa-reply"></span></a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" ng-click="exportarAsientosContables_csv()" class="navbar_custom_small_node_withBackground">Exportar (csv)&nbsp;&nbsp;<span class="fa fa-file-text-o"></span></a></li>
+                                <li><a href="#" ng-if="origen=='edicion'" ng-click="corregirMontosMas2Decimales()" class="navbar_custom_small_node_withBackground">Corregir asientos con más de dos decimales&nbsp;&nbsp;<span class="fa fa-gears"></span></a></li>
                             </ul>
                         </li>
                     </ul>

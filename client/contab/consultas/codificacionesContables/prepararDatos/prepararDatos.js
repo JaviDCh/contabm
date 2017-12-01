@@ -1,6 +1,9 @@
 
+
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Contab_Consultas_CodificacionesContables_PrepararDatos_Controller",

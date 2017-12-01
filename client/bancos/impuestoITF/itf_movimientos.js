@@ -1,5 +1,8 @@
 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Bancos_ImpuestoITF_Movimientos_Controller",
 ['$scope', '$meteor', '$modal', '$state', 'uiGridConstants', function ($scope, $meteor, $modal, $state, uiGridConstants) {
 

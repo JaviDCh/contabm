@@ -1,5 +1,7 @@
 
 import lodash from 'lodash';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 angular.module("contabm").controller("Contab_Consultas_Saldos_Lista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',

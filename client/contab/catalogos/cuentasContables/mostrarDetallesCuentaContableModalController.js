@@ -1,4 +1,7 @@
 ﻿
+
+import { Companias } from '/imports/collections/companias';
+
 angular.module("contabm.contab.catalogos").controller('MostrarDetallesCuentaContable_Modal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaSeleccionadaDoc', 'cuentaContableSeleccionada',
 function ($scope, $modalInstance, $modal, $meteor, companiaSeleccionadaDoc, cuentaContableSeleccionada) {

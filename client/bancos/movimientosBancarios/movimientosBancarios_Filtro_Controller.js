@@ -1,5 +1,7 @@
 
 import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',

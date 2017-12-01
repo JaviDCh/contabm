@@ -1,5 +1,8 @@
 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Contab_Consultas_CodificacionesContables_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$reactive', function ($scope, $meteor, $modal, uiGridConstants, $reactive) {

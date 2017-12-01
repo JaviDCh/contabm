@@ -1,4 +1,8 @@
 
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Bancos_ImpuestoITF_Filtro_Controller",
 ['$scope', '$meteor', '$modal', '$state', function ($scope, $meteor, $modal, $state) {
 

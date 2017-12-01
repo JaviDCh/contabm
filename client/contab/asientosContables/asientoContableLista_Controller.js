@@ -4,6 +4,8 @@ import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+
 angular.module("contabm").controller("Contab_AsientoContableLista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
@@ -20,6 +22,27 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     $scope.origen = $stateParams.origen;
     var pageNumber = $stateParams.pageNumber;
 
+    $scope.processProgress = {
+        current: 0,
+        max: 0,
+        progress: 0,
+        message: ''
+    };
+
+    // -------------------------------------------------------------------------------------------------------
+    // para recibir los eventos desde la tarea en el servidor ...
+    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'contab', process: 'asientos.lista.corregirAsientosMas2Decimales' });
+    EventDDP.addListener('contab_asientos.lista.corregirAsientosMas2Decimales_reportProgress', function(process) {
+        $scope.processProgress.current = process.current;
+        $scope.processProgress.max = process.max;
+        $scope.processProgress.progress = process.progress;
+        $scope.processProgress.message = process.message ? process.message : null;
+        // if we don't call this method, angular wont refresh the view each time the progress changes ...
+        // until, of course, the above process ends ...
+        $scope.$apply();
+    });
+    // -------------------------------------------------------------------------------------------------------
+
     // ------------------------------------------------------------------------------------------------
     // leemos la compañía seleccionada
     let companiaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
@@ -31,7 +54,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.regresarALista = function () {
         $state.go("contab.asientosContables.filter", { origen: $scope.origen });
-    };
+    }
 
 
     $scope.nuevo = function () {
@@ -40,12 +63,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             id: "0",
             pageNumber: 0,                          // nota: por ahora no vamos a paginar; tal vez luego, cuando esto funcione bien ...
             vieneDeAfuera: false
-        });
-    };
+        })
+    }
 
     $scope.regresar = function () {
         $state.go('contab.asientosContables.filter', { origen: $scope.origen });
-    };
+    }
 
 
     $scope.imprimir = function() {
@@ -448,6 +471,65 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               function (cancel) {
                   return true;
               });
+    }
+
+
+    $scope.corregirMontosMas2Decimales = function() { 
+
+        $scope.showProgress = true; 
+
+        // construimos un array con los IDs de los asientos en la lista, para enviarlo a un meteor method que corrija estos 
+        // asientos ... 
+        let asientosSeleccionadosArray = []; 
+
+        for (let asiento of $scope.asientosContables) { 
+            asientosSeleccionadosArray.push(asiento.numeroAutomatico); 
+        }
+
+        Meteor.call('asientosContables.mas2decimales.corregir', asientosSeleccionadosArray, (err, result) => {
+
+            if (err) {
+
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+            if (result.error) {
+                
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: result.message
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'info',
+                msg: result.message
+            });
+
+            $scope.showProgress = false;
+            $scope.$apply();
+        })
+        
     }
 
   }

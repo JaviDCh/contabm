@@ -2,6 +2,8 @@
 import moment from 'moment';
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 angular.module("contabm").controller("Contab_Consultas_CuentasYMovimientos_Filtro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',

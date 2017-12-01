@@ -1,9 +1,18 @@
 
+
+
+
 <div class="row">
-    <div style="text-align: right; font-style: italic; ">
-        <span style="color: dodgerblue">
-            {{ companiaSeleccionada ? companiaSeleccionada.nombreCorto : 'No hay una compañía Contab seleccioada ...' }}
-        </span>
+    <div class="col-sm-6 col-sm-offset-0">
+        <h4 style="margin: 0 0 0 30; color: #3183B9; text-align: left; ">contabm - Catálogos - Bancos</h4>
+    </div>
+
+    <div class="col-sm-6 col-sm-offset-0">
+        <div style="text-align: right; font-style: italic; ">
+            <span style="color: dodgerblue">
+                {{ companiaSeleccionada ? companiaSeleccionada.nombreCorto : 'No hay una compañía Contab seleccioada ...' }}
+            </span>
+        </div>
     </div>
 </div>
 
@@ -21,6 +30,22 @@
     </div>
 </div>
 
+<nav class="navbar navbar-inverse navbar_custom_small_fullWidth" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a class="navbar_custom_small_header">Nómina - Grupos de empleados </a>
+                </li>
+                <li>
+                    <a href="#" class="navbar_custom_small_node" ng-click="save()">Grabar <span class="fa fa-save"></span></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
 <div class="row" style="text-align: center; ">
     <div class="col-sm-5 col-sm-offset-1">
 
@@ -29,8 +54,8 @@
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li><a class="navbar_custom_small_header">Grupos </a></li>
-                        <!-- <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevo()">Nuevo <span class="fa fa-file-o"></span></a></li>
-                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li> -->
+                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevoGrupoEmpleados()">Nuevo <span class="fa fa-file-o"></span></a></li>
+                        <!-- <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li> -->
                     </ul>
 
                 </div>
@@ -52,8 +77,8 @@
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li><a class="navbar_custom_small_header">Empleados </a></li>
-                        <!-- <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevo()">Nuevo <span class="fa fa-file-o"></span></a></li>
-                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li> -->
+                        <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevoEmpleado()">Nuevo <span class="fa fa-file-o"></span></a></li>
+                        <!-- <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="save()">Grabar <span class="fa fa-save"></span></a></li> -->
                     </ul>
 
                 </div>

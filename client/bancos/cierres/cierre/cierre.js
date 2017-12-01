@@ -1,5 +1,8 @@
 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Bancos_Cierre_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 

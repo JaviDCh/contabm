@@ -4,6 +4,22 @@ import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { GruposEmpleados } from '/models/nomina/catalogos'; 
 
+// let gruposEmpleados_SimpleSchema = new SimpleSchema({
+//     _id: { type: String, optional: false },
+//     grupo: { type: Number, label: "ID en contab", optional: false, },
+//     nombre: { type: String, label: "Nombre del grupo", optional: false, min: 1, max: 10, },
+//     descripcion: { type: String, label: "Descripcion del grupo", optional: false, min: 1, max: 250, },
+//     grupoNominaFlag: { type: Boolean, label: "Grupo de nómina?", optional: false, },
+
+//     empleados: { type: Array, optional: true, minCount: 0, },
+//     'empleados.$': { type: gruposEmpleados_Empleados_SimpleSchema },
+
+//     cia:  { type: Number, label: "Cia Contab", optional: false },
+// })
+
+// export const GruposEmpleados = new Mongo.Collection("gruposEmpleados");
+// GruposEmpleados.attachSchema(gruposEmpleados_SimpleSchema);
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -15,7 +31,7 @@ angular.module("contabm").controller("Catalogos_Nomina_GruposEmpleados_Controlle
 
       $scope.closeAlert = function (index) {
           $scope.alerts.splice(index, 1);
-      };
+      }
 
       // ------------------------------------------------------------------------------------------------
       // leemos la compañía seleccionada

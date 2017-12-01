@@ -5,6 +5,9 @@ import angularMeteor from 'angular-meteor';
 
 import templateUrl from './administracion_utilitarios.html';
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 class Administracion_Utilitarios {
 
   constructor($scope, $reactive) {

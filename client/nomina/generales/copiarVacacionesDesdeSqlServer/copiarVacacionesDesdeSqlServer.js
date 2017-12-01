@@ -1,4 +1,8 @@
 ﻿
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("NominaCopiarVacacionesDesdeSqlServer_Controller",
 ['$scope', '$state', '$stateParams', '$meteor', '$modal',
   function ($scope, $state, $stateParams, $meteor, $modal) {

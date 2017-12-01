@@ -3,6 +3,7 @@ import moment from 'moment';
 import lodash from 'lodash';
 
 import { Monedas } from '/imports/collections/monedas.js';
+import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 
 angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista_Controller",

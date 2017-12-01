@@ -1,5 +1,11 @@
 
+
+
 import lodash from 'lodash';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 angular.module("contabm").controller("Contab_Cierre_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -122,7 +128,7 @@ angular.module("contabm").controller("Contab_Cierre_Controller",
                        (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({
@@ -146,7 +152,7 @@ angular.module("contabm").controller("Contab_Cierre_Controller",
           Meteor.apply('construirAsientoAutomaticoCierre', [ $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc ], [{ noRetry: true }], (err, result) => {
 
                if (err) {
-                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                    $scope.alerts.length = 0;
                    $scope.alerts.push({
@@ -178,7 +184,7 @@ angular.module("contabm").controller("Contab_Cierre_Controller",
                 construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal, companiaSeleccionadaDoc)
               },
               function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({ type: 'danger', msg: errorMessage });
@@ -195,7 +201,7 @@ angular.module("contabm").controller("Contab_Cierre_Controller",
                 construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal, companiaSeleccionadaDoc)
               },
               function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({ type: 'danger', msg: errorMessage });
@@ -216,7 +222,7 @@ function construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal
     Meteor.call('contabLeerUltimoMesCerrado', companiaSeleccionadaDoc, (err, result) => {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -268,7 +274,7 @@ function construirYMostrarListaDeMesesACerrar($meteor, $scope, mesesDelAnoFiscal
                   Meteor.call('determinarSiExisteAsientoAutomaticoCierreAnual', $scope.ultimoMesCerrado.ano, companiaSeleccionadaDoc, (err, result) => {
 
                     if (err) {
-                        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                        let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                         $scope.alerts.length = 0;
                         $scope.alerts.push({

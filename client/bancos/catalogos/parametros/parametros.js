@@ -1,5 +1,7 @@
 
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm.bancos.catalogos").controller("Catalogos_ParametrosBancos_Controller",

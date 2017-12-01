@@ -1,6 +1,9 @@
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Bancos_ImpuestoITF_resultados_Controller",
 ['$scope', '$meteor', '$modal', '$state', '$stateParams', 'uiGridConstants',
 function ($scope, $meteor, $modal, $state, $stateParams, uiGridConstants) {

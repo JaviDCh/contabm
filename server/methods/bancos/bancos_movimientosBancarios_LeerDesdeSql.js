@@ -123,7 +123,7 @@ Meteor.methods(
         where += `(cb.Cia = ${ciaContab.toString()})`;
 
         // bancos
-        if (_.isArray(filtro2.bancos) && filtro2.bancos.length > 0) {
+        if (lodash.isArray(filtro2.bancos) && filtro2.bancos.length > 0) {
 
             if (where)
                 where += " And ";
@@ -144,7 +144,7 @@ Meteor.methods(
         };
 
         // monedas
-        if (_.isArray(filtro2.monedas) && filtro2.monedas.length > 0) {
+        if (lodash.isArray(filtro2.monedas) && filtro2.monedas.length > 0) {
 
             if (where)
                 where += " And ";
@@ -165,7 +165,7 @@ Meteor.methods(
         };
 
         // tipos
-        if (_.isArray(filtro2.tipos) && filtro2.tipos.length > 0) {
+        if (lodash.isArray(filtro2.tipos) && filtro2.tipos.length > 0) {
 
             if (where)
                 where += " And ";
@@ -187,7 +187,7 @@ Meteor.methods(
 
 
         // usuarios
-        if (_.isArray(filtro2.usuarios) && filtro2.usuarios.length > 0) {
+        if (lodash.isArray(filtro2.usuarios) && filtro2.usuarios.length > 0) {
 
             if (where)
                 where += " And ";
@@ -208,7 +208,7 @@ Meteor.methods(
         };
 
         // cuentasBancarias
-        if (_.isArray(filtro2.cuentasBancarias) && filtro2.cuentasBancarias.length > 0) {
+        if (lodash.isArray(filtro2.cuentasBancarias) && filtro2.cuentasBancarias.length > 0) {
 
             if (where)
                 where += " And ";
@@ -229,7 +229,7 @@ Meteor.methods(
         };
 
         // chequeras
-        if (_.isArray(filtro2.chequeras) && filtro2.chequeras.length > 0) {
+        if (lodash.isArray(filtro2.chequeras) && filtro2.chequeras.length > 0) {
 
             if (where)
                 where += " And ";

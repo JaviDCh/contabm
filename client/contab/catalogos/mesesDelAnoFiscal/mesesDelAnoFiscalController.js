@@ -1,5 +1,9 @@
 
 
+
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm.contab.catalogos").controller("Catalogos_MesesDelAnoFiscal_Controller",
 ['$scope', '$meteor', '$modal', 'uiGridConstants', '$reactive',
  function ($scope, $meteor, $modal, uiGridConstants, $reactive) {

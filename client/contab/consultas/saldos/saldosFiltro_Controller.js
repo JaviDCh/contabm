@@ -1,6 +1,9 @@
 
+
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 angular.module("contabm").controller("Contab_Consultas_Saldos_Filtro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',

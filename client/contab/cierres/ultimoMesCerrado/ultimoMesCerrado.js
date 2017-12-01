@@ -2,6 +2,9 @@
 import lodash from 'lodash';
 import moment from 'moment'; 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Contab_UltimoMesCerrado_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 

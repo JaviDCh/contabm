@@ -2,6 +2,9 @@
 import moment from 'moment';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 angular.module("contabm").controller("Bancos_MovimientosBancarios_MovimientoBancario_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {

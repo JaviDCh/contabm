@@ -1,6 +1,9 @@
 
 import moment from 'moment';
 
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Bancos_UltimoMesCerrado_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
