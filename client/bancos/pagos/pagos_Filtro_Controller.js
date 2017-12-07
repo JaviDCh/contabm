@@ -3,6 +3,7 @@
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_Pagos_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
@@ -84,7 +85,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         Meteor.call('bancos.pagos.leerDesdeSqlServer', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

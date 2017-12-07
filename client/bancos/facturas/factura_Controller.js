@@ -8,6 +8,7 @@ import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_Facturas_Factura_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'leerTablasImpuestosRetenciones', 'tablasImpuestosRetenciones',
@@ -110,7 +111,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                   },
                   function (err) {
 
-                      let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                       $scope.alerts.length = 0;
                       $scope.alerts.push({
@@ -460,7 +461,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, noModificarAsientoContableAsociado, (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({
@@ -1334,7 +1335,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
               isValid = Facturas.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  Facturas.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  Facturas.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Facturas.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               };
@@ -1394,7 +1395,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
               },
               function (err) {
 
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -1454,7 +1455,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
           Meteor.call('factura.leerByID.desdeSql', facturaID, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -1515,7 +1516,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
               Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
 
                   if (err) {
-                      let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                       $scope.alerts.length = 0;
                       $scope.alerts.push({

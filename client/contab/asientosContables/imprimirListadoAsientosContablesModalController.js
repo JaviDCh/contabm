@@ -1,5 +1,6 @@
 
 import lodash from 'lodash';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('ImprimirListadoAsientosContablesModalController',
 ['$scope', '$modalInstance', '$modal', 'ciaSeleccionada',
@@ -98,7 +99,7 @@ function ($scope, $modalInstance, $modal, ciaSeleccionada) {
             Meteor.call('contab.asientos.reporteWeb', $scope.reportConfig, (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({ type: 'danger', msg: errorMessage });

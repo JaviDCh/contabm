@@ -1,5 +1,6 @@
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('AsociarFacturasModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'uiGridConstants', 'companiaContabSeleccionada', 'pago',
@@ -334,7 +335,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
              (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -446,7 +447,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
                 };
             },
             function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

@@ -1,5 +1,7 @@
 
 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+
 angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
 
@@ -178,7 +180,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables
                   isValid = GruposContables.simpleSchema().namedContext().validate(item);
 
                   if (!isValid) {
-                      GruposContables.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      GruposContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + GruposContables.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                       });
                   }
@@ -244,7 +246,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables
                   });
             },
             function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

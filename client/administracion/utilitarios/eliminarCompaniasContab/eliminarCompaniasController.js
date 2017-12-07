@@ -1,5 +1,6 @@
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("AdministracionUtilitarios_EliminarCompanias_Controller",
@@ -60,18 +61,18 @@ angular.module("contabm").controller("AdministracionUtilitarios_EliminarCompania
         Meteor.call('administracion.utilitarios.eliminarDatosCompaniaContab', companiaContabSeleccionada, (err, result) => {
 
           if (err) {
-              let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-              $scope.alerts.length = 0;
-              $scope.alerts.push({
-                  type: 'danger',
-                  msg: errorMessage
-              });
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: errorMessage
+            });
 
-              $scope.showProgress = false;
-              $scope.$apply();
+            $scope.showProgress = false;
+            $scope.$apply();
 
-              return;
+            return;
           }
 
           if (result.error) {

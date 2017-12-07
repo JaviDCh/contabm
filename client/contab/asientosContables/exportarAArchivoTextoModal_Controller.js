@@ -2,6 +2,7 @@
 import saveAs from 'save-as';
 import numeral from 'numeral'; 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('ExportarAArchivoTextoModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaContabSeleccionada',
@@ -39,7 +40,7 @@ angular.module("contabm").controller('ExportarAArchivoTextoModal_Controller',
             Meteor.call('exportarAsientosContablesAArchivoTexto', (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({

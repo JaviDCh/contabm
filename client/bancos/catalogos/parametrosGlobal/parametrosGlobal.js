@@ -133,7 +133,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_ParametrosGloba
                   isValid = ParametrosGlobalBancos.simpleSchema().namedContext().validate(item);
 
                   if (!isValid) {
-                      ParametrosGlobalBancos.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      ParametrosGlobalBancos.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                       });
                   }

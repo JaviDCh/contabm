@@ -6,6 +6,7 @@ import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_ParametrosContab_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -142,7 +143,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_ParametrosConta
                isValid = ParametrosContab.simpleSchema().namedContext().validate(editedItem);
 
                if (!isValid) {
-                   ParametrosContab.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                   ParametrosContab.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                        errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + ParametrosContab.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                    });
                }
@@ -171,7 +172,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_ParametrosConta
            Meteor.call('contab.parametrosContab.save', editedItem, (err, result) => {
 
                if (err) {
-                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                    $scope.alerts.length = 0;
                    $scope.alerts.push({
@@ -224,7 +225,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_ParametrosConta
                        $scope.companiaSeleccionada.numero, (err, result) => {
 
                if (err) {
-                   let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                    $scope.alerts.length = 0;
                    $scope.alerts.push({

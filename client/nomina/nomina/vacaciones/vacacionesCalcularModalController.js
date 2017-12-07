@@ -1,5 +1,6 @@
 
 import moment from 'moment';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('VacacionesCalcularModal_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'vacacion', 'companiaContabSeleccionada',
@@ -204,7 +205,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, vacacion, companiaCon
                 $scope.showProgress = false;
             },
             function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

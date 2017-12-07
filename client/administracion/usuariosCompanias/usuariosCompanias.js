@@ -250,18 +250,6 @@ angular.module("contabm").controller("UsuariosCompaniasController",
           let isValid = false;
           let errores = [];
 
-        //   editedItems.forEach(function (item) {
-        //       if (item.docState != 3) {
-        //           isValid = AnalisisContable.simpleSchema().namedContext().validate(item);
-          //
-        //           if (!isValid) {
-        //               AnalisisContable.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
-        //                   errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
-        //               });
-        //           }
-        //       }
-        //   });
-
           if (errores && errores.length) {
 
               $scope.alerts.length = 0;

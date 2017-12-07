@@ -9,6 +9,7 @@ import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoCo
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2';  
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Contab_AsientoContable_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'catalogosContab',
@@ -826,7 +827,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
               isValid = AsientosContables.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  AsientosContables.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  AsientosContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                   });
               }
@@ -1054,7 +1055,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
                  (err, result) => {
 
                  if (err) {
-                     let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                      $scope.alerts.length = 0;
                      $scope.alerts.push({

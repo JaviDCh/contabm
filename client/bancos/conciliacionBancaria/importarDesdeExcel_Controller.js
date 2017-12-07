@@ -3,6 +3,7 @@ import XLSX from "XLSX";
 import lodash from "lodash";
 import moment from "moment";
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('BancosConciliacionBancariaImportarDesdeExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancaria', 'companiaSeleccionada',
@@ -280,7 +281,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
                 }
             },
             function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

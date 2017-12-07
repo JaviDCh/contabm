@@ -1,5 +1,7 @@
 
 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+
 
 angular.module("contabm").controller('BancosConciliacionBancariaComparar_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionBancariaID', 'companiaSeleccionada',
@@ -150,7 +152,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancariaID, compa
                            mantenerComparacionesAnteriores, (err, result) => {
 
                    if (err) {
-                       let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                        $scope.alerts.length = 0;
                        $scope.alerts.push({

@@ -212,7 +212,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_ParametrosBanco
                   isValid = ParametrosBancos.simpleSchema().namedContext().validate(item);
 
                   if (!isValid) {
-                      ParametrosBancos.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      ParametrosBancos.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                       });
                   }

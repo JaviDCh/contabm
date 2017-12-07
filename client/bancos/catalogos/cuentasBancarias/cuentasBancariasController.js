@@ -3,6 +3,7 @@
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancarias_Controller",
@@ -760,15 +761,15 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
               },
               function (err) {
 
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-                  $scope.showProgress = false;
+                $scope.showProgress = false;
               });
       };
 
@@ -794,7 +795,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                  isValid = Chequeras.simpleSchema().namedContext().validate(item);
 
                  if (!isValid) {
-                     Chequeras.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                     Chequeras.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                          errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + Chequeras.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                      });
                  }
@@ -863,7 +864,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                  });
            },
            function (err) {
-               let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                $scope.alerts.length = 0;
                $scope.alerts.push({

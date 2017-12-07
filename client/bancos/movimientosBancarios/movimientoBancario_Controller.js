@@ -4,6 +4,7 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_MovimientoBancario_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
@@ -376,7 +377,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               isValid = MovimientosBancarios.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  MovimientosBancarios.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  MovimientosBancarios.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + MovimientosBancarios.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
@@ -429,7 +430,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               },
               function (err) {
 
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -486,7 +487,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
           Meteor.call('movimientoBancario.leerByID.desdeSql', pk, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({

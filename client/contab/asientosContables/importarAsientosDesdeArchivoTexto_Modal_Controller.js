@@ -1,6 +1,7 @@
 
 import numeral from 'numeral';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('ImportarAsientosDesdeArchivoTexto_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$timeout', 'companiaContabSeleccionada',
@@ -54,7 +55,7 @@ angular.module("contabm").controller('ImportarAsientosDesdeArchivoTexto_Controll
                                                                       (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({

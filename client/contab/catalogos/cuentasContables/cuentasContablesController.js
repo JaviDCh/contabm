@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -325,7 +326,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContable
                    isValid = CuentasContables.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       CuentasContables.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       CuentasContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + CuentasContables.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }
@@ -392,7 +393,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContable
                    });
              },
              function (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                  $scope.alerts.length = 0;
                  $scope.alerts.push({

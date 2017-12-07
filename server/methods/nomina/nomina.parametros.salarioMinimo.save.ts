@@ -7,6 +7,7 @@ import * as lodash from 'lodash';
 import { Parametros_Nomina_SalarioMinimo_sql } from '../../../server/imports/sqlModels/nomina/parametros/salarioMinimo'; 
 import * as AppGlobalValues from '../../../imports/globals/globalValues'; 
 import '../../../imports/globals/tsDeclares'; 
+import { TimeOffset } from '../../../globals/globals'; 
 
 Meteor.methods(
 {

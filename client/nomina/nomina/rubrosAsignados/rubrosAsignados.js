@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import { Empleados } from '/models/nomina/empleados'; 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("RubrosAsignados_Controller",
@@ -379,15 +380,6 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
           $scope.rubros_ui_grid.data = $scope.rubrosAsignados;
       };
 
-
-
-
-
-
-
-
-
-
       // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
       $scope.limpiarFiltro = function () {
           $scope.filtro = {};
@@ -400,7 +392,7 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
           Meteor.call('nomina_rubrosAsignados_LeerDesdeSql', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -460,7 +452,7 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
           Meteor.call('getCollectionCount', 'Temp_Consulta_Nomina_RubrosAsignados', (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -565,7 +557,7 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
                    isValid = Temp_Consulta_Nomina_RubrosAsignados.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       Temp_Consulta_Nomina_RubrosAsignados.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       Temp_Consulta_Nomina_RubrosAsignados.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + Temp_Consulta_Nomina_RubrosAsignados.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }
@@ -610,7 +602,7 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
                  leerPrimerosRegistrosDesdeServidor(limit);
              },
              function (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                  $scope.alerts.length = 0;
                  $scope.alerts.push({

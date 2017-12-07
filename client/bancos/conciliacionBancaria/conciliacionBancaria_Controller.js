@@ -783,7 +783,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               isValid = ConciliacionesBancarias.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  ConciliacionesBancarias.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  ConciliacionesBancarias.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + ConciliacionesBancarias.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
@@ -812,7 +812,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
           Meteor.call('bancos.conciliacionesBancarias.save', editedItem, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -1015,7 +1015,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                   }
               },
               function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -1114,8 +1114,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                   }
               },
               function (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
-
+                  
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
                       type: 'danger',

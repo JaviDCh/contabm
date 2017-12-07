@@ -6,6 +6,7 @@ import lodash from 'lodash';
 
 import templateUrl from './categoriasRetencion.html';
 import { CategoriasRetencion } from '/imports/models/bancos/catalogos/categoriasRetencion';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 export default angular.module("categoriasRetencion", [ angularMeteor, uiRouter ])
     .controller("Bancos_Catalogos_CategoriasRetencion_Controller", ['$scope', function ($scope) {
@@ -163,7 +164,7 @@ export default angular.module("categoriasRetencion", [ angularMeteor, uiRouter ]
                        isValid = CategoriasRetencion.simpleSchema().namedContext().validate(item);
 
                        if (!isValid) {
-                           CategoriasRetencion.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                           CategoriasRetencion.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                                errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + CategoriasRetencion.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                            });
                        }
@@ -195,7 +196,7 @@ export default angular.module("categoriasRetencion", [ angularMeteor, uiRouter ]
                Meteor.call('bancos.categoriasRetencion.grabarSqlServer', editedItems, (err, result) => {
 
                     if (err) {
-                        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                        let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                         $scope.alerts.length = 0;
                         $scope.alerts.push({
@@ -286,7 +287,7 @@ function inicializarItem() {
         Meteor.call('bancos.categoriasRetencion.leerDesdeSqlServer', (err, result) => {
 
              if (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
                  reject(Error(errorMessage));
              }
 

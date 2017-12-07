@@ -271,7 +271,7 @@ angular.module("contabm").controller("Catalogos_Nomina_CuentasContablesEmpleadoR
         Meteor.call('nomina_cuentasContablesEmpleadoRubro_leerDesdeSql', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -331,7 +331,7 @@ angular.module("contabm").controller("Catalogos_Nomina_CuentasContablesEmpleadoR
         Meteor.call('getCollectionCount', 'Temp_Consulta_Nomina_CuentasContablesEmpleadoRubro', (err, result) => {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -418,7 +418,7 @@ angular.module("contabm").controller("Catalogos_Nomina_CuentasContablesEmpleadoR
                 isValid = Temp_Consulta_Nomina_CuentasContablesEmpleadoRubro.simpleSchema().namedContext().validate(item);
 
                 if (!isValid) {
-                    Temp_Consulta_Nomina_CuentasContablesEmpleadoRubro.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                    Temp_Consulta_Nomina_CuentasContablesEmpleadoRubro.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                         errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + Temp_Consulta_Nomina_CuentasContablesEmpleadoRubro.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                     });
                 }

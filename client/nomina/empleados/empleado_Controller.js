@@ -6,6 +6,7 @@ import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada'
 import { Empleados } from '/models/nomina/empleados'; 
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Nomina_Empleado_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
@@ -419,7 +420,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               isValid = Empleados.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  Empleados.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  Empleados.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Empleados.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
@@ -466,7 +467,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               },
               function (err) {
 
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -533,7 +534,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
           Meteor.call('empleados_leerByID_desdeSql', pk, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({

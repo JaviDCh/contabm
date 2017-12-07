@@ -1195,7 +1195,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
                   isValid = CodificacionesContables.simpleSchema().namedContext().validate(editedItem);
 
                   if (!isValid) {
-                      CodificacionesContables.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      CodificacionesContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                       });
                   };
@@ -1207,7 +1207,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
                   isValid = CodificacionesContables_codigos.simpleSchema().namedContext().validate(editedItem);
 
                   if (!isValid) {
-                      CodificacionesContables_codigos.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      CodificacionesContables_codigos.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                       });
                   };
@@ -1219,7 +1219,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
                   isValid = CodificacionesContables_codigos_cuentasContables.simpleSchema().namedContext().validate(editedItem);
 
                   if (!isValid) {
-                      CodificacionesContables_codigos_cuentasContables.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                      CodificacionesContables_codigos_cuentasContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                           errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + error.name + "'; error de tipo '" + error.type + ".");
                       });
                   };

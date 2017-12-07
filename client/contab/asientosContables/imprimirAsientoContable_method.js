@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Monedas } from '/imports/collections/monedas';
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 import { Companias } from '/imports/collections/companias';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 
 // import pdfMake from '/pdfMake_from_bower/imports/build/pdfmake.min.js';
@@ -32,8 +33,8 @@ let imprimirAsientoContable = ($scope, asientoContable, parametrosReporte) => {
     Meteor.call('asientoContable.leerByFilter.desdeSql', filter, (err, result) => {
 
         if (err) {
-            let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
-
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+            
             $scope.alerts.length = 0;
             $scope.alerts.push({
                 type: 'danger',

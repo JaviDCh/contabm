@@ -7,6 +7,7 @@ import * as lodash from 'lodash';
 import { DeduccionesIslr_sql } from '../../../server/imports/sqlModels/nomina/parametros/deduccionesIslr'; 
 import * as AppGlobalValues from '../../../imports/globals/globalValues'; 
 import '../../../imports/globals/tsDeclares'; 
+import { TimeOffset } from '../../../globals/globals'; 
 
 Meteor.methods(
 {

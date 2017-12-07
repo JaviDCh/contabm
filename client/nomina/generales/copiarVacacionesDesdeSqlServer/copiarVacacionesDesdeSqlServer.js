@@ -2,6 +2,7 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("NominaCopiarVacacionesDesdeSqlServer_Controller",
 ['$scope', '$state', '$stateParams', '$meteor', '$modal',
@@ -40,7 +41,7 @@ angular.module("contabm").controller("NominaCopiarVacacionesDesdeSqlServer_Contr
           Meteor.call('nomina_generales_copiarVacacionesDesdeSqlServer', companiaContab.numero, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({

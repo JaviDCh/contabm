@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Contab_Consultas_CodificacionesContables_PrepararDatos_Controller",
@@ -229,7 +230,7 @@ angular.module("contabm").controller("Contab_Consultas_CodificacionesContables_P
                     $scope.showProgress = false;
                 },
                 function (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({ type: 'danger', msg: errorMessage });

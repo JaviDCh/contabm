@@ -1,6 +1,7 @@
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { Empleados } from '/models/nomina/empleados'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Nomina_Vacacion_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
@@ -182,7 +183,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
               isValid = Vacaciones.simpleSchema().namedContext().validate(editedItem);
 
               if (!isValid) {
-                  Vacaciones.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                  Vacaciones.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Vacaciones.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
@@ -231,7 +232,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
               },
               function (err) {
 
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -398,7 +399,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
                     $scope.showProgress = false;
                 },
                 function (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({

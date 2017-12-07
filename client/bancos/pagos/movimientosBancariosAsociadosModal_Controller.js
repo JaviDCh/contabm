@@ -1,5 +1,6 @@
 
 import moment from 'moment';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('Pagos_MovimientoBancarioAsociado_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'pagoID', 'proveedorID', 'ciaSeleccionada', 'origen',
@@ -49,7 +50,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, 
             $scope.showProgress = false;
         },
         function (err) {
-            let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({ type: 'danger', msg: errorMessage });
@@ -111,7 +112,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, 
                         $scope.showProgress = false;
                     },
                     function (err) {
-                        let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                        let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                         $scope.alerts.length = 0;
                         $scope.alerts.push({ type: 'danger', msg: errorMessage });
@@ -121,7 +122,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, pagoID, proveedorID, 
             },
             function (err) {
 
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({ type: 'danger', msg: errorMessage });

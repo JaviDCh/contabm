@@ -1,6 +1,7 @@
 
 import moment from 'moment';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('AsientosContablesAsociados_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
@@ -56,7 +57,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
     Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
 
         if (err) {
-            let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({ type: 'danger', msg: errorMessage });
@@ -102,7 +103,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
 
             if (err) {
 
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -163,7 +164,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
                      (err, result) =>  {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -195,7 +196,7 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
             Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({ type: 'danger', msg: errorMessage });

@@ -3,6 +3,7 @@ import Papa from 'papaparse';
 import numeral from 'numeral';
 import saveAs from 'save-as'; 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('ExportarAsientosContables_csv_ModalController',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'companiaContabSeleccionada',
@@ -42,7 +43,7 @@ function ($scope, $modalInstance, $modal, $meteor, companiaContabSeleccionada) {
             Meteor.call('exportarAsientosContablesAFormatoCSV', (err, result) => {
 
                 if (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({

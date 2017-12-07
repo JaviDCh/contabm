@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas.js';
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista_Controller",
 ['$stateParams', '$scope', '$meteor', '$modal', function ($stateParams, $scope, $meteor, $modal) {
@@ -391,7 +392,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
           Meteor.call('bancos.proveedores.LeerDesdeSql', JSON.stringify($scope.filtro), (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -450,7 +451,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
           Meteor.call('getCollectionCount', 'Temp_Consulta_Bancos_Proveedores', (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -604,7 +605,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
         Meteor.call('bancos.proveedores.eliminar', proveedoresAEliminar, (err, resolve) => {
 
           if (err) {
-            let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({
@@ -676,7 +677,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
               isValid = Proveedores_SimpleSchema.namedContext().validate(editedItem);
 
               if (!isValid) {
-                  Proveedores_SimpleSchema.namedContext().invalidKeys().forEach(function (error) {
+                  Proveedores_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
                       errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Proveedores_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
                   });
               }
@@ -705,7 +706,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
           Meteor.call('proveedoresSave', editedItem, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -765,7 +766,7 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
      Meteor.call('bancos.proveedores.leerTablasCatalogosDesdeSqlServer', (err, result) => {
 
          if (err) {
-             let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
              $scope.alerts.length = 0;
              $scope.alerts.push({
@@ -833,7 +834,7 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
     Meteor.call('proveedores_leerByID_desdeSql', pk, (err, result) => {
 
         if (err) {
-            let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({

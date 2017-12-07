@@ -1,5 +1,6 @@
 
 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('ContabCodificacionesContablesConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'codificacionContable', 'ciaSeleccionada',
@@ -76,7 +77,7 @@ function ($scope, $modalInstance, $modal, $meteor, codificacionContable, ciaSele
                 $scope.showProgress = false;
             },
             function (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({ type: 'danger', msg: errorMessage });

@@ -3,6 +3,7 @@ import numeral from 'numeral';
 import { Monedas } from '/imports/collections/monedas.js';
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 import { Companias } from '/imports/collections/companias';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_DefinicionCuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -327,17 +328,17 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
           Meteor.call('bancos_cuentasContablesDefinicion_leerDesdeSql', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-                  $scope.showProgress = false;
-                  $scope.$apply();
-                  return;
+                $scope.showProgress = false;
+                $scope.$apply();
+                return;
               }
 
               // ------------------------------------------------------------------------------------------------------
@@ -387,7 +388,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
           Meteor.call('getCollectionCount', 'Temp_Consulta_Bancos_CuentasContables_Definicion', (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -473,7 +474,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
                    isValid = Temp_Consulta_Bancos_CuentasContables_Definicion.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       Temp_Consulta_Bancos_CuentasContables_Definicion.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       Temp_Consulta_Bancos_CuentasContables_Definicion.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + Temp_Consulta_Bancos_CuentasContables_Definicion.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }
@@ -517,7 +518,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
                  leerPrimerosRegistrosDesdeServidor(limit);
              },
              function (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                  $scope.alerts.length = 0;
                  $scope.alerts.push({

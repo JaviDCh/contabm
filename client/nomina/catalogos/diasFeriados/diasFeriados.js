@@ -1,5 +1,6 @@
 
 import moment from 'moment'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {
@@ -334,7 +335,7 @@ angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
           Meteor.call('nomina_diasFeriados_LeerDesdeSql', (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({
@@ -394,7 +395,7 @@ angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
                    isValid = DiasFiestaNacional.simpleSchema().namedContext().validate(item);
 
                    if (!isValid) {
-                       DiasFiestaNacional.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                       DiasFiestaNacional.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                            errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + DiasFiestaNacional.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                        });
                    }
@@ -437,7 +438,7 @@ angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
                  leerRegistrosDesdeElServidor();
              },
              function (err) {
-                 let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                  $scope.alerts.length = 0;
                  $scope.alerts.push({
@@ -481,7 +482,7 @@ angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
                       isValid = DiasFeriados.simpleSchema().namedContext().validate(item);
 
                       if (!isValid) {
-                          DiasFeriados.simpleSchema().namedContext().invalidKeys().forEach(function (error) {
+                          DiasFeriados.simpleSchema().namedContext().validationErrors().forEach(function (error) {
                               errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + DiasFeriados.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
                           });
                       }
@@ -524,7 +525,7 @@ angular.module("contabm").controller("Catalogos_Nomina_DiasFeriados_Controller",
                     leerRegistrosDesdeElServidor();
                 },
                 function (err) {
-                    let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({

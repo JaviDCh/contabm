@@ -1,4 +1,5 @@
 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Contab_PersistirCuentasContables_Controller",
@@ -43,7 +44,7 @@ angular.module("contabm").controller("Contab_PersistirCuentasContables_Controlle
               });
           },
           function (err) {
-              let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
               $scope.alerts.length = 0;
               $scope.alerts.push({

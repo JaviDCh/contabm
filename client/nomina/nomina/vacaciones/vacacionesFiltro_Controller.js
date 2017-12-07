@@ -1,5 +1,6 @@
 
 import { Empleados } from '/models/nomina/empleados'; 
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Nomina_VacacionesFilter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
@@ -65,7 +66,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
           Meteor.call('vacaciones', JSON.stringify($scope.filtro), companiaContab.numero, (err, result) => {
 
               if (err) {
-                  let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                   $scope.alerts.length = 0;
                   $scope.alerts.push({

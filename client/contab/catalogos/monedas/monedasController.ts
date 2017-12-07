@@ -1,9 +1,9 @@
 
 // import { Monedas } from '../../../../imports/collections/monedas';
-import { Monedas } from '/imports/collections/monedas';
+import { Monedas } from '../../../../imports/collections/monedas';
 import * as angular from 'angular';
 import * as lodash from 'lodash';
-import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
+import { mensajeErrorDesdeMethod_preparar } from '../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

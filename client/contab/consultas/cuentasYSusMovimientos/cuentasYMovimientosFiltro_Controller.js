@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Contab_Consultas_CuentasYMovimientos_Filtro_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
@@ -87,7 +88,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         Meteor.call('contab_consulta_cuentasYSusMovimientos_LeerDesdeSql', JSON.stringify($scope.filtro), companiaContab.numero, (err, result) => {
 
             if (err) {
-                let errorMessage = ClientGlobal_Methods.mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
