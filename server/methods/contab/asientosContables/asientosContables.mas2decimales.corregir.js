@@ -228,9 +228,9 @@ Meteor.methods(
             error: false, 
             message: `Ok, los datos han sido actualizados en la base de datos.<br /><br />
             En total, hemos leído <b>${asientosContables.length.toString()}</b> asientos contables, de los cuales: <br />
-            <b>${asientosContablesMesCerradoEnContab.length.toString()}</b> han sido obviados por corresponder a meses cerrados, <br />
-            <b>${asientosContablesMontosCorrectos.length.toString()}</b> han sido obviados por no tener montos con más de dos decimales, <br />
-            <b>${asientosContablesMontosIncorrectos.length.toString()}</b> han sido actualizados para corregir montos con más de dos decimales.
+            <b>${asientosContablesMesCerradoEnContab.length.toString()}</b> han sido <b>obviados</b> por corresponder a <b>meses cerrados</b>, <br />
+            <b>${asientosContablesMontosCorrectos.length.toString()}</b> han sido obviados por <b>no tener</b> montos con más de dos decimales, <br />
+            <b>${asientosContablesMontosIncorrectos.length.toString()}</b> han sido <b>modificados</b> para corregir montos con más de dos decimales.
             `
         } 
     }
