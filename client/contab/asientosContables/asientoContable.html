@@ -1,7 +1,17 @@
 
 
-<div>
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3" style="text-align: center; vertical-align: middle; ">
+        <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
+        <div ng-show="showProgress">
+            <span style="font-size: small; font-weight: bold; ">
+                ({{ processProgress.current }}/{{ processProgress.max }} - {{ processProgress.progress }})
+            </span>
+        </div>
+    </div>
+</div>
 
+<div>
     <nav class="navbar navbar-inverse navbar_custom_small_fullWidth" role="navigation">
         <div class="container-fluid">
             <div class="navbar-collapse collapse">
@@ -52,20 +62,6 @@
            ng-show="false">
 
     <div class="container-fluid ui-viewBorder">
-
-        <div class="row">
-            <div class="col-sm-6 col-sm-offset-3" style="text-align: center; vertical-align: middle; ">
-                <i style="color: #428BCA" class="fa fa-circle-o-notch fa-spin fa-2x" ng-show="showProgress"></i>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12 col-sm-offset-0" style="text-align: left; ">
-                <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">
-                    <span ng-bind-html="alert.msg | unsafe"></span>
-                </alert>
-            </div>
-        </div>
 
         <div class="row">
             <div class="col-sm-12 col-sm-offset-0">
@@ -186,7 +182,7 @@
                                            ng-model="asientoContable.descripcion"
                                            ng-change="setIsEdited()"
                                            ng-model-options="{ updateOn: 'blur' }"
-                                           rows="1"
+                                           rows="2"
                                            ng-required="true">
                                     </textarea>
                                 </div>

@@ -1,13 +1,10 @@
 
+
 import lodash from 'lodash';
 
 Meteor.methods(
 {
     'bancos.categoriasRetencion.leerDesdeSqlServer': function () {
-
-        // new SimpleSchema({
-        //     ciaContabId: { type: Number, optional: false },
-        // }).validate({ ciaContabId, });
 
         let response = null;
         response = Async.runSync(function(done) {

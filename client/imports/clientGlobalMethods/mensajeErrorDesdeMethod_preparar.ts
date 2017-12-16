@@ -1,7 +1,5 @@
 
 
-import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
-
 export function mensajeErrorDesdeMethod_preparar(errorFromMeteorMethod) {
     // preparamos el mensaje de error que debe ser mostrado al usuario, cuando un Meteor Method falla
     // con un objeto 'error' ...

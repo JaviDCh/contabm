@@ -77,27 +77,27 @@ TiposDeCuentaBancaria_sql = sequelize.define('tiposDeCuentaBancaria', {
 // ----------------------------------------
 // Grupos de empleados
 // ----------------------------------------
-GruposEmpleados_sql = sequelize.define('gruposEmpleados', {
-    grupoID: { type: Sequelize.INTEGER, field: 'Grupo', allowNull: false, primaryKey: true, autoIncrement: true, },
+tGruposEmpleados_sql = sequelize.define('gruposEmpleados', {
+    grupo: { type: Sequelize.INTEGER, field: 'Grupo', allowNull: false, primaryKey: true, autoIncrement: true, },
     nombre: { type: Sequelize.STRING, field: 'NombreGrupo', allowNull: false, },
     descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },
     grupoNominaFlag: { type: Sequelize.BOOLEAN, field: 'GrupoNominaFlag', allowNull: false,  },
     cia: { type: Sequelize.INTEGER, field: 'Cia', allowNull: false, },
 }, {
      tableName: 'tGruposEmpleados'
-});
+})
 
-GruposEmpleados_Empleados_sql = sequelize.define('gruposEmpleados_Empleados', {
-    id: { type: Sequelize.INTEGER, field: 'ClaveUnica', allowNull: false, primaryKey: true, autoIncrement: true, },
+tdGruposEmpleados_sql = sequelize.define('gruposEmpleados_Empleados', {
+    claveUnica: { type: Sequelize.INTEGER, field: 'ClaveUnica', allowNull: false, primaryKey: true, autoIncrement: true, },
     empleado: { type: Sequelize.INTEGER, field: 'Empleado', allowNull: false, },
-    grupoID: { type: Sequelize.INTEGER, field: 'Grupo', allowNull: false, },
+    grupo: { type: Sequelize.INTEGER, field: 'Grupo', allowNull: false, },
     suspendidoFlag: { type: Sequelize.BOOLEAN, field: 'SuspendidoFlag', allowNull: false,  },
 }, {
      tableName: 'tdGruposEmpleados'
-});
+})
 
-GruposEmpleados_sql.hasMany(GruposEmpleados_Empleados_sql, { as: 'empleados', foreignKey: 'grupoID' } );
-GruposEmpleados_Empleados_sql.belongsTo(GruposEmpleados_sql, { as: 'grupo', foreignKey: 'grupoID' } );
+tGruposEmpleados_sql.hasMany(tdGruposEmpleados_sql, { as: 'empleados', foreignKey: 'grupo' } );
+tdGruposEmpleados_sql.belongsTo(tGruposEmpleados_sql, { as: 'grupoEmpleados', foreignKey: 'grupo' } );
 
 // ----------------------------------------
 // Dias feriados y dís de fiesta nacionalñ

@@ -10,23 +10,15 @@ angular.module("contabm").controller("Contab_AsientoContableLista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
-    $scope.showProgress = false;
-
-    // ui-bootstrap alerts ...
-    $scope.alerts = [];
-
-    $scope.closeAlert = function (index) {
-        $scope.alerts.splice(index, 1);
-    };
-
     $scope.origen = $stateParams.origen;
     var pageNumber = $stateParams.pageNumber;
-
+    
+    // para reportar el progreso de la tarea en la página
     $scope.processProgress = {
         current: 0,
         max: 0,
-        progress: 0,
-        message: ''
+        progress: 0, 
+        message: "", 
     };
 
     // -------------------------------------------------------------------------------------------------------
@@ -40,7 +32,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         // if we don't call this method, angular wont refresh the view each time the progress changes ...
         // until, of course, the above process ends ...
         $scope.$apply();
-    });
+    })
     // -------------------------------------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------------------------------
@@ -53,6 +45,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     // ------------------------------------------------------------------------------------------------
 
     $scope.regresarALista = function () {
+        $scope.$parent.alerts.length = 0; 
         $state.go("contab.asientosContables.filter", { origen: $scope.origen });
     }
 
@@ -64,10 +57,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             pageNumber: 0,                          // nota: por ahora no vamos a paginar; tal vez luego, cuando esto funcione bien ...
             vieneDeAfuera: false
         })
-    }
-
-    $scope.regresar = function () {
-        $state.go('contab.asientosContables.filter', { origen: $scope.origen });
     }
 
 
@@ -365,57 +354,34 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         Meteor.call('asientoContable_leerByID_desdeSql', pk, (err, result) => {
 
             if (err) {
-
-                let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
-                if (err.errorType)
-                    errorMessage += " (" + err.errorType + ")";
-
-                errorMessage += "<br />";
-
-                if (err.message)
-                    // aparentemente, Meteor compone en message alguna literal que se regrese en err.reason ...
-                    errorMessage += err.message + " ";
-                else {
-                    if (err.reason)
-                        errorMessage += err.reason + " ";
-
-                    if (err.details)
-                        errorMessage += "<br />" + err.details;
-                };
-
-                if (!err.message && !err.reason && !err.details)
-                    errorMessage += err.toString();
-
-
-                $scope.alerts.length = 0;
-                $scope.alerts.push({
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                
+                $scope.$parent.alerts.length = 0;
+                $scope.$parent.alerts.push({
                     type: 'danger',
                     msg: errorMessage
                 });
-
+    
                 $scope.showProgress = false;
                 $scope.$apply();
-
+    
                 return;
-            };
+            }
 
             $state.go('contab.asientosContables.asientoContable', {
                 origen: $scope.origen,
                 id: result.asientoContableMongoID,
                 pageNumber: 0,
                 vieneDeAfuera: false
-            });
-
-            $scope.showProgress = false;
-        });
-    };
+            })
+        })
+    }
 
     $scope.asientosContables = []
     $scope.asientosContables_ui_grid.data = [];
-    $scope.showProgress = true;
 
     // suscribimos a los asientos que se han leído desde sql y grabado a mongo para el usuario
-    // debugger;
+    $scope.showProgress = true;
     Meteor.subscribe('tempConsulta_asientosContables', () => {
 
         $scope.asientosContables = Temp_Consulta_AsientosContables.find({ user: Meteor.userId() },
@@ -424,8 +390,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         $scope.asientosContables_ui_grid.data = $scope.asientosContables;
 
-        $scope.alerts.length = 0;
-        $scope.alerts.push({
+        $scope.$parent.alerts.length = 0;
+        $scope.$parent.alerts.push({
             type: 'info',
             msg: `<b>${$scope.asientosContables.length.toString()}</b> registros han sido seleccionados ...`
         });

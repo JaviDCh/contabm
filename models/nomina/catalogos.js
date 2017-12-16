@@ -108,12 +108,16 @@ TiposDeCuentaBancaria.attachSchema(tiposDeCuentaBancaria_SimpleSchema);
 // ----------------------------------------
 // Grupos de empleados
 // ----------------------------------------
-let gruposEmpleados_Empleados_SimpleSchema = new SimpleSchema({
-    _id: { type: String, optional: false, },
-    id: { type: Number, label: "ID en contab", optional: false, },
+let gruposEmpleados_empleados_SimpleSchema = new SimpleSchema({
+    claveUnica: { type: Number, label: "ID en contab", optional: false, },
     empleado: { type: Number, label: "ID empleado", optional: false, },
+    grupo: { type: Number, label: "Grupo", optional: false, },
     suspendidoFlag: { type: Boolean, label: "Suspendido?", optional: false, },
 })
+
+export const GruposEmpleados_empleados = new Mongo.Collection("gruposEmpleados_empleados");
+GruposEmpleados_empleados.attachSchema(gruposEmpleados_empleados_SimpleSchema);
+
 
 let gruposEmpleados_SimpleSchema = new SimpleSchema({
     _id: { type: String, optional: false },
@@ -121,15 +125,12 @@ let gruposEmpleados_SimpleSchema = new SimpleSchema({
     nombre: { type: String, label: "Nombre del grupo", optional: false, min: 1, max: 10, },
     descripcion: { type: String, label: "Descripcion del grupo", optional: false, min: 1, max: 250, },
     grupoNominaFlag: { type: Boolean, label: "Grupo de nómina?", optional: false, },
-
-    empleados: { type: Array, optional: true, minCount: 0, },
-    'empleados.$': { type: gruposEmpleados_Empleados_SimpleSchema },
-
     cia:  { type: Number, label: "Cia Contab", optional: false },
 })
 
 export const GruposEmpleados = new Mongo.Collection("gruposEmpleados");
 GruposEmpleados.attachSchema(gruposEmpleados_SimpleSchema);
+
 
 // ----------------------------------------
 // DiasFeriados
