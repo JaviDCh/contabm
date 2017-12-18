@@ -38,12 +38,12 @@ let leerCuentaContableDefinida = (concepto,
 
 
     new SimpleSchema({
-        concepto: { type: Number, decimal: false, optional: false, },
-        compania: { type: Number, decimal: false, optional: true, },
-        rubro: { type: Number, decimal: false, optional: true, },
-        moneda: { type: Number, decimal: false, optional: true, },
-        ciaContab: { type: Number, decimal: false, optional: false, },
-        concepto2: { type: Number, decimal: false, optional: true, },
+        concepto: { type: SimpleSchema.Integer, optional: false, },
+        compania: { type: SimpleSchema.Integer, optional: true, },
+        rubro: { type: SimpleSchema.Integer, optional: true, },
+        moneda: { type: SimpleSchema.Integer, optional: true, },
+        ciaContab: { type: SimpleSchema.Integer, optional: false, },
+        concepto2: { type: SimpleSchema.Integer, optional: true, },
     }).validate({ concepto, compania, rubro, moneda, ciaContab, concepto2, });
 
 

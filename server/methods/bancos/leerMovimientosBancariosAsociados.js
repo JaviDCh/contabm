@@ -11,7 +11,7 @@ Meteor.methods({
        // facturas, pagos, etc.
 
         new SimpleSchema({
-           pagoID: { type: Number, decimal: false, optional: false, },
+           pagoID: { type: SimpleSchema.Integer, optional: false, },
        }).validate({ pagoID, });
 
 

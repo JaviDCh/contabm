@@ -1,4 +1,6 @@
 
+import { Companias } from '/imports/collections/companias';
+
 Meteor.methods(
 {
     bancos_itf_leerMovimientosBancarios: function (parametros, ciaContab) {

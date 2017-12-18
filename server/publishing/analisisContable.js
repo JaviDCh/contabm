@@ -1,7 +1,8 @@
 
-Meteor.publish('analisisContable', function (noRegresarCuentasContables) {
 
-    // debugger;
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
+Meteor.publish('analisisContable', function (noRegresarCuentasContables) {
 
     // determinamos la compañía seleccionada, pues algunos catálogos que se publiquen deben corresponder a ésta ...
     let empresaUsuariaSeleccionada = null;

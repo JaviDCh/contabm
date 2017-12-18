@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
 
 import { Monedas } from '/imports/collections/monedas';
+import { Companias } from '/imports/collections/companias';
 import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods({

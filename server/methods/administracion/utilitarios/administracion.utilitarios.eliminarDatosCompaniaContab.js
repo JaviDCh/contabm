@@ -14,9 +14,6 @@ Meteor.methods(
         }).validate({ ciaContab, });
 
         // -------------------------------------------------------------------------------------------------------------
-        // *** pagos ***
-        // -------------------------------------------------------------------------------------------------------------
-        // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         // -------------------------------------------------------------------------------------------------------------
         let numberOfItems = 1;
@@ -59,9 +56,9 @@ Meteor.methods(
         currentProcess++;
 
         eventData = {
-                          current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `eliminando facturas ...`
-                        }
+                      current: currentProcess, max: numberOfProcess, progress: '0 %',
+                      message: `eliminando facturas ...`
+                    }
         methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
         // ---------------------------------------------------------------------------------------------------
         // intentamos eliminar las facturas
@@ -95,7 +92,7 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
           let errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
@@ -127,7 +124,7 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
           let errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
@@ -267,9 +264,9 @@ Meteor.methods(
         currentProcess++;
 
         eventData = {
-                          current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `eliminando empleados ...`
-                        }
+                      current: currentProcess, max: numberOfProcess, progress: '0 %',
+                      message: `eliminando empleados ...`
+                    }
         methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
         deleteFromSql_result = eliminarRegistrosSql('tEmpleados', ciaContab.numero);
@@ -333,9 +330,9 @@ Meteor.methods(
         currentProcess++;
 
         eventData = {
-                          current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `eliminando asientos contables ...`
-                        }
+                      current: currentProcess, max: numberOfProcess, progress: '0 %',
+                      message: `eliminando asientos contables ...`
+                    }
         methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
         deleteFromSql_result = eliminarRegistrosSql('Asientos', ciaContab.numero);
@@ -450,9 +447,9 @@ Meteor.methods(
         currentProcess++;
 
         eventData = {
-                          current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `eliminando registros de caja chica ...`
-                        }
+                      current: currentProcess, max: numberOfProcess, progress: '0 %',
+                      message: `eliminando registros de caja chica ...`
+                    }
         methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
         deleteFromSql_result = eliminarRegistrosSql('CajaChica_CajasChicas', ciaContab.numero, 'CiaContab');
@@ -490,9 +487,9 @@ Meteor.methods(
         currentProcess++;
 
         eventData = {
-                          current: currentProcess, max: numberOfProcess, progress: '0 %',
-                          message: `eliminando cuentas contables ...`
-                        }
+                      current: currentProcess, max: numberOfProcess, progress: '0 %',
+                      message: `eliminando cuentas contables ...`
+                    }
         methodResult = Meteor.call('eventDDP_matchEmit', eventName, eventSelector, eventData);
 
         deleteFromSql_result = eliminarRegistrosSql('CuentasContables', ciaContab.numero);
@@ -521,7 +518,7 @@ Meteor.methods(
           message: finalMessage,
         }
     }
-});
+})
 
 // --------------------------------------------------------------------------------------------------
 // para eliminar el contenido de una tabla sql, para una ciaContab determinada ...
@@ -542,7 +539,7 @@ function eliminarRegistrosSql(tableName, ciaContabID, ciaColumnName = 'Cia') {
           .then(function(result) { done(null, result); })
           .catch(function (err) { done(err, null); })
           .done();
-  });
+  })
 
   if (response.error) {
     errorMessage = response.error && response.error.message ? response.error.message : response.error.toString();
@@ -568,7 +565,7 @@ function eliminarRegistrosSql(tableName, ciaContabID, ciaColumnName = 'Cia') {
           .then(function(result) { done(null, result); })
           .catch(function (err) { done(err, null); })
           .done();
-  });
+  })
 
   if (response.error) {
 

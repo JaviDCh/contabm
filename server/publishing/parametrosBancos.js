@@ -1,8 +1,9 @@
 
 
-Meteor.publish('parametrosBancos', function () {
+import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 
-    // debugger;
+Meteor.publish('parametrosBancos', function () {
 
     // determinamos la compañía seleccionada, pues algunos catálogos que se publiquen deben corresponder a ésta ...
     let empresaUsuariaSeleccionada = null;

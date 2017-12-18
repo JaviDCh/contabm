@@ -1,6 +1,7 @@
 
 import { Monedas } from '/imports/collections/monedas';
 import { TimeOffset } from '/globals/globals'; 
+import { Companias } from '/imports/collections/companias';
 
 Meteor.methods(
 {

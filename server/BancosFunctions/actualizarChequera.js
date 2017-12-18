@@ -6,7 +6,7 @@ import SimpleSchema from 'simpl-schema';
 let actualizarChequera = (chequeraID) => {
 
     new SimpleSchema({
-        chequeraID: { type: Number, decimal: false, optional: false, },
+        chequeraID: { type: SimpleSchema.Integer, optional: false, },
     }).validate({ chequeraID, });
 
     let errMessage = "";
