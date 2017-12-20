@@ -118,7 +118,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
 
                         // si la fecha no vino como un entero (ej: 40603), tal vez sea un verdadero date
                         // pero como un string ...
-                        if (!_.isDate(fecha) && moment(fecha, ValidDateFormats, true).isValid()) {
+                        if (!lodash.isDate(fecha) && moment(fecha, ValidDateFormats, true).isValid()) {
                             // la fecha no es válida pero es un string válido
                             fecha = moment(fecha).toDate();
                         }
@@ -155,6 +155,12 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
                                 monto = monto.toString().trim();
                                 monto = monto.replace(/\./gi, "");
                                 monto = monto.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
+                                // el monto puede traer el signo luego del número; nos protegemos de esta posibilidad ... 
+                                if (monto.indexOf("-") >= 0 || monto.indexOf("‐") >= 0) { 
+                                    monto = monto.replace("-", "");
+                                    monto = monto.replace("‐", "");     // este es un caracter muy raro que se ve como un "-" pero es otra cosa 
+                                    monto = "-" + monto;                // nos aseguramos de poner el signo siempre adelante (así -100 y no 100-)
+                                }
                                 // validamos que el string sea un Number
                                 if (!isNaN(parseFloat(monto)) && isFinite(monto)) {
                                     monto = parseFloat(monto);
@@ -170,6 +176,7 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
                                 creditos = creditos.replace("â€", "");
                                 creditos = creditos.replace(/\./gi, "");
                                 creditos = creditos.replace("-", "");
+                                creditos = creditos.replace("‐", "");     // este es un caracter muy raro que se ve como un "-" pero es otra cosa 
                                 creditos = creditos.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
                                 // validamos que el string sea un Number
                                 if (!isNaN(parseFloat(creditos)) && isFinite(creditos)) {
@@ -184,6 +191,8 @@ function ($scope, $modalInstance, $modal, $meteor, conciliacionBancaria, compani
                                 debitos = debitos.toString().trim();
                                 debitos = debitos.replace("â€", "");
                                 debitos = debitos.replace(/\./gi, "");
+                                debitos = debitos.replace("-", "");
+                                debitos = debitos.replace("‐", "");     // este es un caracter muy raro que se ve como un "-" pero es otra cosa 
                                 debitos = debitos.replace(",", ".");    // ahora debe ser: 10.7, 100.75, 1058.15, etc.
                                 // validamos que el string sea un Number
                                 if (!isNaN(parseFloat(debitos)) && isFinite(debitos)) {

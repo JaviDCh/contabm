@@ -21,7 +21,7 @@ Meteor.methods(
             }
             else
                 where = `(Fecha = '${moment(filtro2.fecha1).format('YYYY-MM-DD')}')`;
-        };
+        }
 
         if (filtro2.ingreso1) {
             if (where)
@@ -34,7 +34,7 @@ Meteor.methods(
             }
             else
                 where += `(Ingreso = '${moment(filtro2.fecha1).format('YYYY-MM-DD')}')`;
-        };
+        }
 
         if (filtro2.ultAct1) {
             if (where)
@@ -47,7 +47,7 @@ Meteor.methods(
             }
             else
                 where += `(UltAct = '${moment(filtro2.ultAct1).format('YYYY-MM-DD')}')`;
-        };
+        }
 
         if (filtro2.numero1) {
             if (where)
@@ -60,7 +60,7 @@ Meteor.methods(
             }
             else
                 where += `(Numero = ${filtro2.numero1.toString()})`;
-        };
+        }
 
         if (filtro2.lote) {
             if (where)
@@ -74,7 +74,7 @@ Meteor.methods(
             } else {
                 where += ` (a.Lote = '${filtro2.lote}')`;
             };
-        };
+        }
 
         if (where)
             where += " And ";
@@ -90,7 +90,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(a.Numero < 0)`;
-        };
+        }
 
         if (filtro2.soloAsientosTipoCierreAnual) {
             if (where)
@@ -99,7 +99,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(a.AsientoTipoCierreAnualFlag = 1)`;
-        };
+        }
 
 
         if (filtro2.sinAsientosTipoCierreAnual) {
@@ -109,7 +109,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(a.AsientoTipoCierreAnualFlag Is Null Or a.AsientoTipoCierreAnualFlag = 0)`;
-        };
+        }
 
         if (filtro2.cuentasContables.length > 0) {
 
@@ -125,12 +125,22 @@ Meteor.methods(
                     cuentasContablesLista = "(" + c.toString();
                 else
                     cuentasContablesLista += ", " + c.toString();
-            });
+            })
 
             cuentasContablesLista += ")";
             where += ` (d.CuentaContableID In ${cuentasContablesLista})`;
-        };
+        }
 
+        if (filtro2.soloConCentrosCostoAsignado) {
+            if (where)
+                where += " And ";
+            else
+                where = "(1 = 1) And ";
+
+            where += `(d.CentroCosto Is Not Null)`;
+        }
+
+        
         if (_.isArray(filtro2.tiposAsiento) && filtro2.tiposAsiento.length > 0) {
 
             if (where)

@@ -866,23 +866,23 @@ $scope.uploadFile = function(files) {
             type: 'number'
         },
         {
-        name: 'centroCosto',
-        field: 'centroCosto',
-        displayName: 'Centro de costo',
-        width: "100",
-        headerCellClass: 'ui-grid-leftCell',
-        cellClass: 'ui-grid-leftCell',
-        
-        editableCellTemplate: 'ui-grid/dropdownEditor',
-        editDropdownIdLabel: 'centroCosto',
-        editDropdownValueLabel: 'descripcion',
-        editDropdownOptionsArray: $scope.centrosCosto,
-        cellFilter: 'mapDropdown:row.grid.appScope.centrosCosto:"centroCosto":"descripcion"',
+            name: 'centroCosto',
+            field: 'centroCosto',
+            displayName: 'Centro de costo',
+            width: "100",
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            
+            editableCellTemplate: 'ui-grid/dropdownEditor',
+            editDropdownIdLabel: 'centroCosto',
+            editDropdownValueLabel: 'descripcion',
+            editDropdownOptionsArray: $scope.centrosCosto,
+            cellFilter: 'mapDropdown:row.grid.appScope.centrosCosto:"centroCosto":"descripcion"',
 
-        enableColumnMenu: false,
-        enableCellEdit: true,
-        enableSorting: true,
-        type: 'number'
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            type: 'number'
     },
         {
             name: 'delButton',
@@ -1315,6 +1315,10 @@ $scope.uploadFile = function(files) {
                     if (result.error) { 
                         $scope.alerts.push({ type: 'warning', msg: result.message });
                     }
+
+                    // cuando el asiento es mostrado para una factura (vieneDeAfuera), por ejemplo, la lista de contros de costo no existe para 
+                    // cuando se define el ui-grid; la volvemos a cargar aquí para que esté disponible para el DDL en el ui-grid ... 
+                    $scope.partidas_ui_grid.columnDefs[7].editDropdownOptionsArray = $scope.centrosCosto; 
 
                     $scope.showProgress = false;
                     $scope.$apply();
