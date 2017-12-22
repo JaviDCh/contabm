@@ -183,39 +183,39 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             templateUrl: 'client/contab/asientosContables/asientoContable.html',
             controller: 'Contab_AsientoContable_Controller',
             params: { 'origen': null, 'id': null, 'pageNumber': null, 'vieneDeAfuera': null },
-            parent: 'contab.asientosContables',
-            resolve: {
-                // para asegurarnos que los catálogos están cargados (por un publisher en el server)
-                // antes de intentar abrir el state; ésto se hizo necesario desde que empezamos a
-                // abrir la página de asientos desde alguna otra página, en un Tab diferente (y los
-                // catálogos no estaban allí!!!)
-                catalogosContab: function($q) {
+            parent: 'contab.asientosContables'
+            // resolve: {
+            //     // para asegurarnos que los catálogos están cargados (por un publisher en el server)
+            //     // antes de intentar abrir el state; ésto se hizo necesario desde que empezamos a
+            //     // abrir la página de asientos desde alguna otra página, en un Tab diferente (y los
+            //     // catálogos no estaban allí!!!)
+            //     catalogosContab: function($q) {
 
-                    var deferred = $q.defer();
+            //         var deferred = $q.defer();
 
-                    let ciaSeleccionada = null;
-                    let ciaContabSeleccionada = null;
+            //         let ciaSeleccionada = null;
+            //         let ciaContabSeleccionada = null;
 
-                    if (Meteor.userId()) {
-                        ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
-                        if (ciaSeleccionada) {
-                            ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
-                        }
-                    }
+            //         if (Meteor.userId()) {
+            //             ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
+            //             if (ciaSeleccionada) {
+            //                 ciaContabSeleccionada = Companias.findOne({ _id: ciaSeleccionada.companiaID });
+            //             }
+            //         }
 
-                    if (ciaContabSeleccionada) {
-                        // Ok, los catálogos están en el client
-                        deferred.resolve('okey');
-                    } else {
-                        Meteor.subscribe('catalogosContab', () => {
-                            // Ok, los catálogos están en el client
-                            deferred.resolve('okey');
-                        });
-                    }
+            //         if (ciaContabSeleccionada) {
+            //             // Ok, los catálogos están en el client
+            //             deferred.resolve('okey');
+            //         } else {
+            //             Meteor.subscribe('catalogosContab', () => {
+            //                 // Ok, los catálogos están en el client
+            //                 deferred.resolve('okey');
+            //             });
+            //         }
 
-                    return deferred.promise;
-                },
-            },
+            //         return deferred.promise;
+            //     },
+            // },
         })
 
         // -------------------------------------------------------------------------------------------

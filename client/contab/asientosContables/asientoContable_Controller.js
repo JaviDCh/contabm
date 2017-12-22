@@ -16,8 +16,12 @@ import { join } from 'path';
 import { cuadrarAsientoContable, revisarSumasIguales } from './funciones/generales'; 
 
 angular.module("contabm").controller("Contab_AsientoContable_Controller",
-['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'catalogosContab',
-function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalogosContab) {
+
+// ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'catalogosContab',
+// function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalogosContab) {
+
+['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 
+function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     // 'catalogosContab' es un 'resolve' en el state que se ejecuta con un promise; el promise
     // se resuelve solo cuando los catálogos están cargados en el client. Esto resulta muy importante,
@@ -26,16 +30,29 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, catalo
     $scope.showProgress = false;
     $scope.$parent.alerts.length = 0;
 
-    // ------------------------------------------------------------------------------------------------
-    // leemos la compañía seleccionada
-    let companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
-    let companiaSeleccionadaDoc = {};
+    let companiaSeleccionada = {};
+    let companiaContabSeleccionada = {};
 
-    let companiaContabSeleccionada;
+    // sin las compañías existen en el client, las leemos; de otra forma, cuando el evento que sigue se ejecute ... 
+    companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
 
-    if (companiaSeleccionada)
+    if (companiaSeleccionada) { 
         companiaContabSeleccionada = Companias.findOne(companiaSeleccionada.companiaID);
-    // ------------------------------------------------------------------------------------------------
+        $scope.companiaSeleccionada = companiaContabSeleccionada;
+    }
+
+    $scope.$on('actualizarCatalogos', function (event, args) {
+        // leemos la compañía Contab seleccioinada solo cuando el parent controller indica que los 
+        // catálogos están en el client ... 
+        companiaSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
+
+        if (companiaSeleccionada) { 
+            companiaContabSeleccionada = Companias.findOne(companiaSeleccionada.companiaID);
+            $scope.companiaSeleccionada = companiaContabSeleccionada;
+        }
+    })
+
+    
 
     $scope.origen = $stateParams.origen;
     $scope.id = $stateParams.id;
@@ -738,18 +755,7 @@ $scope.uploadFile = function(files) {
         }
     }
 
-
-    // proveemos una lista particular de cuentas contables para el dropdown en el ui-grid; la idea es mostrar
-    // cuenta+descripción+cia, en vez de solo la cuenta contable ...
-    let cuentasContablesLista = [];
-
-    CuentasContables2.find({ cia: companiaContabSeleccionada.numero, totDet: 'D', actSusp: 'A' },
-                        { sort: { cuenta: true }} ).
-                    forEach((cuenta) => {
-                        // cuentaDescripcionCia() es un 'helper' definido en el collection CuentasContables ...
-                        cuentasContablesLista.push({ id: cuenta.id, cuentaDescripcionCia: cuenta.cuentaDescripcionCia() });
-                    })
-
+    let cuentasContablesLista = Array.isArray($scope.$parent.cuentasContablesLista) ? $scope.$parent.cuentasContablesLista : [];
     $scope.centrosCosto = $scope.$parent.centrosCosto; 
 
     $scope.partidas_ui_grid.columnDefs = [
@@ -894,6 +900,15 @@ $scope.uploadFile = function(files) {
         },
     ]
 
+
+    $scope.$on('actualizarCatalogos', function (event, args) {
+        $scope.centrosCosto = $scope.$parent.centrosCosto;
+        $scope.partidas_ui_grid.columnDefs[7].editDropdownOptionsArray = $scope.centrosCosto;
+
+        cuentasContablesLista = Array.isArray($scope.$parent.cuentasContablesLista) ? $scope.$parent.cuentasContablesLista : [];
+        $scope.partidas_ui_grid.columnDefs[2].editDropdownOptionsArray = cuentasContablesLista;
+    })
+
     $scope.deleteItem = function (item) {
         if (item.docState && item.docState === 1)
             // si el item es nuevo, simplemente lo eliminamos del array
@@ -901,8 +916,9 @@ $scope.uploadFile = function(files) {
         else
             item.docState = 3;
 
-        if (!$scope.asientoContable.docState)
+        if (!$scope.asientoContable.docState) { 
             $scope.asientoContable.docState = 2;
+        }
     }
 
     $scope.agregarPartida = function () {
@@ -1122,211 +1138,209 @@ $scope.uploadFile = function(files) {
       };
 
 
-      $scope.convertirAOtraMoneda = () => {
+    $scope.convertirAOtraMoneda = () => {
 
-          if ($scope.asientoContable.docState) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
-                                  "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
-                                 false).then();
-              return;
-          }
+        if ($scope.asientoContable.docState) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
+                                "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
+                                false).then();
+            return;
+        }
 
-          if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico || !$scope.asientoContable.numero) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  "Aparentemente, el asiento contable no está completo aún. " +
-                                  "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
-                                 false).then();
-              return;
-          }
+        if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico || !$scope.asientoContable.numero) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                "Aparentemente, el asiento contable no está completo aún. " +
+                                "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
+                                false).then();
+            return;
+        }
 
-          if ($scope.asientoContable.numero < 0) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  "El asiento contable tiene un número negativo. <br />" +
-                                  "Solo asientos contables con números <b><em>Contab</b></em> pueden ser convertidos.",
-                                 false).then();
-              return;
-          }
+        if ($scope.asientoContable.numero < 0) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                "El asiento contable tiene un número negativo. <br />" +
+                                "Solo asientos contables con números <b><em>Contab</b></em> pueden ser convertidos.",
+                                false).then();
+            return;
+        }
 
-          if ($scope.asientoContable.moneda != $scope.asientoContable.monedaOriginal) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  `El asiento contable es un asiento convertido; es decir, es el resultado de una
-                                   conversión. <br />
-                                   Solo asientos contables registrados en <em>moneda original</em> pueden ser convertidos.`,
-                                 false).then();
-              return;
-          }
+        if ($scope.asientoContable.moneda != $scope.asientoContable.monedaOriginal) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                `El asiento contable es un asiento convertido; es decir, es el resultado de una
+                                conversión. <br />
+                                Solo asientos contables registrados en <em>moneda original</em> pueden ser convertidos.`,
+                                false).then();
+            return;
+        }
 
-          // ninguna de las partidas debe tener un monto con más de 2 decimales
-          if ($scope.asientoContable && $scope.asientoContable.partidas) {
-              if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
-                  DialogModal($modal, "<em>Asientos contables</em>",
-                                      `Aparentemente, al menos una de las partidas en el asiento contable,
-                                       tiene un monto con <b>más de dos decimales</b>.<br /><br />
-                                       Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
-                                       hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
-                                       Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
-                                       Luego puede regresar e intentar grabar el asiento contable.`,
-                                     false).then();
-                  return;
-              }
-          }
+        // ninguna de las partidas debe tener un monto con más de 2 decimales
+        if ($scope.asientoContable && $scope.asientoContable.partidas) {
+            if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
+                DialogModal($modal, "<em>Asientos contables</em>",
+                                    `Aparentemente, al menos una de las partidas en el asiento contable,
+                                    tiene un monto con <b>más de dos decimales</b>.<br /><br />
+                                    Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
+                                    hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
+                                    Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
+                                    Luego puede regresar e intentar grabar el asiento contable.`,
+                                    false).then();
+                return;
+            }
+        }
 
-          $scope.showProgress = true;
+        $scope.showProgress = true;
 
-          Meteor.call('contab.asientos.convertir',
-                 $scope.asientoContable.numeroAutomatico,
-                 (err, result) => {
+        Meteor.call('contab.asientos.convertir',
+                $scope.asientoContable.numeroAutomatico,
+                (err, result) => {
 
-                 if (err) {
-                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                if (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                     $scope.alerts.length = 0;
-                     $scope.alerts.push({
-                         type: 'danger',
-                         msg: errorMessage
-                     });
-
-                     $scope.showProgress = false;
-                     $scope.$apply();
-                     return;
-                 };
-
-                 // el método puede regresar un error (y su mensaje)
-                 $scope.alerts.length = 0;
-                 $scope.alerts.push({
-                     type: result.error ? 'danger' : 'info',
-                     msg: result.message
-                 });
-
-                 $scope.showProgress = false;
-                 $scope.$apply();
-          });
-      };
-
-
-      // -------------------------------------------------------------------------
-      // para inicializar el item (en el $scope) cuando el usuario abre la página
-      // -------------------------------------------------------------------------
-
-      $scope.helpers({
-          monedas: () => {
-            return Monedas.find();
-          },
-          tiposAsientoContable: () => {
-              return TiposAsientoContable.find();
-          },
-      });
-
-      let fechaOriginalAsientoContable = null;
-
-      function inicializarItem() {
-
-          $scope.showProgress = true;
-
-          if ($scope.id == "0") {
-              // TODO: aquí muchos fields vendrían por defecto, como: usuario, cia, moneda, moneda original,
-              // factor de cambio, ...
-              let usuario = Meteor.users.findOne(Meteor.userId());
-              let monedaDefecto = Monedas.findOne({ defaultFlag: true });
-              let tipoAsientoDefecto = ParametrosGlobalBancos.findOne();
-              fechaOriginalAsientoContable = null;
-
-              if (!monedaDefecto) {
-                  DialogModal($modal, "<em>Asientos contables</em>",
-                                      `Aparentemente, no se ha definido una moneda <em>defecto</em>
-                                      en el catálogo de monedas. <br />
-                                      Ud. debe revisar el catálgo <em>Monedas</em> y corregir esta situación.`,
-                                     false).then();
-
-                  $scope.showProgress = false;
-                  return;
-              };
-
-              if (!tipoAsientoDefecto || !tipoAsientoDefecto.tipoAsientoDefault) {
-                  DialogModal($modal, "<em>Asientos contables</em>",
-                                      `Aparentemente, no se ha definido una tipo de asientos <em>defecto</em>,
-                                      en el catálogo <em>Parámetros globales</em> en <em>Bancos</em>. <br />
-                                      Ud. debe revisar el catálgo <em>Parámetros globales</em> (en Bancos) y
-                                      corregir esta situación.`,
-                                     false).then();
-
-                  $scope.showProgress = false;
-                  return;
-              };
-
-              $scope.asientoContable = {  _id: new Mongo.ObjectID()._str,
-                                          numeroAutomatico: 0,
-                                          mes: 0,
-                                          ano: 0,
-                                          mesFiscal: 0,
-                                          anoFiscal: 0,
-                                          numero: 0,
-                                          tipo: tipoAsientoDefecto.tipoAsientoDefault,
-                                          moneda: monedaDefecto.moneda,
-                                          monedaOriginal: monedaDefecto.moneda,
-                                          partidas: [],
-                                          ingreso: new Date(),
-                                          ultAct: new Date(),
-                                          user: Meteor.userId(),
-                                          usuario: usuario.emails[0].address,
-                                          cia: companiaContabSeleccionada.numero,
-                                          docState: 1
-                                        };
-
-                $scope.partidas_ui_grid.data = [];
-
-                if (lodash.isArray($scope.asientoContable.partidas))
-                   $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-
-                $scope.showProgress = false;
-          }
-          else {
-
-              let filtro = {
-                  _id: $scope.id,
-              };
-
-              // cuando el usuario selecciona el asiento en la lista (asientosContablesList), alli, con
-              // un Meteor method se lee desde sql y se graba a mongo; ahora suscribimos para leerlo
-              // desde mongo y mostrarlo en esta página
-              Meteor.subscribe('asientosContables', JSON.stringify(filtro), () => {
-
-                  $scope.helpers({
-                      asientoContable: () => {
-                        return AsientosContables.findOne({ _id: $scope.id });
-                      }
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
                     });
-
-                    // guardamos, en una propiedad separada, la fecha del asiento; esto nos permitirá validar 2 cosas, aún
-                    // si el usuario cambia la fecha del asiento:
-                    // 1) que no se cambie a un mes diferente (esto podría permitirse, pero tomando en cuenta varios criterios)
-                    // 2) que el asiento no corresponda a un mes cerrado (y su fecha sea cambiada a uno que no lo es)
-                    fechaOriginalAsientoContable = $scope.asientoContable ? $scope.asientoContable.fecha : null;
-
-                    $scope.partidas_ui_grid.data = [];
-
-                    if (lodash.isArray($scope.asientoContable.partidas)) { 
-                        $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-                    }
-
-                    let result = revisarSumasIguales($scope.asientoContable.partidas); 
-
-                    if (result.error) { 
-                        $scope.alerts.push({ type: 'warning', msg: result.message });
-                    }
-
-                    // cuando el asiento es mostrado para una factura (vieneDeAfuera), por ejemplo, la lista de contros de costo no existe para 
-                    // cuando se define el ui-grid; la volvemos a cargar aquí para que esté disponible para el DDL en el ui-grid ... 
-                    $scope.partidas_ui_grid.columnDefs[7].editDropdownOptionsArray = $scope.centrosCosto; 
 
                     $scope.showProgress = false;
                     $scope.$apply();
-              });
-          };
-      };
+                    return;
+                };
 
-      inicializarItem();
+                // el método puede regresar un error (y su mensaje)
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: result.error ? 'danger' : 'info',
+                    msg: result.message
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+        });
+    };
+
+
+    // -------------------------------------------------------------------------
+    // para inicializar el item (en el $scope) cuando el usuario abre la página
+    // -------------------------------------------------------------------------
+
+    $scope.helpers({
+        monedas: () => {
+        return Monedas.find();
+        },
+        tiposAsientoContable: () => {
+            return TiposAsientoContable.find();
+        },
+    });
+
+    let fechaOriginalAsientoContable = null;
+
+    function inicializarItem() {
+
+        $scope.showProgress = true;
+
+        if ($scope.id == "0") {
+            // TODO: aquí muchos fields vendrían por defecto, como: usuario, cia, moneda, moneda original,
+            // factor de cambio, ...
+            let usuario = Meteor.users.findOne(Meteor.userId());
+            let monedaDefecto = Monedas.findOne({ defaultFlag: true });
+            let tipoAsientoDefecto = ParametrosGlobalBancos.findOne();
+            fechaOriginalAsientoContable = null;
+
+            if (!monedaDefecto) {
+                DialogModal($modal, "<em>Asientos contables</em>",
+                                    `Aparentemente, no se ha definido una moneda <em>defecto</em>
+                                    en el catálogo de monedas. <br />
+                                    Ud. debe revisar el catálgo <em>Monedas</em> y corregir esta situación.`,
+                                    false).then();
+
+                $scope.showProgress = false;
+                return;
+            }
+
+            if (!tipoAsientoDefecto || !tipoAsientoDefecto.tipoAsientoDefault) {
+                DialogModal($modal, "<em>Asientos contables</em>",
+                                    `Aparentemente, no se ha definido una tipo de asientos <em>defecto</em>,
+                                    en el catálogo <em>Parámetros globales</em> en <em>Bancos</em>. <br />
+                                    Ud. debe revisar el catálgo <em>Parámetros globales</em> (en Bancos) y
+                                    corregir esta situación.`,
+                                    false).then();
+
+                $scope.showProgress = false;
+                return;
+            }
+
+            $scope.asientoContable = {  _id: new Mongo.ObjectID()._str,
+                                        numeroAutomatico: 0,
+                                        mes: 0,
+                                        ano: 0,
+                                        mesFiscal: 0,
+                                        anoFiscal: 0,
+                                        numero: 0,
+                                        tipo: tipoAsientoDefecto.tipoAsientoDefault,
+                                        moneda: monedaDefecto.moneda,
+                                        monedaOriginal: monedaDefecto.moneda,
+                                        partidas: [],
+                                        ingreso: new Date(),
+                                        ultAct: new Date(),
+                                        user: Meteor.userId(),
+                                        usuario: usuario.emails[0].address,
+                                        cia: companiaContabSeleccionada.numero,
+                                        docState: 1
+                                    };
+
+            $scope.partidas_ui_grid.data = [];
+
+            if (lodash.isArray($scope.asientoContable.partidas)) { 
+                $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
+
+            }
+                
+            $scope.showProgress = false;
+        }
+        else {
+
+            let filtro = {
+                _id: $scope.id,
+            };
+
+            // cuando el usuario selecciona el asiento en la lista (asientosContablesList), alli, con
+            // un Meteor method se lee desde sql y se graba a mongo; ahora suscribimos para leerlo
+            // desde mongo y mostrarlo en esta página
+            Meteor.subscribe('asientosContables', JSON.stringify(filtro), () => {
+
+                $scope.helpers({
+                    asientoContable: () => {
+                    return AsientosContables.findOne({ _id: $scope.id });
+                    }
+                });
+
+                // guardamos, en una propiedad separada, la fecha del asiento; esto nos permitirá validar 2 cosas, aún
+                // si el usuario cambia la fecha del asiento:
+                // 1) que no se cambie a un mes diferente (esto podría permitirse, pero tomando en cuenta varios criterios)
+                // 2) que el asiento no corresponda a un mes cerrado (y su fecha sea cambiada a uno que no lo es)
+                fechaOriginalAsientoContable = $scope.asientoContable ? $scope.asientoContable.fecha : null;
+
+                $scope.partidas_ui_grid.data = [];
+
+                if (lodash.isArray($scope.asientoContable.partidas)) { 
+                    $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
+                }
+
+                let result = revisarSumasIguales($scope.asientoContable.partidas); 
+
+                if (result.error) { 
+                    $scope.alerts.push({ type: 'warning', msg: result.message });
+                }
+
+                $scope.showProgress = false;
+                $scope.$apply();
+            })
+        }
+    }
+
+    inicializarItem();
   }
 ]);
 
