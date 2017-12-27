@@ -149,6 +149,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               controller: 'BancosConciliacionBancariaExportarExcel_Controller',
               size: 'md',
               resolve: {
+                conciliacionID: () => {
+                    return $scope.id;
+                    },
                   movimientosPropiosNoEncontrados: () => {
                       return lodash.filter($scope.conciliacionesBancarias_movimientosPropios,
                                     (x) => { return x.conciliado === 'no'; });

@@ -14,7 +14,8 @@ import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/gr
 
 Meteor.methods(
 {
-    'bancos.conciliacionBancaria.exportarExcel': function (movimientosPropiosNoEncontrados,
+    'bancos.conciliacionBancaria.exportarExcel': function (conciliacionID, 
+                                                           movimientosPropiosNoEncontrados,
                                                            movimientosContablesNoEncontrados,
                                                            movimientosBancoNoEncontrados,
                                                            banco, moneda, cuentaBancaria,
@@ -22,11 +23,12 @@ Meteor.methods(
                                                            ciaSeleccionada)
     {
         new SimpleSchema({
+            conciliacionID: { type: String, optional: false },
             movimientosPropiosNoEncontrados: { type: String, optional: false },
             movimientosContablesNoEncontrados: { type: String, optional: false },
             movimientosBancoNoEncontrados: { type: String, optional: false },
             ciaSeleccionada: { type: Object, blackbox: true, optional: false }
-        }).validate({ movimientosPropiosNoEncontrados, movimientosContablesNoEncontrados, movimientosBancoNoEncontrados, ciaSeleccionada, });
+        }).validate({ conciliacionID, movimientosPropiosNoEncontrados, movimientosContablesNoEncontrados, movimientosBancoNoEncontrados, ciaSeleccionada, });
 
         movimientosPropiosNoEncontrados = JSON.parse(movimientosPropiosNoEncontrados);
         movimientosContablesNoEncontrados = JSON.parse(movimientosContablesNoEncontrados);
@@ -229,6 +231,47 @@ Meteor.methods(
             items: lodash.orderBy(movimientosContablesNoEncontrados2, ['consecutivo'], ['asc']),
         };
 
+        let listaMovPropios = ConciliacionesBancarias_movimientosPropios.find({ conciliacionID: conciliacionID }, { sort: { consecutivo: 1 }}).fetch(); 
+        for (let item of listaMovPropios) { 
+            item.consecutivoMovBanco = item.consecutivoMovBanco ? item.consecutivoMovBanco : ""; 
+        }
+
+        let values5 = {
+            fechaHoy: moment(new Date()).format("DD-MMM-YYYY"),
+            nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
+            items: listaMovPropios,
+        };
+
+        let listaMovContab = ConciliacionesBancarias_movimientosCuentaContable.find({ conciliacionID: conciliacionID }, { sort: { consecutivo: 1 }}).fetch(); 
+        for (let item of listaMovContab) { 
+            item.consecutivoMovBanco = item.consecutivoMovBanco ? item.consecutivoMovBanco : ""; 
+        }
+
+        let values6 = {
+            fechaHoy: moment(new Date()).format("DD-MMM-YYYY"),
+            nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
+            items: listaMovContab,
+        };
+
+        let listaMovBanco = ConciliacionesBancarias_movimientosBanco.find({ conciliacionID: conciliacionID }, { sort: { consecutivo: 1 }}).fetch(); 
+        for (let item of listaMovBanco) { 
+            item.numero = item.numero ? item.numero : ""; 
+            item.tipo = item.tipo ? item.tipo : ""; 
+            item.concepto = item.concepto ? item.concepto : ""; 
+            item.beneficiario = item.beneficiario ? item.beneficiario : ""; 
+
+            item.consecutivoMovPropio = item.consecutivoMovPropio ? item.consecutivoMovPropio : ""; 
+            item.consecutivoMovContab = item.consecutivoMovContab ? item.consecutivoMovContab : ""; 
+        }
+
+        let values7 = {
+            fechaHoy: moment(new Date()).format("DD-MMM-YYYY"),
+            nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
+            items: listaMovBanco,
+        };
+
+
+
         // Open a workbook
         let workbook = new XlsxInjector(templatePath);
 
@@ -244,6 +287,15 @@ Meteor.methods(
         sheetNumber = 4;
         workbook.substitute(sheetNumber, values4);
 
+        sheetNumber = 5;
+        workbook.substitute(sheetNumber, values5);      // página para mostrar una lista con los movimientos propios 
+
+        sheetNumber = 6;
+        workbook.substitute(sheetNumber, values6);      // página para mostrar una lista con los movimientos contables 
+
+        sheetNumber = 7;
+        workbook.substitute(sheetNumber, values7);      // página para mostrar una lista con los movimientos recibidos desde el banco  
+
         // Save the workbook
         workbook.writeFile(outputPath);
 
@@ -258,72 +310,5 @@ Meteor.methods(
         // cuales hay diferentes tipos (islr, iva, facturas, cheques, ...). Este tipo de plantilla es para obtener algún tipo de reporte
         // en excel y no tiene un tipo definido ...
         return grabarDatosACollectionFS_regresarUrl(buf, outputFileName, 'no aplica', 'bancos', ciaSeleccionada, Meteor.user(), 'xlsx');
-
-        // let future = new Future();
-        //
-        // // Load an XLSX file into memory
-        // fs.readFile(outputPath, Meteor.bindEnvironment(function(err, content) {
-        //
-        //     if(err)
-        //         throw new Meteor.Error('error-leer-plantilla-excel',
-        //             `Error: se ha producido un error al intentar leer el <em>archivo resultado</em> de este
-        //              proceso en el servidor.
-        //              El nombre del archivo que se ha intentado leer es: ${outputPath}.
-        //              El mensaje de error recibido es: ${err.toString()}.
-        //             `);
-        //
-        //     // el método regresa *antes* que la ejecución de este código que es asyncrono. Usamos Future para
-        //     // que el método espere a que todo termine para regresar ...
-        //     let newFile = new FS.File();
-        //     let data2 = new Buffer(content);
-        //
-        //     newFile.attachData( data2, {type: 'xlsx'}, Meteor.bindEnvironment(function( err ) {
-        //         if(err)
-        //             throw new Meteor.Error('error-grabar-archivo-collectionFS',
-        //                 `Error: se ha producido un error al intentar grabar el archivo a un directorio en el servidor.
-        //                  El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
-        //                  El mensaje de error recibido es: ${err.toString()}.
-        //                 `);
-        //
-        //         newFile.name(outputFileName);
-        //         // Collections.Builds.insert( file );
-        //
-        //         // agregamos algunos valores al file que vamos a registrar con collectionFS
-        //         newFile.metadata = {
-        //             user: Meteor.user().emails[0].address,
-        //             nombreArchivo: outputFileName,
-        //             aplicacion: 'bancos',
-        //             cia: ciaSeleccionada._id,
-        //         };
-        //
-        //         // intentamos eliminar el archivo antes de agregarlo nuevamente ...
-        //         Files_CollectionFS_tempFiles.remove({ 'metadata.nombreArchivo': outputFileName });
-        //
-        //         Files_CollectionFS_tempFiles.insert(newFile, Meteor.bindEnvironment(function (err, fileObj) {
-        //             // Inserted new doc with ID fileObj._id, and kicked off the data upload using HTTP
-        //
-        //             if (err) {
-        //                 throw new Meteor.Error('error-grabar-archivo-collectionFS',
-        //                     `Error: se ha producido un error al intentar grabar el archivo a un directorio en el servidor.
-        //                      El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
-        //                      El mensaje de error recibido es: ${err.toString()}.
-        //                     `);
-        //             };
-        //
-        //             // tenemos que esperar que el file efectivamente se guarde, para poder acceder su url ...
-        //             // nótese como Meteor indica que debemos agregar un 'fiber' para correr el callback, pues
-        //             // su naturaleza es asynchrona ...
-        //             Files_CollectionFS_tempFiles.on("stored", Meteor.bindEnvironment(function (fileObj, storeName) {
-        //                 const url = fileObj.url({store: storeName});
-        //                 let result = {
-        //                     linkToFile: url
-        //                 };
-        //                 future['return'](result);
-        //             }));
-        //         }));
-        //     }));
-        // }));
-        //
-        // return future.wait();
     }
 });

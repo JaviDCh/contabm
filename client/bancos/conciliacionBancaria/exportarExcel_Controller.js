@@ -2,13 +2,15 @@
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('BancosConciliacionBancariaExportarExcel_Controller',
-['$scope', '$modalInstance', '$modal', '$meteor', 'movimientosPropiosNoEncontrados',
+['$scope', '$modalInstance', '$modal', '$meteor', 'conciliacionID', 
+                                                  'movimientosPropiosNoEncontrados',
                                                   'movimientosContablesNoEncontrados',
                                                   'movimientosBancoNoEncontrados',
                                                   'banco', 'moneda', 'cuentaBancaria',
                                                   'cuentaContable',
                                                   'ciaSeleccionada',
-function ($scope, $modalInstance, $modal, $meteor, movimientosPropiosNoEncontrados,
+function ($scope, $modalInstance, $modal, $meteor, conciliacionID, 
+                                                   movimientosPropiosNoEncontrados,
                                                    movimientosContablesNoEncontrados,
                                                    movimientosBancoNoEncontrados,
                                                    banco, moneda, cuentaBancaria,
@@ -38,7 +40,8 @@ function ($scope, $modalInstance, $modal, $meteor, movimientosPropiosNoEncontrad
     $scope.exportarAExcel = (file) => {
         $scope.showProgress = true;
 
-        Meteor.call('bancos.conciliacionBancaria.exportarExcel', JSON.stringify(movimientosPropiosNoEncontrados),
+        Meteor.call('bancos.conciliacionBancaria.exportarExcel', conciliacionID, 
+                                                                 JSON.stringify(movimientosPropiosNoEncontrados),
                                                                  JSON.stringify(movimientosContablesNoEncontrados),
                                                                  JSON.stringify(movimientosBancoNoEncontrados),
                                                                  banco, moneda, cuentaBancaria, cuentaContable, 
