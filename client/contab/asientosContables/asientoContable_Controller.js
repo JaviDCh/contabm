@@ -52,7 +52,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         }
     })
 
-    
 
     $scope.origen = $stateParams.origen;
     $scope.id = $stateParams.id;
@@ -322,7 +321,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         let message = "";
 
         reader.onload = function(e) {
-        //   debugger;
             try {
                 var content = e.target.result;
                 let asientoContable = JSON.parse(content);
@@ -426,8 +424,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         };
 
         reader.readAsText(userSelectedFile);
-    };
-$scope.uploadFile = function(files) {
+    }
+
+    $scope.uploadFile = function(files) {
 
         if (!$scope.asientoContable || !$scope.asientoContable.docState || $scope.asientoContable.docState != 1) {
             DialogModal($modal, "<em>Asientos contables</em>",
@@ -696,8 +695,6 @@ $scope.uploadFile = function(files) {
             gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
                 if (newValue != oldValue) {
 
-                //   debugger;
-
                     // solo cuando el usuario indica la cuenta contable, intentamos inicializar el row en base al anteior ...
                     if (colDef.field == 'cuentaContableID') {
                         let index = $scope.asientoContable.partidas.indexOf(rowEntity, 0);
@@ -707,28 +704,29 @@ $scope.uploadFile = function(files) {
                             let rowAnterior = $scope.asientoContable.partidas[index - 1];
                             if (rowAnterior) {
 
-                                if (rowAnterior.descripcion && !rowEntity.descripcion)
+                                if (rowAnterior.descripcion && !rowEntity.descripcion) { 
                                     rowEntity.descripcion = rowAnterior.descripcion;
-
-                                if (rowAnterior.referencia && !rowEntity.referencia)
+                                }
+                                    
+                                if (rowAnterior.referencia && !rowEntity.referencia) { 
                                     rowEntity.referencia = rowAnterior.referencia;
-
+                                }
+                                    
                                 if (!rowEntity.debe && !rowEntity.haber) {
                                     // intentamos cuadrar el asiento en la partida actual ...
                                     let totalDebe = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.debe ? x.debe : 0; });
                                     let totalHaber = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.haber ? x.haber : 0; });
 
                                     if (totalDebe > totalHaber) {
-                                    rowEntity.haber = lodash.round(totalDebe - totalHaber, 2);
+                                        rowEntity.haber = lodash.round(totalDebe - totalHaber, 2);
                                     }
                                     else {
-                                    rowEntity.debe = lodash.round(totalHaber - totalDebe, 2);
+                                        rowEntity.debe = lodash.round(totalHaber - totalDebe, 2);
                                     }
-
-                                };
-                            };
-                        };
-                    };
+                                }
+                            }
+                        }
+                    }
 
                     // cuando el usuario indica un monto, ponemos cero en el otro; si indica un monto en el
                     // debe, ponemos cero en haber y viceversa ...
@@ -736,15 +734,20 @@ $scope.uploadFile = function(files) {
                     if (colDef.field == 'debe') rowEntity.haber = 0;
                     if (colDef.field == 'haber') rowEntity.debe = 0;
 
-                    // intentamos inicializar la partida en base a la anterior ...
-
-                    if (!rowEntity.docState)
+                    if (!rowEntity.docState && rowEntity.docState != 0) { 
                         rowEntity.docState = 2;
-
-                    if (!$scope.asientoContable.docState)
+                    } else if (rowEntity.docState === 0) { 
+                        // el registro es nuevo; pasamos a nuevo-editado cuando el usaurio edita; agregamos uno nuevo al instante, 
+                        // para que siempre haya uno nuevo en la lista. La idea es que el usuario no tenga que hacer click en Nuevo en el toolbar  
+                        rowEntity.docState = 1; 
+                        $scope.agregarPartida(); 
+                    }
+                        
+                    if (!$scope.asientoContable.docState) { 
                         $scope.asientoContable.docState = 2;
-                };
-            });
+                    }
+                }
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -764,9 +767,10 @@ $scope.uploadFile = function(files) {
             field: 'docState',
             displayName: '',
             cellTemplate:
-            '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
-            '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
-            '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>',
+            '<span ng-show="row.entity[col.field] == 0" class="fa fa-circle-thin" style="color: gray; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: blue; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: brown; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
             enableCellEdit: false,
             enableColumnMenu: false,
             enableSorting: false,
@@ -934,23 +938,23 @@ $scope.uploadFile = function(files) {
             partida: 10,
             debe: 0,
             haber: 0,
-            docState: 1
+            docState: 0             // partida nueva que el usuario no ha editado ... 
         };
 
         if (ultimaPartida && !lodash.isEmpty(ultimaPartida)) {
             partida.partida = ultimaPartida.partida + 10;
-            partida.descripcion = ultimaPartida.descripcion;
-            partida.referencia = ultimaPartida.referencia;
-        };
+        }
 
         $scope.asientoContable.partidas.push(partida);
 
         $scope.partidas_ui_grid.data = [];
-        if (lodash.isArray($scope.asientoContable.partidas))
+        if (lodash.isArray($scope.asientoContable.partidas)) { 
             $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-
-        if (!$scope.asientoContable.docState)
+        }
+            
+        if (!$scope.asientoContable.docState) { 
             $scope.asientoContable.docState = 2;
+        }    
     }
 
 
@@ -992,6 +996,12 @@ $scope.uploadFile = function(files) {
         // nótese como validamos cada item antes de intentar guardar en el servidor
         let isValid = false;
         let errores = [];
+
+        // para que el usuario tenga una mejor experiencia al registrar el asiento, agregamos siempre una nueva partida a la lista. Por ésto, 
+        // siempre va a haber una partida de más en el array. La eliminamos pues no pasaría la validación ... 
+        if (editedItem && editedItem.partidas && Array.isArray(editedItem.partidas) && editedItem.partidas.length) { 
+            lodash.remove(editedItem.partidas, (p) => { return p.docState === 0; }); 
+        }
 
         if (editedItem.docState != 3) {
             isValid = AsientosContables.simpleSchema().namedContext().validate(editedItem);
@@ -1058,84 +1068,84 @@ $scope.uploadFile = function(files) {
     }
 
 
-      $scope.asignarNumeroContab = () => {
+    $scope.asignarNumeroContab = () => {
 
-          if ($scope.asientoContable.docState) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
-                                  "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
-                                 false).then();
-              return;
-          }
+        if ($scope.asientoContable.docState) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                "Aparentemente, <em>se han efectuado cambios</em> en el registro. " +
+                                "Ud. debe grabar los cambios antes de intentar ejecutar esta función.",
+                                false).then();
+            return;
+        }
 
-          if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico) {
-              DialogModal($modal, "<em>Asientos contables</em>",
-                                  "Aparentemente, el asiento contable no está completo aún. " +
-                                  "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
-                                 false).then();
-              return;
-          }
+        if (!$scope.asientoContable || !$scope.asientoContable.numeroAutomatico) {
+            DialogModal($modal, "<em>Asientos contables</em>",
+                                "Aparentemente, el asiento contable no está completo aún. " +
+                                "Ud. debe completar el registro del asiento contable antes de intentar ejecutar esta función.",
+                                false).then();
+            return;
+        }
 
-          // ninguna de las partidas debe tener un monto con más de 2 decimales
-          if ($scope.asientoContable && $scope.asientoContable.partidas) {
-              if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
-                  DialogModal($modal, "<em>Asientos contables</em>",
-                                      `Aparentemente, al menos una de las partidas en el asiento contable,
-                                       tiene un monto con <b>más de dos decimales</b>.<br /><br />
-                                       Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
-                                       hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
-                                       Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
-                                       Luego puede regresar e intentar grabar el asiento contable.`,
-                                     false).then();
-                  return;
-              }
-          }
+        // ninguna de las partidas debe tener un monto con más de 2 decimales
+        if ($scope.asientoContable && $scope.asientoContable.partidas) {
+            if (montoConMasDeDosDecimales($scope.asientoContable.partidas)) {
+                DialogModal($modal, "<em>Asientos contables</em>",
+                                    `Aparentemente, al menos una de las partidas en el asiento contable,
+                                    tiene un monto con <b>más de dos decimales</b>.<br /><br />
+                                    Para corregir esta situación, Ud. debe seleccionar alguna partida en la lista y
+                                    hacer un <em>click</em> en la función <em>cuadrar asiento</em>.<br />
+                                    Esto redondeara los montos en las partidas a un máximo de dos decimales.<br /><br />
+                                    Luego puede regresar e intentar grabar el asiento contable.`,
+                                    false).then();
+                return;
+            }
+        }
 
-          $scope.showProgress = true;
+        $scope.showProgress = true;
 
-          $meteor.call('contab_asignarNumeroAsientoContab', $scope.asientoContable.numeroAutomatico).then(
-              function (data) {
+        $meteor.call('contab_asignarNumeroAsientoContab', $scope.asientoContable.numeroAutomatico).then(
+            function (data) {
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'info',
-                      msg: data
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: data
+                });
 
-                  $scope.showProgress = false;
-              },
-              function (err) {
+                $scope.showProgress = false;
+            },
+            function (err) {
 
-                  let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
-                  if (err.errorType)
-                      errorMessage += " (" + err.errorType + ")";
+                let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
+                if (err.errorType)
+                    errorMessage += " (" + err.errorType + ")";
 
-                  errorMessage += "<br />";
+                errorMessage += "<br />";
 
-                  if (err.message)
-                      // aparentemente, Meteor compone en message alguna literal que se regrese en err.reason ...
-                      errorMessage += err.message + " ";
-                  else {
-                      if (err.reason)
-                          errorMessage += err.reason + " ";
+                if (err.message)
+                    // aparentemente, Meteor compone en message alguna literal que se regrese en err.reason ...
+                    errorMessage += err.message + " ";
+                else {
+                    if (err.reason)
+                        errorMessage += err.reason + " ";
 
-                      if (err.details)
-                          errorMessage += "<br />" + err.details;
-                  };
+                    if (err.details)
+                        errorMessage += "<br />" + err.details;
+                }
 
-                  if (!err.message && !err.reason && !err.details)
-                      errorMessage += err.toString();
+                if (!err.message && !err.reason && !err.details)
+                    errorMessage += err.toString();
 
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-                  $scope.showProgress = false;
-              });
-      };
+                $scope.showProgress = false;
+            });
+    }
 
 
     $scope.convertirAOtraMoneda = () => {
@@ -1218,7 +1228,92 @@ $scope.uploadFile = function(files) {
                 $scope.showProgress = false;
                 $scope.$apply();
         });
-    };
+    }
+
+
+    $scope.helpParaCuentasContables = function() { 
+
+        if (!partidaSeleccionada || lodash.isEmpty(partidaSeleccionada)) {
+            DialogModal($modal, "<em>Asientos contables - Consultar cuentas contables</em>",
+                `Ud. debe seleccionar una partida en la lista. <br />
+                 Si Ud. selecciona una cuenta contable mediante esta función, ésta será asignada a la partida seleccionada en la lista.`,
+                false).then();
+            return;
+        }
+
+        if (!$scope.asientoContable || !$scope.asientoContable.partidas || !Array.isArray($scope.asientoContable.partidas) || !$scope.asientoContable.partidas.length) {
+            DialogModal($modal, "<em>Asientos contables - Cuadrar asiento contable</em>",
+                `Error inesperado: aparentemente, el asiento contable no tiene partidas registradas. Por favor revise.`,
+                false).then();
+            return;
+        }
+
+        var modalInstance = $modal.open({
+            templateUrl: 'client/contab/asientosContables/cuentasContablesSearch/buscarCuentasContables_modal.html',
+            controller: 'BuscarCuentasContables_Modal_Controller',
+            size: 'md',
+            resolve: {
+                companiaContabSeleccionada: () => {
+                    return companiaContabSeleccionada;
+                }, 
+                partidaSeleccionada: () => {
+                    return partidaSeleccionada;
+                }
+            }
+        }).result.then(
+            function (resolve) {
+                // el usuario seleccionó una cuenta contable en la lista; actualizamos la partida seleccionada ... 
+                partidaSeleccionada.cuentaContableID = resolve.cuentaContableID; 
+
+                if (!partidaSeleccionada.docState && partidaSeleccionada.docState != 0) { 
+                    partidaSeleccionada.docState = 2;
+                } else if (partidaSeleccionada.docState === 0) { 
+                    // el registro es nuevo; pasamos a nuevo-editado cuando el usaurio edita; agregamos uno nuevo al instante, 
+                    // para que siempre haya uno nuevo en la lista. La idea es que el usuario no tenga que hacer click en Nuevo en el toolbar  
+                    partidaSeleccionada.docState = 1; 
+
+                    let index = $scope.asientoContable.partidas.indexOf(partidaSeleccionada, 0);
+
+                    if (index != -1 && index > 0) {
+
+                        let partidaAnterior = $scope.asientoContable.partidas[index - 1];
+                        if (partidaAnterior) {
+                            if (partidaAnterior.descripcion && !partidaSeleccionada.descripcion) { 
+                                partidaSeleccionada.descripcion = partidaAnterior.descripcion;
+                            }
+                                
+                            if (partidaAnterior.referencia && !partidaSeleccionada.referencia) { 
+                                partidaSeleccionada.referencia = partidaAnterior.referencia;
+                            }
+                                
+                            if (!partidaSeleccionada.debe && !partidaSeleccionada.haber) {
+                                // intentamos cuadrar el asiento en la partida actual ...
+                                let totalDebe = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.debe ? x.debe : 0; });
+                                let totalHaber = lodash.sumBy($scope.asientoContable.partidas, (x) => { return x.haber ? x.haber : 0; });
+
+                                if (totalDebe > totalHaber) {
+                                    partidaSeleccionada.haber = lodash.round(totalDebe - totalHaber, 2);
+                                }
+                                else {
+                                    partidaSeleccionada.debe = lodash.round(totalHaber - totalDebe, 2);
+                                }
+                            }
+                        }
+                    }
+
+                    $scope.agregarPartida(); 
+                }
+                    
+                if (!$scope.asientoContable.docState) { 
+                    $scope.asientoContable.docState = 2;
+                }
+
+                return true;
+            },
+            function (cancel) {
+                return true;
+            });
+    }
 
 
     // -------------------------------------------------------------------------
@@ -1241,8 +1336,6 @@ $scope.uploadFile = function(files) {
         $scope.showProgress = true;
 
         if ($scope.id == "0") {
-            // TODO: aquí muchos fields vendrían por defecto, como: usuario, cia, moneda, moneda original,
-            // factor de cambio, ...
             let usuario = Meteor.users.findOne(Meteor.userId());
             let monedaDefecto = Monedas.findOne({ defaultFlag: true });
             let tipoAsientoDefecto = ParametrosGlobalBancos.findOne();
@@ -1290,12 +1383,10 @@ $scope.uploadFile = function(files) {
                                         docState: 1
                                     };
 
+            $scope.agregarPartida();        // para que el asiento nuevo venga con una partida y el usuario no tenga que hacer un click en Nuevo ... 
+
             $scope.partidas_ui_grid.data = [];
-
-            if (lodash.isArray($scope.asientoContable.partidas)) { 
-                $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-
-            }
+            $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
                 
             $scope.showProgress = false;
         }
