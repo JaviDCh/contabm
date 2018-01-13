@@ -1,6 +1,7 @@
 
 import moment from 'moment';
 import numeral from 'numeral';
+import lodash from 'lodash'; 
 import JSZip from 'jszip';
 import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
@@ -31,9 +32,10 @@ Meteor.methods(
 
 
         // el template debe ser siempre un documento word ...
-        if (!nombreArchivo || !nombreArchivo.endsWith('.docx'))
+        if (!nombreArchivo || !nombreArchivo.endsWith('.docx')) { 
             throw new Meteor.Error('archivo-debe-ser-word-doc', 'El archivo debe ser un documento Word (.docx).');
-
+        }
+            
         // antes que nada, leemos el movimientoBancario
         let response = null;
         response = Async.runSync(function(done) {
@@ -48,14 +50,17 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-        if (!response.result.length)
-            throw new Meteor.Error('db-registro-no-encontrado',
-            'Error inesperado: no pudimos leer el movimiento bancario en la base de datos.');
+        }
+            
+        if (!response.result.length) { 
+            throw new Meteor.Error('db-registro-no-encontrado',  
+                                   'Error inesperado: no pudimos leer el movimiento bancario en la base de datos.');
+        }
+            
 
 
         let movimientoBancario = response.result[0].dataValues;
@@ -66,7 +71,7 @@ Meteor.methods(
         movimientoBancario.ultMod = movimientoBancario.ultMod ? moment(movimientoBancario.ultMod).add(TimeOffset, 'hours').toDate() : null;
 
         // con la cuenta bancaria, obtenemos el banco en mongo ...
-        let cuentaBancaria = _.isArray(response.result) &&
+        let cuentaBancaria = Array.isArray(response.result) &&
                              response.result[0] &&
                              response.result[0].chequera &&
                              response.result[0].chequera.cuentaBancaria &&
@@ -74,12 +79,14 @@ Meteor.methods(
                              response.result[0].chequera.cuentaBancaria.dataValues.cuentaBancaria ?
                              response.result[0].chequera.cuentaBancaria.dataValues.cuentaBancaria : 'Indefinida';
 
-         let banco = Bancos.findOne({ 'agencias.cuentasBancarias.cuentaBancaria': cuentaBancaria });
+        let banco = Bancos.findOne({ 'agencias.cuentasBancarias.cuentaBancaria': cuentaBancaria });
 
-         let nombreBanco = "Indefinido";
-         if (banco) {
-             nombreBanco = banco.abreviatura;
-         };
+        let nombreBanco = "Indefinido";
+        let bancoNombreCompleto = "Indefinido"; 
+        if (banco) {
+            nombreBanco = banco.abreviatura;
+            bancoNombreCompleto = banco.nombre; 
+        }
 
         // ahora leemos el asiento contable asociado al movimiento bancario
         response = null;
@@ -91,16 +98,18 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-        if (!response.result.length)
+        }
+            
+        if (!response.result.length) {
             throw new Meteor.Error('db-registro-no-encontrado',
-            `Error inesperado: no pudimos leer un asiento contable para el movimiento bancario indicado.<br />
-             El movimiento bancario debe tener un asiento contable asociado.`);
-
+                                    `Error inesperado: no pudimos leer un asiento contable para el movimiento bancario indicado.<br />
+                                    El movimiento bancario debe tener un asiento contable asociado.`);
+        }
+        
 
         let asientoContable = response.result[0];
 
@@ -113,29 +122,31 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
+            
         let partidasAsientoContable = response.result;
 
         // preparamos un array que debemos pasar para combinar con Word ...
         let partidas = [];
 
         partidasAsientoContable.forEach((x) => {
-
             // buscamos la cuenta contable; debe existir en mongo ...
             let cuentaContable = CuentasContables.findOne({ id: x.cuentaContableID });
 
             let p = {
                 cuentaContable: cuentaContable ? cuentaContable.cuentaEditada : 'Indefinida',
                 descripcionPartida: x.descripcion,
-                montoPartida: numeral(x.haber != 0 ? x.haber * -1 : x.debe).format("0,0.00"),
+                montoPartida: numeral(x.haber != 0 ? (x.haber * -1) : x.debe).format("(0,0.00)"),
+                montoPartidaDebe: numeral(x.haber != 0 ? 0 : x.debe).format("0,0.00"),
+                montoPartidaHaber: numeral(x.haber != 0 ? Math.abs(x.haber) : 0).format("0,0.00"), 
             };
 
-            partidas.push(p);
-        });
+            partidas.push(p);  
+        })
 
         // ----------------------------------------------------------------------------------------------------
         // collectionFS asigna un nombre diferente a cada archivo que guarda en el server; debemos
@@ -175,6 +186,7 @@ Meteor.methods(
             beneficiario: movimientoBancario.beneficiario,
             fechaEscrita: moment(movimientoBancario.fecha).format("DD [de] MMMM"),
             año: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0,0"),
+            añoSinFormato: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0"),
 
             concepto: movimientoBancario.concepto,
             numeroComprobante: asientoContable ? asientoContable.numero : '',
@@ -183,14 +195,19 @@ Meteor.methods(
 
             cuentaBancaria: cuentaBancaria,
             banco: nombreBanco,
+            bancoNombreCompleto: bancoNombreCompleto, 
             p: partidas,
+
+            totalMonto: numeral(lodash.sumBy(partidasAsientoContable, "debe") - lodash.sumBy(partidasAsientoContable, "haber")).format("0,0.00"), 
+            totalDebe: numeral(lodash.sumBy(partidasAsientoContable, "debe")).format("0,0.00"),  
+            totalHaber: numeral(lodash.sumBy(partidasAsientoContable, "haber")).format("0,0.00"),  
 
             elaboradoPor: configuracionChequeImpreso && configuracionChequeImpreso.elaboradoPor ? configuracionChequeImpreso.elaboradoPor : ' ',
             revisadoPor: configuracionChequeImpreso && configuracionChequeImpreso.revisadoPor ? configuracionChequeImpreso.revisadoPor : ' ',
             aprobadoPor: configuracionChequeImpreso && configuracionChequeImpreso.aprobadoPor ? configuracionChequeImpreso.aprobadoPor : ' ',
             contabilizadoPor: configuracionChequeImpreso && configuracionChequeImpreso.contabilizadoPor ? configuracionChequeImpreso.contabilizadoPor : ' ',
             nombreCompania: ciaSeleccionada.nombre,
-        });
+        })
 
         try {
             // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
@@ -223,4 +240,4 @@ Meteor.methods(
         // promise y no el promise object ...
         return grabarDatosACollectionFS_regresarUrl(buf, nombreArchivo2, tipoArchivo, 'bancos', ciaSeleccionada, Meteor.user(), 'docx');
     }
-});
+})
