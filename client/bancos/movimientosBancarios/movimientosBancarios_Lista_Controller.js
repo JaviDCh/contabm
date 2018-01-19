@@ -2,13 +2,11 @@
 import numeral from 'numeral';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_List_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
 function ($scope, $stateParams, $state, $meteor, $modal) {
 
-    //debugger;
     $scope.showProgress = false;
 
     // ui-bootstrap alerts ...
@@ -16,7 +14,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.origen = $stateParams.origen;
     let limit = parseInt($stateParams.limit);
@@ -36,12 +34,12 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
             id: "0",
             limit: limit,
             vieneDeAfuera: false
-        });
-    };
+        })
+    }
 
     $scope.regresar = function () {
         $state.go('bancos.movimientosBancarios.filter', { origen: $scope.origen });
-    };
+    }
 
 
     let list_ui_grid_api = null;
@@ -79,9 +77,10 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
                     $scope.showProgress = false;
                 }
-                else
+                else { 
                     return;
-            });
+                }
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -90,7 +89,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         getRowIdentity: function (row) {
             return row._id;
         }
-    };
+    }
 
 
     $scope.list_ui_grid.columnDefs = [
@@ -229,7 +228,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
             enableSorting: true,
             type: 'string'
         },
-    ];
+    ]
 
 
     $scope.movimientosBancarios = []
@@ -250,7 +249,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         // de los subscriptions también ...
         if (subscriptionHandle && subscriptionHandle.stop) {
             subscriptionHandle.stop();
-        };
+        }
 
         subscriptionHandle =
         Meteor.subscribe('temp.Bancos.Consulta.movimientosBancarios', limit, () => {
@@ -273,8 +272,8 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
 
             $scope.showProgress = false;
             $scope.$apply();
-        });
-    };
+        })
+    }
 
 
     // al abrir la página, mostramos los primeros 50 items
@@ -297,24 +296,24 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
             $scope.showProgress = false;
             $scope.$apply();
             return;
-        };
+        }
 
         // el método regresa la cantidad de items en el collection (siempre para el usuario)
         recordCount = result;
         $scope.leerRegistrosDesdeServer(limit);
-    });
+    })
 
 
     $scope.leerMasRegistros = () => {
         limit += 50;    // la próxima vez, se leerán 50 más ...
         $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
-    };
+    }
 
     $scope.leerTodosLosRegistros = () => {
         // simplemente, leemos la cantidad total de registros en el collection (en el server y para el user)
         limit = recordCount;
         $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
-    };
+    }
 
 
     $scope.exportarExcel = function() {
@@ -335,7 +334,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
               function (cancel) {
                   return true;
               });
-    };
+    }
     // ------------------------------------------------------------------------------------------------
 
     // cuando el usuario sale de la página, nos aseguramos de detener (ie: stop) el subscription,
@@ -344,7 +343,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
     $scope.$on('$destroy', function() {
         if (subscriptionHandle && subscriptionHandle.stop) {
             subscriptionHandle.stop();
-        };
-    });
+        }
+    })
   }
-]);
+])

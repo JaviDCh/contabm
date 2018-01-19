@@ -10,17 +10,17 @@ function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, cia
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.companiaSeleccionada = ciaSeleccionada;
 
     $scope.ok = function () {
         $modalInstance.close("Ok");
-    };
+    }
 
     $scope.cancel = function () {
         $modalInstance.dismiss("Cancel");
-    };
+    }
 
     $scope.helpers({
         template_files: () => {
@@ -28,9 +28,9 @@ function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, cia
                 'metadata.tipo': { $in: tiposArchivo },
                 'metadata.aplicacion': aplicacion,
                 // 'metadata.cia': ciaSeleccionada._id
-            });
+            })
         },
-    });
+    })
 
     $scope.downLoadWordDocument = false;
     $scope.selectedFile = {};
@@ -44,7 +44,7 @@ function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, cia
         let configuracionChequeImpreso = ConfiguracionChequeImpreso.findOne({ cia: ciaSeleccionada._id });
         if (configuracionChequeImpreso) {
             ConfiguracionChequeImpreso.remove({ _id: configuracionChequeImpreso._id });
-        };
+        }
 
         if ($scope.configuracionChequeImpreso) {
             ConfiguracionChequeImpreso.insert({
@@ -54,8 +54,8 @@ function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, cia
                 aprobadoPor: $scope.configuracionChequeImpreso.aprobadoPor ? $scope.configuracionChequeImpreso.aprobadoPor : null,
                 contabilizadoPor: $scope.configuracionChequeImpreso.contabilizadoPor ? $scope.configuracionChequeImpreso.contabilizadoPor : null,
                 cia: ciaSeleccionada._id,
-            });
-        };
+            })
+        }
         // ----------------------------------------------------------------------------------------------
 
         $meteor.call('bancos.obtenerChequeImpreso',
@@ -87,8 +87,8 @@ function ($scope, $modalInstance, $modal, $meteor, tiposArchivo, aplicacion, cia
                 $scope.alerts.push({ type: 'danger', msg: errorMessage });
 
                 $scope.showProgress = false;
-            });
-    };
+            })
+    }
 
     // --------------------------------------------------------------------------------------------------------------------
     // suscribimos a las imagenes registradas para la cia seleccionada

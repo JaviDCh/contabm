@@ -7,6 +7,7 @@ import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
+import { montoEscrito } from '/imports/general/montoEnLetras';
 
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
@@ -148,17 +149,48 @@ Meteor.methods(
             partidas.push(p);  
         })
 
+        // leemos el proveedor para obener algunos datos más 
+        let proveedorNombreContacto1 = ""; 
+        let proveedorNombreContacto2 = ""; 
+        let proveedorRif = ""; 
+        let proveedorNit = ""; 
+
+        // ahora leemos el asiento contable asociado al movimiento bancario
+        response = null;
+        response = Async.runSync(function(done) {
+            Proveedores_sql.findAll({
+                where: { proveedor: movimientoBancario.provClte ? movimientoBancario.provClte : 0, },
+                attributes: [ "nit", "rif", "contacto1", "contacto2", ], 
+                raw: true,       // aparentemente, cuando hay Includes, el 'raw' no funciona del todo bien ...
+                })
+                .then(function(result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        })
+
+        if (response.error) { 
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+            
+        if (response.result.length) {
+            let proveedor = response.result[0]; 
+            proveedorNombreContacto1 = proveedor.contacto1 ? proveedor.contacto1 : ""; 
+            proveedorNombreContacto2 = proveedor.contacto2 ? proveedor.contacto2 : ""; 
+            proveedorRif = proveedor.rif ? proveedor.rif : ""; 
+            proveedorNit = proveedor.nit ? proveedor.nit : ""; 
+        }
+
         // ----------------------------------------------------------------------------------------------------
         // collectionFS asigna un nombre diferente a cada archivo que guarda en el server; debemos
         // leer el item en el collection, para obtener el nombre 'verdadero' del archivo en el disco
 
         let collectionFS_file = Files_CollectionFS_Templates.findOne(fileID);
 
-        if (!collectionFS_file)
+        if (!collectionFS_file) { 
             throw new Meteor.Error('collectionFS-no-encontrada',
             'Error inesperado: no pudimos leer el item en collectionFS, que corresponda al archivo indicado.');
-
-
+        }
+            
         // ----------------------------------------------------------------------------------------------------
         // obtenemos el directorio en el server donde están las plantillas (guardadas por el usuario mediante collectionFS)
         // nótese que usamos un 'setting' en setting.json (que apunta al path donde están las plantillas)
@@ -180,8 +212,12 @@ Meteor.methods(
         let doc = new Docxtemplater();
         doc.loadZip(zip);
 
+        // var writtenNumber = require('written-number');
+        // writtenNumber(1234, { lang: 'es' }); // => 'mil doscientos treinta y cuatro'
+
         //set the templateVariables
         doc.setData({
+            montoEnLetras: montoEscrito(movimientoBancario.monto), 
             monto: numeral(Math.abs(movimientoBancario.monto)).format("0,0.00"),
             beneficiario: movimientoBancario.beneficiario,
             fechaEscrita: moment(movimientoBancario.fecha).format("DD [de] MMMM"),
@@ -196,6 +232,12 @@ Meteor.methods(
             cuentaBancaria: cuentaBancaria,
             banco: nombreBanco,
             bancoNombreCompleto: bancoNombreCompleto, 
+
+            proveedorNombreContacto1: proveedorNombreContacto1, 
+            proveedorNombreContacto2: proveedorNombreContacto2, 
+            proveedorRif: proveedorRif, 
+            proveedorNit: proveedorNit, 
+
             p: partidas,
 
             totalMonto: numeral(lodash.sumBy(partidasAsientoContable, "debe") - lodash.sumBy(partidasAsientoContable, "haber")).format("0,0.00"), 
