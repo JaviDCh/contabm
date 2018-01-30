@@ -218,6 +218,16 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
         })
 
         // -------------------------------------------------------------------------------------------
+        // caja chica - reposiciones 
+        .state('bancos.cajaChica', {
+            url: '/cajaChica',
+            templateUrl: 'client/bancos/cajaChica/reposiciones/lista.html',
+            controller: 'Bancos_CajaChica_Reposiciones_Controller',
+            params: { 'origen': null, },
+            parent: 'bancos',
+        })
+
+        // -------------------------------------------------------------------------------------------
         // ITF (impuesto transacciones financieras)
         .state('bancos.impuestoTransaccionesFinancieras', {
             url: '/impuestoTransaccionesFinancieras',

@@ -1,5 +1,9 @@
 
+
+
 import SimpleSchema from 'simpl-schema';
+import { Temp_Consulta_Bancos_CajaChica } from '/imports/collections/bancos/temp.bancos.consulta.cajaChica'; 
+
 
 Meteor.methods({
    getCollectionCount: function (collectionName) {
@@ -37,6 +41,9 @@ Meteor.methods({
                 break;
             case 'Temp_Consulta_Bancos_CuentasContables_Definicion':
                 return Temp_Consulta_Bancos_CuentasContables_Definicion.find({ user: this.userId }).count();
+                break;
+            case 'Temp_Consulta_Bancos_CajaChica':
+                return Temp_Consulta_Bancos_CajaChica.find({ user: this.userId }).count();
                 break;
             default:
                 return -9999;

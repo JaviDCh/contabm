@@ -1219,7 +1219,7 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
 
         leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(conceptoDefinicionCuentaContable,
                                                                                 entidadOriginal.proveedor,
-                                                                                proveedor.tipo,
+                                                                                entidadOriginal.tipo,
                                                                                 entidadOriginal.moneda,
                                                                                 companiaContab.numero,
                                                                                 null);
@@ -1518,7 +1518,7 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
 
         leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(conceptoDefinicionCuentaContable,
                                                                                 entidadOriginal.proveedor,
-                                                                                proveedor.tipo,
+                                                                                entidadOriginal.tipo,
                                                                                 entidadOriginal.moneda,
                                                                                 companiaContab.numero,
                                                                                 null);

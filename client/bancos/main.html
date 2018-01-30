@@ -77,6 +77,19 @@ vieneDeAfuera es true cuando una página, como factura, es abierta desde otro m�
                 </li>
 
                 <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Caja chica <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown dropdown-submenu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reposiciones</a>
+                            <ul class="dropdown-menu">
+                                <li ng-if="userHasRole(['bancos_cajasChicas'])"><a ui-sref="bancos.cajaChica({ origen: 'edicion' })">Edición</a></li>
+                                <li ng-if="userHasRole(['bancos_consultas'])"><a ui-sref="bancos.cajaChica({ origen: 'consulta' })">Consulta</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Cierres <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li ng-if="userHasRole(['bancos_cierres'])"><a ui-sref="bancos.cierre">Cierre</a></li>

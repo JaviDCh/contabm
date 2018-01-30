@@ -169,7 +169,7 @@ Meteor.methods(
                     // sumarizar columnas en la tabla en Word, hay que hacer un 'upd field'; por esta razón, debemos
                     // calcular y mostrar los totales ...
                     impuestoRetenido2 += impRet.monto ? impRet.monto : 0;
-                    totalPagado2 += impRet.totalPagado ? impRet.totalPagado : 0;
+                    totalPagado2 += (impRet.montoBase && impRet.monto) ? impRet.montoBase - impRet.monto : 0; 
             });
         });
 

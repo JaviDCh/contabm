@@ -126,7 +126,11 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
 
       $scope.cuentasContablesLista = CuentasContables2.find({ cia: $scope.companiaSeleccionada.numero, totDet: 'D', actSusp: 'A' },
                                                             { sort: { cuenta: true }}).fetch();
-      $scope.cuentasContablesLista.forEach((x) => { x.cuentaDescripcionCia = x.cuentaDescripcionCia(); })
+      $scope.cuentasContablesLista.forEach((x) => { x.cuentaDescripcionCia = x.cuentaDescripcionCia(); }); 
+
+      // para permitir que el usuario deseleccione en los ddl's ... nótese unshift to insert the item at the beggining of array 
+      $scope.tiposProveedor.unshift({ tipo: null, descripcion: '', }); 
+      $scope.monedas.unshift({ moneda: null, descripcion: '', }); 
 
       $scope.cuentasContables_ui_grid.columnDefs = [
           {
@@ -311,6 +315,9 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
                   return Proveedores.find({}, { sort: { nombre: 1, } });
               },
           });
+
+          // para agregar un 'empty option' al ddl de compañías ... unshift to insert the item at the beggining of array ... 
+          $scope.proveedores.unshift({ proveedor: null, nombre: '', }); 
 
           // nótese como construimos el ddl en el ui-grid, solo cuando tenemos la lista (de proveedores) ...
           $scope.cuentasContables_ui_grid.columnDefs[2].cellFilter = 'mapDropdown:row.grid.appScope.proveedores:"proveedor":"nombre"';

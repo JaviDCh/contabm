@@ -203,69 +203,60 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
           $scope.pago.docState = 3;
       };
 
-      $scope.refresh0 = function () {
+    $scope.refresh0 = function () {
 
-          if ($scope.pago && $scope.pago.docState && $scope.pago.docState == 1) {
-              var promise = DialogModal($modal,
-                                        "<em>Bancos - Pagos</em>",
-                                        `Ud. está ahora agregando un <em>nuevo</em> registro; no hay nada que refrescar.<br />
-                                         Ud. puede hacer un <em>click</em> en <em>Nuevo</em> para deshacer esta operación y comenzar de nuevo.
-                                        `,
-                                        false);
-              return;
-          };
+        if ($scope.pago && $scope.pago.docState && $scope.pago.docState == 1) {
+            var promise = DialogModal($modal,
+                                    "<em>Bancos - Pagos</em>",
+                                    `Ud. está ahora agregando un <em>nuevo</em> registro; no hay nada que refrescar.<br />
+                                        Ud. puede hacer un <em>click</em> en <em>Nuevo</em> para deshacer esta operación y comenzar de nuevo.
+                                    `,
+                                    false);
+            return;
+        };
 
-          if ($scope.pago.docState && $scope.origen == 'edicion') {
-              var promise = DialogModal($modal,
-                                        "<em>Bancos - Pagos</em>",
-                                        "Aparentemente, Ud. ha efectuado cambios; aún así, desea <em>refrescar el registro</em> y perder los cambios?",
-                                        true);
+        if ($scope.pago.docState && $scope.origen == 'edicion') {
+            var promise = DialogModal($modal,
+                                    "<em>Bancos - Pagos</em>",
+                                    "Aparentemente, Ud. ha efectuado cambios; aún así, desea <em>refrescar el registro</em> y perder los cambios?",
+                                    true);
 
-              promise.then(
-                  function (resolve) {
-                      $scope.refresh();
-                  },
-                  function (err) {
-                      return true;
-                  });
+            promise.then(
+                function (resolve) {
+                    $scope.refresh();
+                },
+                function (err) {
+                    return true;
+                });
 
-              return;
-          }
-          else
-              $scope.refresh();
-      };
+            return;
+        }
+        else
+            $scope.refresh();
+    }
 
       $scope.refresh = () => {
           pago_leerByID_desdeSql($scope.pago.claveUnica);
-      };
+      }
 
-      $scope.nuevo0 = function () {
+    $scope.nuevo0 = function () {
 
-            if ($scope.pago.docState) {
-                var promise = DialogModal($modal,
-                                          "<em>Bancos - Pagos</em>",
-                                          "Aparentemente, <em>se han efectuado cambios</em> en el registro. Si Ud. continúa esta operación, " +
-                                          "los cambios se perderán.<br /><br />Desea continuar y perder los cambios efectuados al registro actual?",
-                                          true);
+        if ($scope.pago.docState) {
+            DialogModal($modal,
+                        "<em>Bancos - Pagos</em>",
+                        "Aparentemente, <em>se han efectuado cambios</em> en el registro. Si Ud. continúa esta operación, " +
+                        "los cambios se perderán.<br /><br />Desea continuar y perder los cambios efectuados al registro actual?",
+                        true).then();
+            return;
+        } else { 
+            $scope.nuevo();
+        }
+    }
 
-                promise.then(
-                    function (resolve) {
-                        $scope.nuevo();
-                    },
-                    function (err) {
-                        return true;
-                    });
-
-                return;
-            }
-            else
-                $scope.nuevo();
-        };
-
-        $scope.nuevo = function () {
-            $scope.id = "0";                        // para que inicializarItem() agregue un nuevo registro
-            inicializarItem();
-        };
+    $scope.nuevo = function () {
+        $scope.id = "0";                        // para que inicializarItem() agregue un nuevo registro
+        inicializarItem();
+    }
 
 
       $scope.asociarFacturas = () => {
@@ -412,188 +403,190 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               });
       }
 
-      // -------------------------------------------------------------------------
-      // Grabar las modificaciones hechas al registro
-      // -------------------------------------------------------------------------
-      $scope.grabar = function () {
+    // -------------------------------------------------------------------------
+    // Grabar las modificaciones hechas al registro
+    // -------------------------------------------------------------------------
+    $scope.grabar = function () {
 
-          if (!$scope.pago.docState) {
-              DialogModal($modal, "<em>Pagos</em>",
-                                  `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
-                                   No hay nada que grabar.`,
-                                 false).then();
-              return;
-          };
+        if (!$scope.pago.docState) {
+            DialogModal($modal, "<em>Pagos</em>",
+                                `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
+                                No hay nada que grabar.`,
+                                false).then();
+            return;
+        }
 
-          grabar2();
-      };
+        grabar2();
+    }
 
 
-      function grabar2() {
-          $scope.showProgress = true;
+    function grabar2() {
+        $scope.showProgress = true;
 
-          // obtenemos un clone de los datos a guardar ...
-          let editedItem = _.cloneDeep($scope.pago);
+        // obtenemos un clone de los datos a guardar ...
+        let editedItem = _.cloneDeep($scope.pago);
 
-          // nótese como intentamos hacer un clean() al schema para que se establezcan sus default values y, en general,
-          // simple-schema "limpie" el objeto usando el schema como base ...
+        // nótese como intentamos hacer un clean() al schema para que se establezcan sus default values y, en general,
+        // simple-schema "limpie" el objeto usando el schema como base ...
 
-          // por ejemplo, solo luego de hacer el "clean" al objeto, los default values serán aplicados ...
-          const mySchema = Pagos.simpleSchema();
-          const cleanDoc = mySchema.clean(editedItem);
+        // por ejemplo, solo luego de hacer el "clean" al objeto, los default values serán aplicados ...
+        const mySchema = Pagos.simpleSchema();
+        const cleanDoc = mySchema.clean(editedItem);
 
-          // nótese como validamos cada item antes de intentar guardar en el servidor
-          let isValid = false;
-          let errores = [];
+        // nótese como validamos cada item antes de intentar guardar en el servidor
+        let isValid = false;
+        let errores = [];
 
-          if (editedItem.docState != 3) {
-              isValid = Pagos.simpleSchema().namedContext().validate(editedItem);
+        if (editedItem.docState != 3) {
+            isValid = Pagos.simpleSchema().namedContext().validate(editedItem);
 
-              if (!isValid) {
-                  Pagos.simpleSchema().namedContext().validationErrors().forEach(function (error) {
-                      errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Pagos.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
-                  });
-              };
-          };
+            if (!isValid) {
+                Pagos.simpleSchema().namedContext().validationErrors().forEach(function (error) {
+                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Pagos.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
+                })
+            }
+        }
 
-          if (errores && errores.length) {
+        if (errores && errores.length) {
 
-              $scope.alerts.length = 0;
-              $scope.alerts.push({
-                  type: 'danger',
-                  msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
-                      errores.reduce(function (previous, current) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
+                    errores.reduce(function (previous, current) {
 
-                          if (previous == "")
-                              // first value
-                              return current;
-                          else
-                              return previous + "<br />" + current;
-                      }, "")
-              });
+                        if (previous == "")
+                            // first value
+                            return current;
+                        else
+                            return previous + "<br />" + current;
+                    }, "")
+            })
 
-              $scope.showProgress = false;
-              return;
-          };
+            $scope.showProgress = false;
+            return;
+        }
 
-          $meteor.call('pagosSave', editedItem,
-                                    $scope.fechaOriginal,
-                                    $scope.companiaSeleccionada.numero).then(
-              function (data) {
+        $meteor.call('pagosSave', editedItem,
+                                $scope.fechaOriginal,
+                                $scope.companiaSeleccionada.numero).then(
+            function (data) {
 
-                  if (data.error) {
-                      // el método que intenta grabar los cambis puede regresar un error cuando,
-                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: data.message
-                      });
-                      $scope.showProgress = false;
-                  } else {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'info',
-                          msg: data.message
-                      });
+                if (data.error) {
+                    // el método que intenta grabar los cambis puede regresar un error cuando,
+                    // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data.message
+                    });
+                    $scope.showProgress = false;
+                } else {
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'info',
+                        msg: data.message
+                    });
 
-                      // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
-                      $scope.id = data.id;
+                    // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
+                    $scope.id = data.id;
 
-                      // nótese que siempre, al registrar cambios, leemos el registro desde sql server; la idea es
-                      // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
-                      // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
-                      // encontrar nada ...
-                      inicializarItem($scope.id);
-                  };
-              },
-              function (err) {
-                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                    // nótese que siempre, al registrar cambios, leemos el registro desde sql server; la idea es
+                    // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
+                    // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
+                    // encontrar nada ...
+                    inicializarItem($scope.id);
+                }
+            },
+            function (err) {
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
-                  $scope.showProgress = false;
-              });
-      };
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+                $scope.showProgress = false;
+            })
+    }
 
-      $scope.pago = {};
+    $scope.pago = {};
 
-      function inicializarItem() {
-          $scope.showProgress = true;
+    function inicializarItem() {
+        $scope.showProgress = true;
 
-          if ($scope.id == "0") {
+        if ($scope.id == "0") {
+            let usuario =  Meteor.user();
 
-              let usuario =  Meteor.user();
+            $scope.pago = {};
+            let pago = {
+                claveUnica: 0,
+                fecha: new Date(),
 
-              $scope.pago = {};
-              $scope.pago = {
-                 claveUnica: 0,
-                 fecha: new Date(),
+                ingreso: new Date(),
+                ultAct: new Date(),
+                usuario: usuario ? usuario.emails[0].address : null,
+                cia: $scope.companiaSeleccionada.numero,
 
-                 ingreso: new Date(),
-                 ultAct: new Date(),
-                 usuario: usuario ? usuario.emails[0].address : null,
-                 cia: $scope.companiaSeleccionada.numero,
-
-                 docState: 1,
+                docState: 1,
             };
+
+            // para hacer un clean al objecto y, por ejemplo, se agreguen los default values 
+            $scope.pago = Pagos.simpleSchema().clean(pago); 
 
             $scope.alerts.length = 0;
             $scope.showProgress = false;
-          }
-          else {
-              $scope.showProgress = true;
-              pago_leerByID_desdeSql(parseInt($scope.id));
-          };
-      };
+        }
+        else {
+            $scope.showProgress = true;
+            pago_leerByID_desdeSql(parseInt($scope.id));
+        }
+    }
 
-      inicializarItem();
+    inicializarItem();
 
-      function pago_leerByID_desdeSql(pk) {
-          // ejecutamos un método para leer el pago desde sql server
-          Meteor.call('pago.leerByID.desdeSql', pk, (err, result) => {
+    function pago_leerByID_desdeSql(pk) {
+        // ejecutamos un método para leer el pago desde sql server
+        Meteor.call('pago.leerByID.desdeSql', pk, (err, result) => {
 
-              if (err) {
-                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+            if (err) {
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-                  $scope.showProgress = false;
-                  $scope.$apply();
-                  return;
-              };
+                $scope.showProgress = false;
+                $scope.$apply();
+                return;
+            }
 
-              $scope.pago = {};
-              $scope.pago = JSON.parse(result);
+            $scope.pago = {};
+            $scope.pago = JSON.parse(result);
 
-              if ($scope.pago == null) {
-                  // el usuario eliminó el registro y, por eso, no pudo se leído desde sql
-                  $scope.pago = {};
+            if ($scope.pago == null) {
+                // el usuario eliminó el registro y, por eso, no pudo se leído desde sql
+                $scope.pago = {};
 
-                  $scope.showProgress = false;
-                  $scope.$apply();
+                $scope.showProgress = false;
+                $scope.$apply();
 
-                  return;
-              };
+                return;
+            }
 
-              // las fechas vienen serializadas como strings; convertimos nuevamente a dates
-              $scope.pago.fecha = $scope.pago.fecha ? moment($scope.pago.fecha).toDate() : null;
-              $scope.pago.ingreso = $scope.pago.ingreso ? moment($scope.pago.ingreso).toDate() : null;
-              $scope.pago.ultAct = $scope.pago.ultAct ? moment($scope.pago.ultAct).toDate() : null;
+            // las fechas vienen serializadas como strings; convertimos nuevamente a dates
+            $scope.pago.fecha = $scope.pago.fecha ? moment($scope.pago.fecha).toDate() : null;
+            $scope.pago.ingreso = $scope.pago.ingreso ? moment($scope.pago.ingreso).toDate() : null;
+            $scope.pago.ultAct = $scope.pago.ultAct ? moment($scope.pago.ultAct).toDate() : null;
 
-              // mantenemos las fechas originales para poder validar luego si el usuario las cambia
-              $scope.fechaOriginal = $scope.pago.fecha;
+            // mantenemos las fechas originales para poder validar luego si el usuario las cambia
+            $scope.fechaOriginal = $scope.pago.fecha;
 
-              $scope.showProgress = false;
-              $scope.$apply();
-          });
-      };
+            $scope.showProgress = false;
+            $scope.$apply();
+        })
+    }
   }
 ]);
