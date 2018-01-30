@@ -182,6 +182,18 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
             type: 'string'
         },
         {
+            name: 'anticipoFlag',
+            field: 'anticipoFlag',
+            displayName: 'Anticipo',
+            width: "80",
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            type: 'string'
+        },
+        {
             name: 'monto',
             field: 'monto',
             displayName: 'Monto',

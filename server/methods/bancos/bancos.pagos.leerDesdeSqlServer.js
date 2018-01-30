@@ -1,10 +1,13 @@
 
-import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+
 import moment from 'moment';
 import numeral from 'numeral';
 import lodash from 'lodash';
+
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
+
+import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 
 Meteor.methods(
 {
@@ -23,30 +26,36 @@ Meteor.methods(
             if (filtro2.fecha2) {
                 where = `(p.fecha Between '${moment(filtro2.fecha1).format('YYYY-MM-DD')}' And '${moment(filtro2.fecha2).format('YYYY-MM-DD')}')`;
             }
-            else
+            else { 
                 where = `(p.fecha = '${moment(filtro2.fecha1).format('YYYY-MM-DD')}')`;
-        };
+            }
+        }
 
         if (lodash.isFinite(filtro2.monto1)) {
 
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
-
+            }
+                
             if (lodash.isFinite(filtro2.monto2)) {
                 where += `(p.Monto Between ${filtro2.monto1} And ${filtro2.monto2})`;
             }
-            else
+            else { 
                 where += `(p.Monto = ${filtro2.monto1})`;
-        };
+            }   
+        }
 
         // el numero del pago es de tipo String
         if (filtro2.numeroPago) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             // hacemos que la busqueda sea siempre genérica ... nótese como quitamos algunos '*'
             // que el usuario haya agregado
@@ -54,13 +63,15 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(p.NumeroPago Like '${criteria}')`;
-        };
+        }
 
         if (filtro2.concepto) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             // hacemos que la busqueda sea siempre genérica ... nótese como quitamos algunos '*'
             // que el usuario haya agregado
@@ -68,13 +79,15 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(p.Concepto Like '${criteria}')`;
-        };
+        }
 
         if (filtro2.nombreCompania) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             // hacemos que la busqueda sea siempre genérica ... nótese como quitamos algunos '*'
             // que el usuario haya agregado
@@ -82,42 +95,48 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(prov.Nombre Like '${criteria}')`;
-        };
-
+        }
 
         if (filtro2.anticipoFlag) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(p.AnticipoFlag = 1)`;
-        };
+        }
 
         if (filtro2.miSuFlag) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(p.MiSuFlag = ${filtro2.miSuFlag})`;
-        };
+        }
 
-
-        if (where)
+        if (where) { 
             where += " And ";
-        else
-            where = "(1 = 1) And ";
+        }
+        else { 
+            where += "(1 = 1) And ";
+        }
 
         where += `(p.Cia = ${ciaContab.toString()})`;
 
         // monedas
         if (_.isArray(filtro2.monedas) && filtro2.monedas.length > 0) {
 
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             let lista = "";
 
@@ -126,16 +145,15 @@ Meteor.methods(
                     lista = "(" + x.toString();
                 else
                     lista += ", " + x.toString();
-            });
+            })
 
             lista += ")";
             where += `(p.Moneda In ${lista})`;
-        };
+        }
 
-
-        if (!where)
+        if (!where) { 
             where = "1 = 1";            // esto nunca va a ocurrir aquí ...
-
+        }
 
         // ---------------------------------------------------------------------------------------------------
         // leemos los pagos desde sql server, que cumplan el criterio indicado
@@ -143,8 +161,8 @@ Meteor.methods(
                     p.Fecha as fecha,
             	    prov.Abreviatura as nombreCompania, m.Simbolo as simboloMoneda,
                     p.Concepto as concepto,
-            	    Case p.MiSuFlag When 1 Then 'Mi' When 2 Then 'Su' Else 'Indef' End As miSuFlag,
-                    p.Monto as monto
+                    Case p.MiSuFlag When 1 Then 'Mi' When 2 Then 'Su' Else 'Indef' End As miSuFlag,
+                    Case p.AnticipoFlag When 1 Then 'Ok' Else ' ' End As anticipoFlag 
                     From Pagos p Inner Join Proveedores prov on p.Proveedor = prov.Proveedor
                     Inner Join Monedas m on p.Moneda = m.Moneda
                     Where ${where}
@@ -166,19 +184,18 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
 
         // eliminamos los asientos que el usuario pueda haber registrado antes ...
         Temp_Consulta_Bancos_Pagos.remove({ user: this.userId });
 
-
         if (response.result.length == 0) {
             return "Cero registros han sido leídos desde sql server.";
-        };
+        }
 
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
@@ -223,11 +240,11 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'leerBancosPagosDesdeSqlServer' },
                                         { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
         return "Ok, los pagos han sido leídos desde sql server.";
     }
-});
+})
