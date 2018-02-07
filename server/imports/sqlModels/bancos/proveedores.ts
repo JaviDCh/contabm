@@ -1,8 +1,10 @@
 
-import { sequelize } from '../_globals/_loadThisFirst/_globals';
-import Sequelize from 'sequelize';
 
-Proveedores_sql = sequelize.define('proveedores_sql', {
+
+import { sequelize } from '../../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import * as Sequelize from 'sequelize';
+
+export const Proveedores_sql = sequelize.define('proveedores_sql', {
     proveedor: { type: Sequelize.INTEGER, field: 'Proveedor', primaryKey: true, autoIncrement: true, allowNull: false },
     nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, validate: { len: [1, 70] }, },
     abreviatura: { type: Sequelize.STRING, field: 'Abreviatura', allowNull: false, validate: { len: [1, 10] }, },
@@ -43,10 +45,10 @@ Proveedores_sql = sequelize.define('proveedores_sql', {
     usuario: { type: Sequelize.STRING, field: 'Usuario', allowNull: false, validate: { len: [1, 125] }, },
 }, {
      tableName: 'Proveedores'
-});
+})
 
 
-Personas_sql = sequelize.define('personas_sql', {
+export const Personas_sql = sequelize.define('personas_sql', {
     persona: { type: Sequelize.INTEGER, field: 'Persona', primaryKey: true, autoIncrement: true, allowNull: false },
     compania: { type: Sequelize.INTEGER, field: 'Compania', allowNull: false, },
     nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, validate: { len: [1, 50] }, },
@@ -71,7 +73,7 @@ Personas_sql = sequelize.define('personas_sql', {
     usuario: { type: Sequelize.STRING, field: 'Usuario', allowNull: false, validate: { len: [1, 125] }, },
 }, {
      tableName: 'Personas'
-});
+})
 
 
 Proveedores_sql.hasMany(Personas_sql, { as: 'personas', foreignKey: 'compania' } );

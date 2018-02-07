@@ -2,7 +2,7 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-Proveedores = new Mongo.Collection("proveedores");
+export const Proveedores = new Mongo.Collection("proveedores");
 
 let schema = new SimpleSchema({
     _id: { type: String, optional: false },

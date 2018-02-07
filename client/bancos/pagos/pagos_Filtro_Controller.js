@@ -3,6 +3,8 @@
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_Pagos_Filter_Controller",

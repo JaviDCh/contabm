@@ -6,6 +6,8 @@ import SimpleSchema from 'simpl-schema';
 
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+
 import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods({

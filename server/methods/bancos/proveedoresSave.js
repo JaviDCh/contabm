@@ -5,6 +5,9 @@ import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Proveedores_sql, Personas_sql } from '/server/imports/sqlModels/bancos/proveedores'; 
+
 Meteor.methods(
 {
     proveedoresSave: function (proveedor) {

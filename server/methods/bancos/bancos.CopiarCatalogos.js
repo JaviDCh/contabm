@@ -2,9 +2,12 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import numeral from 'numeral';
 import SimpleSchema from 'simpl-schema';
+
 import { Monedas } from '/imports/collections/monedas';
 import { Monedas_sql } from '/server/imports/sqlModels/monedas';
 import { Companias } from '/imports/collections/companias';
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Proveedores_sql } from '/server/imports/sqlModels/bancos/proveedores'; 
 
 Meteor.methods(
 {

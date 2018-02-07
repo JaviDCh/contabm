@@ -13,55 +13,113 @@ import { Temp_Consulta_Bancos_CajaChica } from '../../../../imports/collections/
 
 Meteor.methods(
 {
-    'bancos.cajaChica.LeerDesdeSql': function (filtro) {
+    'bancos.cajaChica.LeerDesdeSql': function (filtro, ciaContab) {
 
         let filtro2 = JSON.parse(filtro);
 
         new SimpleSchema({
             filtro2: { type: Object, blackbox: true, optional: false, },
-        }).validate({ filtro2, });
+            ciaContab: { type: Number, optional: false, },
+        }).validate({ filtro2, ciaContab, });
+
 
         let where = "";
 
-        if (filtro2.nombreProveedor) {
+        if (filtro2.fecha1) {
+            if (filtro2.fecha2) {
+                where = `(r.Fecha Between '${moment(filtro2.fecha1).format('YYYY-MM-DD')}' And '${moment(filtro2.fecha2).format('YYYY-MM-DD')}')`;
+            }
+            else { 
+                where = `(r.Fecha = '${moment(filtro2.fecha1).format('YYYY-MM-DD')}')`;
+            }  
+        }
+
+
+        if (lodash.isFinite(filtro2.reposicion1)) {
             if (where) { 
                 where += " And ";
             }
             else { 
-                where = "(1 = 1) And ";
+                where += "(1 = 1) And ";
             }
-                
-            // hacemos que la busqueda sea siempre genérica ... nótese como quitamos algunos '*'
-            // que el usuario haya agregado
-            let criteria = filtro2.nombreProveedor.replace(/\*/g, '');
-            criteria = `%${criteria}%`;
-
-            where += `(p.Nombre Like '${criteria}')`;
+               
+            if (lodash.isFinite(filtro2.reposicion2)) {
+                where += `(r.Reposicion Between ${filtro2.reposicion1} And ${filtro2.reposicion2})`;
+            }
+            else
+                where += `(r.Reposicion = ${filtro2.reposicion1})`;
         }
 
-        if (!where) { 
-            where = "1 = 1";
+        // estados (pendiente, pagado, ...)
+        if (lodash.isArray(filtro2.estados) && filtro2.estados.length > 0) {
+
+            if (where) { 
+                where += " And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
+               
+            let lista = "";
+
+            filtro2.estados.forEach((x) => {
+                if (!lista) { 
+                    lista = `('${x.toString()}'`;
+                }
+                else { 
+                    lista += `, '${x.toString()}'`;
+                } 
+            })
+
+            lista += ")";
+            where += `(r.EstadoActual In ${lista})`;
+        }
+
+        // cajas chicas
+        if (lodash.isArray(filtro2.cajasChicas) && filtro2.cajasChicas.length > 0) {
+
+            if (where) { 
+                where += " And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
+               
+            let lista = "";
+
+            filtro2.cajasChicas.forEach((x) => {
+                if (!lista) { 
+                    lista = `(${x.toString()}`;
+                }
+                else { 
+                    lista += `, ${x.toString()}`;
+                } 
+            })
+
+            lista += ")";
+            where += `(r.CajaChica In ${lista})`;
+        }
+
+        if (where) { 
+            where += " And ";
+        }  
+        else { 
+            where = "(1 = 1) And ";
         }
             
+        where += `(cc.CiaContab = ${ciaContab.toString()})`;
 
         // ---------------------------------------------------------------------------------------------------
         // leemos los pagos desde sql server, que cumplan el criterio indicado
-        let query = `Select r.Reposicion as reposicion, r.Fecha as fecha, r.EstadoActual as estadoActual, r.Observaciones as observaciones, 
+        let query = `Select cc.Descripcion as cajaChica, r.Reposicion as reposicion, r.Fecha as fecha, 
+                     r.EstadoActual as estadoActual, r.Observaciones as observaciones, 
                      Sum(g.Monto) as montoImponible, Sum(g.MontoNoImponible) as montoNoImponible, Sum(g.Iva) as iva, Sum(g.Total) as total, 
                      Count(*) as lineas 
-                     From CajaChica_Reposiciones r Inner Join CajaChica_Reposiciones_Gastos g On r.Reposicion = g.Reposicion
-                     Group By r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones
+                     From CajaChica_Reposiciones r Inner Join CajaChica_Reposiciones_Gastos g On r.Reposicion = g.Reposicion 
+                     Inner Join CajaChica_CajasChicas cc On r.CajaChica = cc.CajaChica  
+                     Where ${where} 
+                     Group By cc.Descripcion, r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones   
                     `;
-
-
-        // let query = `Select r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones, 
-        //             Sum(g.Monto) as montoImponible, Sum(g.MontoNoImponible) as montoNoImponible, Sum(g.Iva) as iva, Sum(g.Total) as total, 
-        //             Count(*) as lineas 
-        //             From CajaChica_Reposiciones r Inner Join CajaChica_Reposiciones_Gastos g On r.Reposicion = g.Reposicion
-        //             Group By r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones
-        //             Where ${where}
-        //            `;
-
 
         let response: any = null;
         response = Async.runSync(function(done) {
@@ -92,8 +150,8 @@ Meteor.methods(
         let cantidadRecs = 0;
         let numberOfProcess = 1;
         let currentProcess = 1;
-        EventDDP.matchEmit('bancos_proveedores_reportProgressDesdeSqlServer',
-                            { myuserId: this.userId, app: 'bancos', process: 'leerBancosProveedoresDesdeSqlServer' },
+        EventDDP.matchEmit('bancos_cajaChica_reportProgressDesdeSqlServer',
+                            { myuserId: this.userId, app: 'bancos', process: 'leerBancosCajaChicaDesdeSqlServer' },
                             { current: 1, max: numberOfProcess, progress: '0 %' });
         // -------------------------------------------------------------------------------------------------------------
 

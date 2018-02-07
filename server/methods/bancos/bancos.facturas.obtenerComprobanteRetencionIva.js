@@ -7,6 +7,7 @@ import Docxtemplater from 'docxtemplater';
 import fs from 'fs';
 
 import { Companias } from '/imports/collections/companias';
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
 import { TimeOffset } from '/globals/globals'; 
 
 import SimpleSchema from 'simpl-schema';

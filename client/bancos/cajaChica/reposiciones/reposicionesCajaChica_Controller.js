@@ -4,17 +4,25 @@ import numeral from 'numeral';
 import moment from 'moment';
 import lodash from 'lodash';
 
-import { Monedas } from '/imports/collections/monedas.js';
 import { Companias } from '/imports/collections/companias';
+import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 import { Temp_Consulta_Bancos_CajaChica } from '/imports/collections/bancos/temp.bancos.consulta.cajaChica'; 
 
 angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
-['$stateParams', '$state', '$scope', '$modal', function ($stateParams, $state, $scope,  $modal) {
+['$stateParams', '$state', '$scope', '$modal', 'uiGridConstants', function ($stateParams, $state, $scope,  $modal, uiGridConstants) {
 
     $scope.showProgress = false;
+
+    // para reportar el progreso de la tarea en la página
+    $scope.processProgress = {
+        current: 0,
+        max: 0,
+        progress: 0
+    };
 
     $scope.origen = $stateParams.origen;
 
@@ -32,13 +40,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         $scope.proveedor.docState = 2;
     };
 
-    // para reportar el progreso de la tarea en la página
-    $scope.processProgress = {
-        current: 0,
-        max: 0,
-        progress: 0
-    };
-
     $scope.estadosCajaChicaArray = [
         { estado: "AB", descripcion: "Abierta" },
         { estado: "CE", descripcion: "Cerrada" },
@@ -50,8 +51,20 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     ];
 
     $scope.helpers({
-        monedas: () => {
-        return Monedas.find({}, { sort: { descripcion: 1 } });
+        ciaContabSeleccionada: () => {
+            return CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
+        },
+        companiaSeleccionada: () => {
+            return Companias.findOne($scope.ciaContabSeleccionada &&
+                                     $scope.ciaContabSeleccionada.companiaID ?
+                                     $scope.ciaContabSeleccionada.companiaID :
+                                     -999,
+                                     { fields:
+                                        {
+                                            numero: true,
+                                            nombre: true,
+                                            nombreCorto: true
+                                        } });
         },
     })
 
@@ -125,13 +138,13 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
                     itemSeleccionado = row.entity;
 
                     if (itemSeleccionadoParaSerEliminado) {
-                    // cuando el usuario hace un click en 'x' para eliminar el item en la lista, no lo mostramos en el tab que sigue
-                    itemSeleccionadoParaSerEliminado = false;
-                    return;
+                        // cuando el usuario hace un click en 'x' para eliminar el item en la lista, no lo mostramos en el tab que sigue
+                        itemSeleccionadoParaSerEliminado = false;
+                        return;
                     }
 
-                    // leemos, desde sql, el proveedor seleccionado en la lista
-                    inicializarItem(itemSeleccionado.proveedor, $scope);
+                    // leemos, desde sql, el registro seleccionado en la lista
+                    inicializarItem(itemSeleccionado.reposicion, $scope);
                 }
                 else
                     return;
@@ -162,7 +175,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         },
         {
             name: 'reposicion',
-            field: 'proveedor',
+            field: 'reposicion',
             displayName: '##',
             width: 60,
             enableFiltering: true,
@@ -176,8 +189,8 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         },
         {
             name: 'fecha',
-            field: 'ingreso',
-            displayName: 'Ingreso',
+            field: 'fecha',
+            displayName: 'Fecha',
             width: '80',
             enableFiltering: false,
             cellFilter: 'dateFilter',
@@ -185,37 +198,52 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'date'
         },
-        {
+        {       
             name: 'estadoActual',
-            field: 'ciudad',
-            displayName: 'Ciudad',
+            field: 'estadoActual',
+            displayName: 'Estado',
             width: 80,
             enableFiltering: true,
-            headerCellClass: 'ui-grid-leftCell',
-            cellClass: 'ui-grid-leftCell',
-            enableColumnMenu: false,
-            enableSorting: true,
-            type: 'string'
-        },
-        {
-            name: 'observaciones',
-            field: 'nombre',
-            displayName: 'Nombre',
-            width: 250,
-            enableFiltering: true,
-            headerCellClass: 'ui-grid-leftCell',
-            cellClass: 'ui-grid-leftCell',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
             pinnedLeft: true,
             type: 'string'
         },
         {
+            name: 'cajaChica',
+            field: 'cajaChica',
+            displayName: 'Caja chica',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
+            name: 'observaciones',
+            field: 'observaciones',
+            displayName: 'Observaciones',
+            width: 200,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
             name: 'lineas',
-            field: 'proveedor',
-            displayName: '##',
+            field: 'lineas',
+            displayName: 'Lineas',
             width: 60,
             enableFiltering: true,
             headerCellClass: 'ui-grid-centerCell',
@@ -223,14 +251,14 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: true,
+            pinnedLeft: false,
             type: 'number'
         },
         {
             name: 'montoNoImponible',
             field: 'montoNoImponible',
             displayName: 'No imponible',
-            width: '100',
+            width: '120',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
             cellFilter: 'currencyFilter',
@@ -243,13 +271,14 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
+            pinnedLeft: false,
             type: 'number'
         },
         {
             name: 'montoImponible',
             field: 'montoImponible',
             displayName: 'Imponible',
-            width: '100',
+            width: '120',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
             cellFilter: 'currencyFilter',
@@ -262,6 +291,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
+            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -281,13 +311,14 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
+            pinnedLeft: false,
             type: 'number'
         },
         {
             name: 'total',
-            field: 'totalFactura',
+            field: 'total',
             displayName: 'Total',
-            width: '100',
+            width: '120',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
             cellFilter: 'currencyFilter',
@@ -300,6 +331,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
+            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -308,6 +340,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',
             enableCellEdit: false,
             enableSorting: false,
+            pinnedLeft: false,
             width: 25
         },
     ]
@@ -317,16 +350,16 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         // la idea es que el item se marque para ser eliminado, pero no se muestre (sus detalles) en el tab que sigue ...
         if (item.docState && item.docState === 1) {
             // si el item es nuevo, simplemente lo eliminamos del array
-            lodash.remove($scope.proveedores, (x) => { return x._id === item._id; });
+            lodash.remove($scope.reposiciones, (x) => { return x._id === item._id; });
             itemSeleccionadoParaSerEliminado = true;
         }
         else {
             item.docState = 3;
 
-            if (lodash.some($scope.proveedores, (x) => { return x._id === item._id; })) {
+            if (lodash.some($scope.reposiciones, (x) => { return x._id === item._id; })) {
                 // creo que ésto no debería ser necesario! sin embargo, al actualizar item arriba no se actualiza el item que corresponde en
                 // el array ($scope.proveedores)
-                lodash.find($scope.proveedores, (x) => { return x._id === item._id; }).docState = 3;
+                lodash.find($scope.reposiciones, (x) => { return x._id === item._id; }).docState = 3;
             }
 
             itemSeleccionadoParaSerEliminado = true;
@@ -334,7 +367,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     }
 
     $scope.eliminar = function () {
-        $scope.proveedor.docState = 3;
+        $scope.reposicion.docState = 3;
     }
 
     $scope.nuevo = function () {
@@ -349,7 +382,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     $scope.aplicarFiltro = function () {
         $scope.showProgress = true;
 
-        Meteor.call('bancos.cajaChica.LeerDesdeSql', JSON.stringify($scope.filtro), (err, result) => {
+        Meteor.call('bancos.cajaChica.LeerDesdeSql', JSON.stringify($scope.filtro), $scope.companiaSeleccionada.numero, (err, result) => {
 
             if (err) {
                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
@@ -391,6 +424,313 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         })
     }
 
+    let gastos_ui_grid_api = null;
+    let itemSeleccionado_gastos = {};
+
+    $scope.gastos_ui_grid = {
+
+        enableSorting: true,
+        showColumnFooter: false,
+        showGridFooter: true,
+        enableFiltering: true,
+        enableRowSelection: true,
+        enableRowHeaderSelection: false,
+        multiSelect: false,
+        enableSelectAll: false,
+        selectionRowHeaderWidth: 0,
+        rowHeight: 25,
+
+        onRegisterApi: function (gridApi) {
+
+            gastos_ui_grid_api = gridApi;
+            gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+                itemSeleccionado_gastos = {};
+                if (row.isSelected) {
+                    itemSeleccionado_gastos = row.entity;
+                }
+                else { 
+                    return;
+                }
+            })
+        },
+        // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
+        rowIdentity: function (row) {
+            return row.id;
+        },
+        getRowIdentity: function (row) {
+            return row.id;
+        }
+    }
+
+    $scope.rubrosCajaChica = []; 
+    $scope.proveedores = []; 
+
+    $scope.gastos_ui_grid.columnDefs = [
+        {
+            name: 'docState',
+            field: 'docState',
+            displayName: '',
+            cellTemplate:
+            '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: blue; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: brown; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
+            enableColumnMenu: false,
+            enableSorting: false,
+            pinnedLeft: true,
+            width: 25
+        },
+        {
+            name: 'rubro',
+            field: 'rubro',
+            displayName: 'Rubro',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+
+            cellFilter: 'mapDropdown:row.grid.appScope.rubrosCajaChica:"rubro":"descripcion"',
+            editableCellTemplate: 'ui-grid/dropdownEditor',
+            editDropdownIdLabel: 'rubro',
+            editDropdownValueLabel: 'descripcion',
+            editDropdownOptionsArray: $scope.rubrosCajaChica,
+
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'number'
+        },
+        {       
+            name: 'descripcion ',
+            field: 'descripcion',
+            displayName: 'Descripción',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'string'
+        },
+        {
+            name: 'proveedor ',
+            field: 'proveedor',
+            displayName: 'Proveedor',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+
+            cellFilter: 'mapDropdown:row.grid.appScope.proveedores:"proveedor":"abreviatura"',
+            editableCellTemplate: 'ui-grid/dropdownEditor',
+            editDropdownIdLabel: 'proveedor',
+            editDropdownValueLabel: 'abreviatura',
+            editDropdownOptionsArray: $scope.proveedores,
+
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'number'
+        },
+        {       
+            name: 'nombre ',
+            field: 'nombre',
+            displayName: 'Proveedor',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'string'
+        },
+        {       
+            name: 'rif',
+            field: 'rif',
+            displayName: 'Rif',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'string'
+        },
+        {
+            name: 'fechaDocumento',
+            field: 'fechaDocumento',
+            displayName: 'Fecha',
+            width: '80',
+            enableFiltering: false,
+            cellFilter: 'dateFilter',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'date'
+        },
+        {       
+            name: 'numeroDocumento   ',
+            field: 'numeroDocumento',
+            displayName: '#Doc',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: true,
+            type: 'string'
+        },
+        {
+            name: 'numeroControl ',
+            field: 'numeroControl',
+            displayName: '#Control',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
+            name: 'montoNoImponible',
+            field: 'montoNoImponible',
+            displayName: 'No imponible',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+
+            aggregationType: uiGridConstants.aggregationTypes.sum,
+            aggregationHideLabel: true,
+            footerCellFilter: 'currencyFilter',
+            footerCellClass: 'ui-grid-rightCell',
+
+            pinnedLeft: false,
+            type: 'number'
+        },
+        {
+            name: 'monto',
+            field: 'monto',
+            displayName: 'Imponible',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+
+            aggregationType: uiGridConstants.aggregationTypes.sum,
+            aggregationHideLabel: true,
+            footerCellFilter: 'currencyFilter',
+            footerCellClass: 'ui-grid-rightCell',
+
+            pinnedLeft: false,
+            type: 'number'
+        },
+        {
+            name: 'ivaPorc ',
+            field: 'ivaPorc',
+            displayName: 'Iva %',
+            width: '60',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'number'
+        },
+        {
+            name: 'iva',
+            field: 'iva',
+            displayName: 'Iva',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+
+            aggregationType: uiGridConstants.aggregationTypes.sum,
+            aggregationHideLabel: true,
+            footerCellFilter: 'currencyFilter',
+            footerCellClass: 'ui-grid-rightCell',
+
+            pinnedLeft: false,
+            type: 'number'
+        },
+        {
+            name: 'total',
+            field: 'total',
+            displayName: 'Total',
+            width: '100',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+
+            aggregationType: uiGridConstants.aggregationTypes.sum,
+            aggregationHideLabel: true,
+            footerCellFilter: 'currencyFilter',
+            footerCellClass: 'ui-grid-rightCell',
+
+            pinnedLeft: false,
+            type: 'number'
+        },
+        {
+            name: 'afectaLibroCompras ',
+            field: 'total',
+            displayName: 'Libro comp?',
+            width: '60',
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilter',
+            enableFiltering: true,
+            enableCellEdit: true,
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'boolean'
+        },
+        {
+            name: 'delButton',
+            displayName: '',
+            cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',
+            enableCellEdit: false,
+            enableSorting: false,
+            pinnedLeft: false,
+            width: 25
+        },
+    ]
+
 
     // ------------------------------------------------------------------------------------------------------
     // si hay un filtro anterior, lo usamos
@@ -430,7 +770,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             // el método regresa la cantidad de items en el collection (siempre para el usuario)
             recordCount = result;
             $scope.leerRegistrosDesdeServer(limit);
-        });
+        })
     }
 
 
@@ -490,8 +830,8 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     // -------------------------------------------------------------------------
     $scope.grabar = function () {
 
-        if (!$scope.proveedor.docState) {
-            DialogModal($modal, "<em>Proveedores y clientes</em>",
+        if (!$scope.reposicion.docState) {
+            DialogModal($modal, "<em>Reposiciones de caja chica</em>",
                                 `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
                                 No hay nada que grabar.`,
                                 false).then();
@@ -506,7 +846,7 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         $scope.showProgress = true;
 
         // obtenemos un clone de los datos a guardar ...
-        let editedItem = lodash.cloneDeep($scope.proveedor);
+        let editedItem = lodash.cloneDeep($scope.reposicion);
 
         // nótese como validamos cada item antes de intentar guardar en el servidor
         let isValid = false;
@@ -523,7 +863,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         }
 
         if (errores && errores.length) {
-
             $scope.alerts.length = 0;
             $scope.alerts.push({
                 type: 'danger',
@@ -595,17 +934,17 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         $scope.processProgress.current = process.current;
         $scope.processProgress.max = process.max;
         $scope.processProgress.progress = process.progress;
-        // if we don't call this method, angular wont refresh the view each time the progress changes ...
+        // if we don't excecute this method, angular wont refresh the view each time the progress changes ...
         // until, of course, the above process ends ...
         $scope.$apply();
-    });
+    })
     // ------------------------------------------------------------------------------------------------------
 
     $scope.showProgress = true;
-    Meteor.call('bancos.proveedores.leerTablasCatalogosDesdeSqlServer', (err, result) => {
+    Meteor.call('bancos.cajaChica.leerTablasCatalogosDesdeSqlServer', $scope.companiaSeleccionada.numero, (err, result) => {
 
         if (err) {
-        let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
             $scope.alerts.length = 0;
             $scope.alerts.push({
@@ -616,14 +955,16 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             $scope.showProgress = false;
             $scope.$apply();
             return;
-        };
+        }
 
         let catalogos = JSON.parse(result);
 
-        $scope.categoriasRetencion = catalogos.categoriasRetencion;
-        $scope.ciudades = catalogos.ciudades;
-        $scope.atributos = catalogos.atributos;
-        $scope.titulos = catalogos.titulos;
+        $scope.cajasChicas = catalogos.cajasChicas;
+        $scope.rubrosCajaChica = catalogos.rubrosCajaChica; 
+        $scope.proveedores = catalogos.proveedores; 
+
+        $scope.gastos_ui_grid.columnDefs[1].editDropdownOptionsArray = $scope.rubrosCajaChica;
+        $scope.gastos_ui_grid.columnDefs[3].editDropdownOptionsArray = $scope.proveedores; 
 
         $scope.showProgress = false;
         $scope.$apply();
@@ -641,36 +982,33 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 ])
 
 
-function inicializarItem(proveedorID, $scope) {
-    if (proveedorID == 0) {
+function inicializarItem(itemID, $scope) {
+    if (itemID == 0) {
         $scope.showProgress = true;
-        $scope.proveedor = {};
+        $scope.reposicion = {};
         let usuario =  Meteor.user();
-        $scope.proveedor =
-            {
-                proveedor: 0,
-                ingreso: new Date(),
-                ultAct: new Date(),
-                personas: [],
-                usuario: usuario ? usuario.emails[0].address : null,
-                docState: 1
-            };
+        $scope.reposicion =
+        {
+            reposicion: 0,
+            fecha: new Date(),
+            docState: 1
+        };
 
-          $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
-          $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
+        $scope.gastos_ui_grid.data = []; 
 
-          $scope.showProgress = false;
+        $scope.showProgress = false;$scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
+        $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
     }
     else {
       $scope.showProgress = true;
-      proveedores_leerByID_desdeSql(proveedorID, $scope);
+      item_leerByID_desdeSql(itemID, $scope);
     }
 }
 
 
-function proveedores_leerByID_desdeSql(pk, $scope) {
+function item_leerByID_desdeSql(pk, $scope) {
     // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
-    Meteor.call('proveedores_leerByID_desdeSql', pk, (err, result) => {
+    Meteor.call('reposicionesCajaChica.leerByID.desdeSql', pk, (err, result) => {
 
         if (err) {
             let errorMessage = mensajeErrorDesdeMethod_preparar(err);
@@ -687,12 +1025,12 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
             return;
         }
 
-        $scope.proveedor = {};
-        $scope.proveedor = JSON.parse(result);
+        $scope.reposicion = {};
+        $scope.reposicion = JSON.parse(result);
 
-        if (!$scope.proveedor || ($scope.proveedor && lodash.isEmpty($scope.proveedor))) {
+        if (!$scope.reposicion || ($scope.reposicion && lodash.isEmpty($scope.reposicion))) {
             // el usuario eliminó el empleado y, por eso, no pudo se leído desde sql
-            $scope.proveedor = {};
+            $scope.reposicion = {};
             $scope.showProgress = false;
             $scope.$apply();
 
@@ -700,15 +1038,18 @@ function proveedores_leerByID_desdeSql(pk, $scope) {
         }
 
         // las fechas vienen serializadas como strings; convertimos nuevamente a dates ...
-        $scope.proveedor.ingreso = $scope.proveedor.ingreso ? moment($scope.proveedor.ingreso).toDate() : null;
-        $scope.proveedor.ultAct = $scope.proveedor.ultAct ? moment($scope.proveedor.ultAct).toDate() : null;
+        $scope.reposicion.fecha = $scope.reposicion.fecha ? moment($scope.reposicion.fecha).toDate() : null;
 
-        if ($scope.proveedor.personas) {
-            $scope.proveedor.personas.forEach((x) => {
-                x.ingreso = x.ingreso ? moment(x.ingreso).toDate() : null;
-                x.ultAct = x.ultAct ? moment(x.ultAct).toDate() : null;
+        if ($scope.reposicion.cajaChica_reposicion_gastos) { 
+            $scope.reposicion.cajaChica_reposicion_gastos.forEach((g) => { 
+                g.fechaDocumento = g.fechaDocumento ? moment(g.fechaDocumento).toDate() : null;
             })
         }
+
+        $scope.gastos_ui_grid.data = []; 
+        if ($scope.reposicion.cajaChica_reposicion_gastos) { 
+            $scope.gastos_ui_grid.data = $scope.reposicion.cajaChica_reposicion_gastos;
+        } 
 
         // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
         $scope.activeTab = { tab1: false, tab2: false, tab3: true, };

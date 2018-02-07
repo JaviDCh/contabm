@@ -1,5 +1,6 @@
 
 import lodash from 'lodash';
+import { Proveedores_sql } from '/server/imports/sqlModels/bancos/proveedores'; 
 
 Meteor.methods(
 {

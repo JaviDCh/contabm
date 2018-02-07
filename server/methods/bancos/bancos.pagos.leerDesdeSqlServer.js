@@ -162,7 +162,8 @@ Meteor.methods(
             	    prov.Abreviatura as nombreCompania, m.Simbolo as simboloMoneda,
                     p.Concepto as concepto,
                     Case p.MiSuFlag When 1 Then 'Mi' When 2 Then 'Su' Else 'Indef' End As miSuFlag,
-                    Case p.AnticipoFlag When 1 Then 'Ok' Else ' ' End As anticipoFlag 
+                    Case p.AnticipoFlag When 1 Then 'Ok' Else ' ' End As anticipoFlag, 
+                    p.Monto as monto  
                     From Pagos p Inner Join Proveedores prov on p.Proveedor = prov.Proveedor
                     Inner Join Monedas m on p.Moneda = m.Moneda
                     Where ${where}

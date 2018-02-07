@@ -9,6 +9,8 @@ import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 import { montoEscrito } from '/imports/general/montoEnLetras';
 
+import { Proveedores_sql } from '/server/imports/sqlModels/bancos/proveedores'; 
+
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
 import { grabarDatosACollectionFS_regresarUrl } from '/server/imports/general/grabarDatosACollectionFS_regresarUrl';

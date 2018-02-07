@@ -6,6 +6,7 @@ import { Monedas } from '/imports/collections/monedas.js';
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 

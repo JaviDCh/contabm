@@ -281,8 +281,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     $scope.importarAsientoContable = () => {
         // permitimos al usuario leer, en un nuevo asiento contable, alguno que se haya exportado a un text file ...
         let inputFile = angular.element("#fileInput");
-        if (inputFile)
+        if (inputFile) { 
             inputFile.click();        // simulamos un click al input (file)
+        }
     }
 
     $scope.uploadFile = function(files) {
@@ -294,10 +295,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                                 false).then();
 
             let inputFile = angular.element("#fileInput");
-            if (inputFile && inputFile[0] && inputFile[0].value)
+            if (inputFile && inputFile[0] && inputFile[0].value) { 
                 // para que el input type file "limpie" el file indicado por el usuario
                 inputFile[0].value = null;
-
+            }
+                
             return;
         }
 
@@ -310,10 +312,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                                 false).then();
 
             let inputFile = angular.element("#fileInput");
-            if (inputFile && inputFile[0] && inputFile[0].value)
+            if (inputFile && inputFile[0] && inputFile[0].value) { 
                 // para que el input type file "limpie" el file indicado por el usuario
                 inputFile[0].value = null;
-
+            }
+                
             return;
         }
 
@@ -327,7 +330,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
                 // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
 
-                $scope.asientoContable.tipo = asientoContable.tipo ? asientoContable.tipo : "";
+                if (asientoContable.tipo) { 
+                    $scope.asientoContable.tipo = asientoContable.tipo;
+                }
+                
                 $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
                 $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
                 $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
@@ -350,9 +356,15 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
                 if (lodash.isArray(asientoContable.partidas)) {
 
-                    if (!lodash.isArray($scope.asientoContable.partidas))
+                    if (!lodash.isArray($scope.asientoContable.partidas)) { 
                         $scope.asientoContable.partidas = [];
+                    }
 
+                    // si existe una partida tipo 0 (docState == 0), la eliminamos y la agregamos al final. Este row está listo
+                    // para que el usuario agregue una partida sin siquiera hacer un click en Nuevo. La idea es que, cada vez que 
+                    // el usuario usa un row del tipo 0, se agrega uno en forma automática. Al Grabar, este row (no usado) es ignorado ... 
+                    lodash.remove($scope.asientoContable.partidas, (x) => { return x.docState === 0; }); 
+                        
                     asientoContable.partidas.forEach((p) => {
 
                         // permitimos que el usuario haya agregado partidas (al asiento nuevo ....)
@@ -368,7 +380,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
                         if (ultimaPartida && !lodash.isEmpty(ultimaPartida)) {
                             partida.partida = ultimaPartida.partida + 10;
-                        };
+                        }
 
                         // TODO: modificar para que, si el valor cuentaContableID no viene con la partida, y si viene
                         // cuentaContable, buscar el id de la cuenta en el catálogo de cuenta y resolver.
@@ -396,177 +408,183 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                         }
 
                         $scope.asientoContable.partidas.push(partida);
-                    });
-                };
+                    })
+
+                    // cuando ya hemos agregado todas las partidas que vienen en el archivo, agregamos una partida tipo 0, para que esté 
+                    // disponible al usuario para agregar una nueva, sin siquiera hacer un click en Nuevo ... 
+                    $scope.agregarPartida(); 
+                }
             }
             catch(err) {
                 message = err.message ? err.message : err.toString();
             }
             finally {
-                if (message)
+                if (message) { 
                     DialogModal($modal, "<em>Asientos contables - Importar asientos contables</em>",
                                         "Ha ocurrido un error al intentar ejecutar esta función:<br />" +
                                         message,
                                         false).then();
+                }
                 else {
                     $scope.partidas_ui_grid.data = [];
                     if (lodash.isArray($scope.asientoContable.partidas))
                         $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-                };
+                }
 
                 let inputFile = angular.element("#fileInput");
-                if (inputFile && inputFile[0] && inputFile[0].value)
+                if (inputFile && inputFile[0] && inputFile[0].value) { 
                     // para que el input type file "limpie" el file indicado por el usuario
                     inputFile[0].value = null;
-
+                }
+                    
                 $scope.$apply();
-            };
-        };
+            }
+        }
 
         reader.readAsText(userSelectedFile);
     }
 
-    $scope.uploadFile = function(files) {
+    // $scope.uploadFile = function(files) {
 
-        if (!$scope.asientoContable || !$scope.asientoContable.docState || $scope.asientoContable.docState != 1) {
-            DialogModal($modal, "<em>Asientos contables</em>",
-                                "Aparentemente, el asiento que recibirá la copia no es nuevo (ya existía).<br />" +
-                                "Ud. debe importar un asiento siempre en un asiento nuevo; es decir, no en uno que ya exista.",
-                                false).then();
+    //     if (!$scope.asientoContable || !$scope.asientoContable.docState || $scope.asientoContable.docState != 1) {
+    //         DialogModal($modal, "<em>Asientos contables</em>",
+    //                             "Aparentemente, el asiento que recibirá la copia no es nuevo (ya existía).<br />" +
+    //                             "Ud. debe importar un asiento siempre en un asiento nuevo; es decir, no en uno que ya exista.",
+    //                             false).then();
 
-            let inputFile = angular.element("#fileInput");
-            if (inputFile && inputFile[0] && inputFile[0].value)
-                // para que el input type file "limpie" el file indicado por el usuario
-                inputFile[0].value = null;
+    //         let inputFile = angular.element("#fileInput");
+    //         if (inputFile && inputFile[0] && inputFile[0].value)
+    //             // para que el input type file "limpie" el file indicado por el usuario
+    //             inputFile[0].value = null;
 
-            return;
-        }
+    //         return;
+    //     }
 
-        let userSelectedFile = files[0];
+    //     let userSelectedFile = files[0];
 
-        if (!userSelectedFile) {
-            DialogModal($modal, "<em>Asientos contables</em>",
-                                "Aparentemente, Ud. no ha seleccionado un archivo.<br />" +
-                                "Por favor seleccione un archivo que corresponda a un asiento contable <em>exportado</em> antes.",
-                                false).then();
+    //     if (!userSelectedFile) {
+    //         DialogModal($modal, "<em>Asientos contables</em>",
+    //                             "Aparentemente, Ud. no ha seleccionado un archivo.<br />" +
+    //                             "Por favor seleccione un archivo que corresponda a un asiento contable <em>exportado</em> antes.",
+    //                             false).then();
 
-            let inputFile = angular.element("#fileInput");
-            if (inputFile && inputFile[0] && inputFile[0].value)
-                // para que el input type file "limpie" el file indicado por el usuario
-                inputFile[0].value = null;
+    //         let inputFile = angular.element("#fileInput");
+    //         if (inputFile && inputFile[0] && inputFile[0].value)
+    //             // para que el input type file "limpie" el file indicado por el usuario
+    //             inputFile[0].value = null;
 
-            return;
-        }
+    //         return;
+    //     }
 
-        var reader = new FileReader();
-        let message = "";
+    //     var reader = new FileReader();
+    //     let message = "";
 
-        reader.onload = function(e) {
-        //   debugger;
-            try {
-                var content = e.target.result;
-                let asientoContable = JSON.parse(content);
+    //     reader.onload = function(e) {
+    //     //   debugger;
+    //         try {
+    //             var content = e.target.result;
+    //             let asientoContable = JSON.parse(content);
 
-                // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
+    //             // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
 
-                $scope.asientoContable.tipo = asientoContable.tipo ? asientoContable.tipo : "";
-                $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
-                $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
-                $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
-                $scope.asientoContable.factorDeCambio = asientoContable.factorDeCambio ? asientoContable.factorDeCambio : 0;
+    //             $scope.asientoContable.tipo = asientoContable.tipo ? asientoContable.tipo : "";
+    //             $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
+    //             $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
+    //             $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
+    //             $scope.asientoContable.factorDeCambio = asientoContable.factorDeCambio ? asientoContable.factorDeCambio : 0;
 
-                // si no viene la moneda, puede venir su simbolo (scrwebm)
-                if (!$scope.asientoContable.moneda && asientoContable.monedaSimbolo) {
-                    let moneda = Monedas.findOne({ simbolo: asientoContable.monedaSimbolo });
-                    if (moneda) {
-                        $scope.asientoContable.moneda = moneda.moneda;
-                    }
-                }
+    //             // si no viene la moneda, puede venir su simbolo (scrwebm)
+    //             if (!$scope.asientoContable.moneda && asientoContable.monedaSimbolo) {
+    //                 let moneda = Monedas.findOne({ simbolo: asientoContable.monedaSimbolo });
+    //                 if (moneda) {
+    //                     $scope.asientoContable.moneda = moneda.moneda;
+    //                 }
+    //             }
 
-                if (!$scope.asientoContable.monedaOriginal && asientoContable.monedaOriginalSimbolo) {
-                    let monedaOriginal = Monedas.findOne({ simbolo: asientoContable.monedaOriginalSimbolo });
-                    if (monedaOriginal) {
-                        $scope.asientoContable.monedaOriginal = monedaOriginal.moneda;
-                    }
-                }
+    //             if (!$scope.asientoContable.monedaOriginal && asientoContable.monedaOriginalSimbolo) {
+    //                 let monedaOriginal = Monedas.findOne({ simbolo: asientoContable.monedaOriginalSimbolo });
+    //                 if (monedaOriginal) {
+    //                     $scope.asientoContable.monedaOriginal = monedaOriginal.moneda;
+    //                 }
+    //             }
 
-                if (lodash.isArray(asientoContable.partidas)) {
+    //             if (lodash.isArray(asientoContable.partidas)) {
 
-                    if (!lodash.isArray($scope.asientoContable.partidas))
-                        $scope.asientoContable.partidas = [];
+    //                 if (!lodash.isArray($scope.asientoContable.partidas))
+    //                     $scope.asientoContable.partidas = [];
 
-                    asientoContable.partidas.forEach((p) => {
+    //                 asientoContable.partidas.forEach((p) => {
 
-                        // permitimos que el usuario haya agregado partidas (al asiento nuevo ....)
-                        let ultimaPartida = lodash.last( lodash.sortBy($scope.asientoContable.partidas, (x) => { return x.partida; }) );
+    //                     // permitimos que el usuario haya agregado partidas (al asiento nuevo ....)
+    //                     let ultimaPartida = lodash.last( lodash.sortBy($scope.asientoContable.partidas, (x) => { return x.partida; }) );
 
-                        let partida = {
-                            _id: new Mongo.ObjectID()._str,
-                            partida: 10,
-                            debe: 0,
-                            haber: 0,
-                            docState: 1
-                        };
+    //                     let partida = {
+    //                         _id: new Mongo.ObjectID()._str,
+    //                         partida: 10,
+    //                         debe: 0,
+    //                         haber: 0,
+    //                         docState: 1
+    //                     };
 
-                        if (ultimaPartida && !lodash.isEmpty(ultimaPartida)) {
-                            partida.partida = ultimaPartida.partida + 10;
-                        };
+    //                     if (ultimaPartida && !lodash.isEmpty(ultimaPartida)) {
+    //                         partida.partida = ultimaPartida.partida + 10;
+    //                     };
 
-                        // TODO: modificar para que, si el valor cuentaContableID no viene con la partida, y si viene
-                        // cuentaContable, buscar el id de la cuenta en el catálogo de cuenta y resolver.
+    //                     // TODO: modificar para que, si el valor cuentaContableID no viene con la partida, y si viene
+    //                     // cuentaContable, buscar el id de la cuenta en el catálogo de cuenta y resolver.
 
-                        // la idea es resolver: el asiento que viene desde scrwebm no trae una cuentaContableID (ej: 2500) sino,
-                        // más bien, la cuenta contable (ej: cuentaContable: '1 001 001 01')
+    //                     // la idea es resolver: el asiento que viene desde scrwebm no trae una cuentaContableID (ej: 2500) sino,
+    //                     // más bien, la cuenta contable (ej: cuentaContable: '1 001 001 01')
 
-                        partida.cuentaContableID = p.cuentaContableID ? p.cuentaContableID : null;
-                        partida.descripcion = p.descripcion ? p.descripcion : "";
-                        partida.referencia = p.referencia ? p.referencia : "";
-                        partida.debe = p.debe ? p.debe : 0;
-                        partida.haber = p.haber ? p.haber : 0;
-                        partida.centroCosto = p.centroCosto ? p.centroCosto : null;
-                        partida.docState = 1;
+    //                     partida.cuentaContableID = p.cuentaContableID ? p.cuentaContableID : null;
+    //                     partida.descripcion = p.descripcion ? p.descripcion : "";
+    //                     partida.referencia = p.referencia ? p.referencia : "";
+    //                     partida.debe = p.debe ? p.debe : 0;
+    //                     partida.haber = p.haber ? p.haber : 0;
+    //                     partida.centroCosto = p.centroCosto ? p.centroCosto : null;
+    //                     partida.docState = 1;
 
-                        // puede venir el código de la cuenta (scrwebm)
-                        if (!partida.cuentaContableID && p.cuentaContable) {
-                            let codigoCuenta = p.cuentaContable.trim();
-                            codigoCuenta = codigoCuenta.replace(/ /g, '');
-                            let cuentaContable = CuentasContables2.findOne({ cuenta: codigoCuenta });
+    //                     // puede venir el código de la cuenta (scrwebm)
+    //                     if (!partida.cuentaContableID && p.cuentaContable) {
+    //                         let codigoCuenta = p.cuentaContable.trim();
+    //                         codigoCuenta = codigoCuenta.replace(/ /g, '');
+    //                         let cuentaContable = CuentasContables2.findOne({ cuenta: codigoCuenta });
 
-                            if (cuentaContable) {
-                                partida.cuentaContableID = cuentaContable.id;
-                            }
-                        }
+    //                         if (cuentaContable) {
+    //                             partida.cuentaContableID = cuentaContable.id;
+    //                         }
+    //                     }
 
-                        $scope.asientoContable.partidas.push(partida);
-                    });
-                };
-            }
-            catch(err) {
-                message = err.message ? err.message : err.toString();
-            }
-            finally {
-                if (message)
-                    DialogModal($modal, "<em>Asientos contables - Importar asientos contables</em>",
-                                        "Ha ocurrido un error al intentar ejecutar esta función:<br />" +
-                                        message,
-                                        false).then();
-                else {
-                    $scope.partidas_ui_grid.data = [];
-                    if (lodash.isArray($scope.asientoContable.partidas))
-                        $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-                };
+    //                     $scope.asientoContable.partidas.push(partida);
+    //                 });
+    //             };
+    //         }
+    //         catch(err) {
+    //             message = err.message ? err.message : err.toString();
+    //         }
+    //         finally {
+    //             if (message)
+    //                 DialogModal($modal, "<em>Asientos contables - Importar asientos contables</em>",
+    //                                     "Ha ocurrido un error al intentar ejecutar esta función:<br />" +
+    //                                     message,
+    //                                     false).then();
+    //             else {
+    //                 $scope.partidas_ui_grid.data = [];
+    //                 if (lodash.isArray($scope.asientoContable.partidas))
+    //                     $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
+    //             };
 
-                let inputFile = angular.element("#fileInput");
-                if (inputFile && inputFile[0] && inputFile[0].value)
-                    // para que el input type file "limpie" el file indicado por el usuario
-                    inputFile[0].value = null;
+    //             let inputFile = angular.element("#fileInput");
+    //             if (inputFile && inputFile[0] && inputFile[0].value)
+    //                 // para que el input type file "limpie" el file indicado por el usuario
+    //                 inputFile[0].value = null;
 
-                $scope.$apply();
-            };
-        };
+    //             $scope.$apply();
+    //         };
+    //     };
 
-        reader.readAsText(userSelectedFile);
-    }
+    //     reader.readAsText(userSelectedFile);
+    // }
 
 
     $scope.cuadrarAsientoContable = () => {
@@ -731,8 +749,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     // cuando el usuario indica un monto, ponemos cero en el otro; si indica un monto en el
                     // debe, ponemos cero en haber y viceversa ...
 
-                    if (colDef.field == 'debe') rowEntity.haber = 0;
-                    if (colDef.field == 'haber') rowEntity.debe = 0;
+                    if (colDef.field == 'debe') { rowEntity.haber = 0; }
+                    if (colDef.field == 'haber') { rowEntity.debe = 0; }
 
                     if (!rowEntity.docState && rowEntity.docState != 0) { 
                         rowEntity.docState = 2;
@@ -927,9 +945,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.agregarPartida = function () {
 
-        if (!lodash.isArray($scope.asientoContable.partidas))
+        if (!lodash.isArray($scope.asientoContable.partidas)) { 
             $scope.asientoContable.partidas = [];
-
+        }
+            
         // obtenemos la última partida, para definir la nueva en base a esa ...
         let ultimaPartida = lodash.last( lodash.sortBy($scope.asientoContable.partidas, (x) => { return x.partida; }) );
 
