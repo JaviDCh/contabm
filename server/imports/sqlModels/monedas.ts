@@ -1,5 +1,5 @@
 
-import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import { sequelize } from '../../../server/sqlModels/_globals/_loadThisFirst/_globals';
 import * as Sequelize from 'sequelize';
 
 export const Monedas_sql = sequelize.define('moneda', {
@@ -10,4 +10,4 @@ export const Monedas_sql = sequelize.define('moneda', {
     defaultFlag: { type: Sequelize.BOOLEAN, field: 'DefaultFlag' },
 }, {
      tableName: 'Monedas'
-});
+})

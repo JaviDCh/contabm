@@ -100,6 +100,23 @@ Meteor.methods(
             where += `(r.CajaChica In ${lista})`;
         }
 
+        // observaciones 
+        if (filtro2.observaciones) {
+            if (where) { 
+                where += " And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
+
+            // hacemos que la busqueda sea siempre genérica ... nótese como quitamos algunos '*'
+            // que el usuario haya agregado
+            let criteria = filtro2.observaciones.replace(/\*/g, '');
+            criteria = `%${criteria}%`;
+
+            where += `(r.Observaciones Like '${criteria}')`;
+        }
+
         if (where) { 
             where += " And ";
         }  
@@ -114,8 +131,8 @@ Meteor.methods(
         let query = `Select cc.Descripcion as cajaChica, r.Reposicion as reposicion, r.Fecha as fecha, 
                      r.EstadoActual as estadoActual, r.Observaciones as observaciones, 
                      Sum(g.Monto) as montoImponible, Sum(g.MontoNoImponible) as montoNoImponible, Sum(g.Iva) as iva, Sum(g.Total) as total, 
-                     Count(*) as lineas 
-                     From CajaChica_Reposiciones r Inner Join CajaChica_Reposiciones_Gastos g On r.Reposicion = g.Reposicion 
+                     Count(g.reposicion) as lineas 
+                     From CajaChica_Reposiciones r Left Outer Join CajaChica_Reposiciones_Gastos g On r.Reposicion = g.Reposicion 
                      Inner Join CajaChica_CajasChicas cc On r.CajaChica = cc.CajaChica  
                      Where ${where} 
                      Group By cc.Descripcion, r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones   

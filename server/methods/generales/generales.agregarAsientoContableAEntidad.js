@@ -9,6 +9,13 @@ import { Companias } from '/imports/collections/companias';
 import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
 
 import { TimeOffset } from '/globals/globals'; 
+import { CajaChica_Reposiciones_sql, 
+         CajaChica_Parametros_sql, 
+         CajaChica_CajasChicas_sql, 
+         CajaChica_Reposiciones_Gastos_sql, 
+         CajaChica_RubrosCuentasContables } from '../../imports/sqlModels/bancos/cajasChicas';
+
+import { Monedas_sql } from '../../imports/sqlModels/monedas'; 
 
 Meteor.methods({
    'generales.agregarAsientoContableAEntidad': function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {
@@ -26,16 +33,17 @@ Meteor.methods({
 
        // leemos la 'entidad' (mov banc, factura, pago, etc.) usando el pk que recibimos en este método
        switch (provieneDe) {
-           case "Bancos":
-               let leerMovimientoBancario = leerMovimientoBancarioDesdeSqlServer(provieneDe_ID);
-               if (leerMovimientoBancario.error)
+           case "Bancos": { 
+                let leerMovimientoBancario = leerMovimientoBancarioDesdeSqlServer(provieneDe_ID);
+                if (leerMovimientoBancario.error)
                     return {
                         error: true,
                         message: leerMovimientoBancario.message
                     };
                 entidadOriginal = leerMovimientoBancario.movimientoBancario;
                 break;
-            case "Facturas":
+           }
+            case "Facturas": { 
                 let leerFactura = leerFacturaDesdeSqlServer(provieneDe_ID);
                 if (leerFactura.error)
                      return {
@@ -44,12 +52,24 @@ Meteor.methods({
                      };
                  entidadOriginal = leerFactura.factura;
                  break;
-           default:
-               return {
-                   error: true,
-                   message: `Error: el valor pasado a esta función para 'provieneDe' (${provieneDe}) no es válido.
-                             Por favor revise.`
-               };
+            }
+            case "Caja chica": { 
+                let leerCajaChicaReposicion = leerCajaChica_Reposicion_DesdeSqlServer(provieneDe_ID);
+                if (leerCajaChicaReposicion.error)
+                     return {
+                         error: true,
+                         message: leerCajaChicaReposicion.message
+                     };
+                 entidadOriginal = leerCajaChicaReposicion.reposicion;
+                 break;
+            }
+           default: { 
+            return {
+                error: true,
+                message: `Error: el valor pasado a esta función para 'provieneDe' (${provieneDe}) no es válido.
+                          Por favor revise.`
+            };
+           } 
        }
 
 
@@ -108,6 +128,9 @@ Meteor.methods({
                     fechaAsiento = entidadOriginal.fechaEmision;        // cxc
                 }
                break;
+            case 'Caja chica':
+               fechaAsiento = entidadOriginal.fecha;
+               break;
            default:
        }
 
@@ -163,29 +186,42 @@ Meteor.methods({
        let agregarAsientoContable = null;
 
        switch (provieneDe) {
-           case "Bancos":
-               agregarAsientoContable = agregarAsientoContable_MovimientoBancario(entidadOriginal,
-                                                                                  tipoAsientoDefault,
-                                                                                  companiaContab,
-                                                                                  fechaAsiento,
-                                                                                  mesFiscal,
-                                                                                  factorCambio,
-                                                                                  numeroNegativoAsiento,
-                                                                                  provieneDe_ID,
-                                                                                  currentUser);
-               break;
-           case "Facturas":
-               agregarAsientoContable = agregarAsientoContable_Factura(entidadOriginal,
-                                                                       tipoAsientoDefault,
-                                                                       companiaContab,
-                                                                       fechaAsiento,
-                                                                       mesFiscal,
-                                                                       factorCambio,
-                                                                       numeroNegativoAsiento,
-                                                                       provieneDe_ID,
-                                                                       currentUser);
-
-               break;
+           case "Bancos": { 
+                agregarAsientoContable = agregarAsientoContable_MovimientoBancario(entidadOriginal,
+                    tipoAsientoDefault,
+                    companiaContab,
+                    fechaAsiento,
+                    mesFiscal,
+                    factorCambio,
+                    numeroNegativoAsiento,
+                    provieneDe_ID,
+                    currentUser);
+                break;
+           }
+           case "Facturas": { 
+                agregarAsientoContable = agregarAsientoContable_Factura(entidadOriginal,
+                    tipoAsientoDefault,
+                    companiaContab,
+                    fechaAsiento,
+                    mesFiscal,
+                    factorCambio,
+                    numeroNegativoAsiento,
+                    provieneDe_ID,
+                    currentUser);
+                break;  
+           }
+           case "Caja chica": { 
+                agregarAsientoContable = agregarAsientoContable_CajaChica_Reposicion(entidadOriginal,
+                    tipoAsientoDefault,
+                    companiaContab,
+                    fechaAsiento,
+                    mesFiscal,
+                    factorCambio,
+                    numeroNegativoAsiento,
+                    provieneDe_ID,
+                    currentUser);
+                break;
+            }
        }
 
        // regresamos un un objeto que contiene un probable error,
@@ -278,7 +314,6 @@ function leerFacturaDesdeSqlServer(pk) {
        };
    }
 
-
     let factura = response.result[0];
 
     // ajustamos las fechas para revertir la conversión que ocurre, para intentar convertir desde utc a local
@@ -346,7 +381,40 @@ function leerFacturaDesdeSqlServer(pk) {
     return { factura: factura };
 }
 
+// --------------------------------------------------------------------------
+// para leer la reposición de caja chica desde sql server
+function leerCajaChica_Reposicion_DesdeSqlServer(pk) {
 
+    let response = null;
+    response = Async.runSync(function(done) {
+        CajaChica_Reposiciones_sql.findAll({ where: { reposicion: pk }, raw: true, })
+           .then(function(result) { done(null, result); })
+           .catch(function (err) { done(err, null); })
+           .done();
+    })
+
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+
+   // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
+   if (!response.result.length) {
+       return {
+           error: true,
+           message: `Error inesperado: no pudimos leer la <em>reposición de caja chica</em> original (pk: ${provieneDe_ID.toString()}) desde la base de datos.`
+       };
+   }
+
+
+    let reposicion = response.result[0];
+
+    // ajustamos las fechas para revertir la conversión que ocurre, para intentar convertir desde utc a local
+    reposicion.fecha = reposicion.fecha ? moment(reposicion.fecha).add(TimeOffset, 'hours').toDate() : null;
+   
+   
+    return { reposicion: reposicion };
+}
 
 
 function leerChequera(pk) {
@@ -410,14 +478,14 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
     let cuentaBancaria = {};
 
-    _.forEach(banco.agencias, (agencia) => {
+    lodash.forEach(banco.agencias, (agencia) => {
         // la cuenta bancaria está en alguna de las agencias del banco ...
-        cuentaBancaria = _.find(agencia.cuentasBancarias, (x) => { return x.cuentaInterna == chequera.numeroCuenta; });
+        cuentaBancaria = lodash.find(agencia.cuentasBancarias, (x) => { return x.cuentaInterna == chequera.numeroCuenta; });
         if (cuentaBancaria)
             return false;           // logramos un 'break' en el (lodash) forEach ..
     });
 
-    if (!cuentaBancaria || _.isEmpty(cuentaBancaria)) {
+    if (!cuentaBancaria || lodash.isEmpty(cuentaBancaria)) {
         return {
             error: true,
             message: `Error inesperado: no hemos podido leer la cuenta bancaria a la cual está asociada
@@ -574,7 +642,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
     // ----------------------------------------------------------------------------------------------------------------
     // para compensar la conversión que ocurre en las fechas al grabar a sql server, restamos 4.3 horas a cada una ...
-    let asientoContable_sql = _.cloneDeep(asientoContable);
+    let asientoContable_sql = lodash.cloneDeep(asientoContable);
     asientoContable_sql.fecha = moment(asientoContable.fecha).subtract(TimeOffset, 'h').toDate();
     asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'h').toDate();
     asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'h').toDate();
@@ -708,16 +776,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
             partidasAsientoContable.push(partidaAsiento);
       }
-
-
-
-
-
-
-
-
-
-
 
 
       // la función que sigue lee las facturas asociadas al pago asociado al movimiento bancario; luego intenta leer registros de
@@ -1024,7 +1082,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
       // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
       // que las de mayor monto vayan primero
-
       numeroPartida = 0;
       lodash(partidasAsientoContable).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
 
@@ -1673,7 +1730,7 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
 
         // ----------------------------------------------------------------------------------------------------------------
         // para compensar la conversión que ocurre en las fechas al grabar a sql server, restamos 4.3 horas a cada una ...
-        let asientoContable_sql = _.cloneDeep(asientoContable);
+        let asientoContable_sql = lodash.cloneDeep(asientoContable);
         asientoContable_sql.fecha = moment(asientoContable.fecha).subtract(TimeOffset, 'h').toDate();
         asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'h').toDate();
         asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'h').toDate();
@@ -1714,3 +1771,316 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
             asientoContableAgregadoID: asientoAgregado.numeroAutomatico
         };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------------
+// construimos y agregamos el asiento contable para el movimiento bancario
+function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsientoDefault, companiaContab,
+                                                       fechaAsiento, mesFiscal, factorCambio, numeroNegativoAsiento,
+                                                       provieneDe_ID, currentUser) {
+
+    // ----------------------------------------------------------------------------------------------------------------------------------
+    // leemos la tabla que contiene los parámetros de caja chica                                                     
+    let response = null;
+    response = Async.runSync(function(done) {
+        CajaChica_Parametros_sql.findAll({ where: { cia: companiaContab.numero }, raw: true, })
+        .then(function(result) { done(null, result); })
+        .catch(function (err) { done(err, null); })
+        .done();
+    })
+
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+    // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
+    if (!response.result.length) {
+        return {
+            error: true,
+            message: `Error: no encontramos un registro para la compañía Contab en la tabla de <em>parámetros de caja chica</em>, 
+                        para poder obtener el tipo de asiento y la cuenta contable 'puente' para la contabilización de la reposición de la caja chica.`
+        };
+    }
+
+    let parametrosCajaChica = response.result[0];   // para obtener el tipo de asiento 'default' y la cuenta contable 'puente' 
+    
+    // ----------------------------------------------------------------------------------------------------------------------------------
+    // leemos la caja chica que corresponde a la reposición, para obtener su descripción y mostrar en la descripción del asiento 
+    response = null;
+    response = Async.runSync(function(done) {
+        CajaChica_CajasChicas_sql.findAll({ where: { cajaChica: entidadOriginal.cajaChica }, attributes: [ 'descripcion' ], raw: true, })
+            .then(function(result) { done(null, result); })
+            .catch(function (err) { done(err, null); })
+            .done();
+    })
+
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+    if (!response.result.length) {
+        return {
+            error: true,
+            message: `Error: no encontramos un registro para la compañía Contab en la tabla de <em>parámetros de caja chica</em>, 
+                        para poder obtener el tipo de asiento y la cuenta contable 'puente' para la contabilización de la reposición de la caja chica.`
+        };
+    }
+
+    let cajaChica = response.result[0];   // para obtener el tipo de asiento 'default' y la cuenta contable 'puente' 
+
+
+    // ----------------------------------------------------------------------------------------------------------------------------------
+    // leemos la moneda que el usuario ha definido como 'defecto'. Debe haber una, para asignar al asiento                                              
+    response = null;
+    response = Async.runSync(function(done) {
+        Monedas_sql.findAll({ where: { defaultFlag: true }, attributes: [ 'moneda' ], raw: true, })
+           .then(function(result) { done(null, result); })
+           .catch(function (err) { done(err, null); })
+           .done();
+    })
+
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+    if (!response.result.length) {
+        return {
+            error: true,
+            message: `Error: no encontramos un registro para la compañía Contab en la tabla de <em>parámetros de caja chica</em>, 
+                        para poder obtener el tipo de asiento y la cuenta contable 'puente' para la contabilización de la reposición de la caja chica.`
+        };
+    }
+
+    let monedaDefault = response.result[0];     
+   
+
+    // ----------------------------------------------------------------------------------------------------------------------------------
+    // debe existir una cuenta contable definida para la contabilización del Iva ... 
+    let leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(4, null, null, null, companiaContab.numero, null);
+
+    if (leerCuentaContableDefinida.error) {
+        return {
+            error: true,
+            message: `Error: no se ha encontrado una cuenta contable definida para contabilizar el Iva (Iva).
+                        Por favor defina una cuenta contable para contabilizar el Iva.`
+        }
+    } 
+
+    let cuentaContableIvaID = leerCuentaContableDefinida.cuentaContableID;
+ 
+
+    let mesCalendario = fechaAsiento.getMonth() + 1;
+    let anoCalendario = fechaAsiento.getFullYear();
+
+    let asientoContable = {
+        // numeroAutomatico: ,
+        numero: numeroNegativoAsiento.numeroNegativoAsiento,
+        mes: mesCalendario,
+        ano: anoCalendario,
+        tipo: parametrosCajaChica.tipoAsiento,
+        fecha: fechaAsiento,
+        descripcion: `Asiento de caja chica generado en forma automática para la reposición número ${entidadOriginal.reposicion.toString()}, de la caja chica: ${cajaChica.descripcion}`,
+        moneda: monedaDefault.moneda,
+        monedaOriginal: monedaDefault.moneda,
+        convertirFlag: true,
+        factorDeCambio: factorCambio.factorCambio,
+        provieneDe: "Caja chica",
+        provieneDe_id: provieneDe_ID,
+        ingreso: new Date(),
+        ultAct: new Date(),
+        copiablaFlag: true,
+        asientoTipoCierreAnualFlag: false,
+        mesFiscal: mesFiscal.mesFiscal,
+        anoFiscal: mesFiscal.anoFiscal,
+        usuario: currentUser.emails[0].address,
+        lote: null,
+        cia: companiaContab.numero,
+    };
+
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // para compensar la conversión que ocurre en las fechas al grabar a sql server, restamos 4.0 horas a cada una ...
+    let asientoContable_sql = lodash.cloneDeep(asientoContable);
+    asientoContable_sql.fecha = moment(asientoContable.fecha).subtract(TimeOffset, 'h').toDate();
+    asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'h').toDate();
+    asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'h').toDate();
+
+
+    // ----------------------------------------------------------------------------------------------------------------------------
+    // construmos un array con las partidas que serán agregadas al asiento, una por gasto, además otra si hay un monto para el Iva 
+    response = null;
+    response = Async.runSync(function(done) {
+        CajaChica_Reposiciones_Gastos_sql.findAll({ 
+            where: { reposicion: entidadOriginal.reposicion }, 
+            attributes: [ 'rubro', 'descripcion', 'montoNoImponible', 'monto', 'iva', 'numeroDocumento' ], 
+            raw: true, })
+           .then(function(result) { done(null, result); })
+           .catch(function (err) { done(err, null); })
+           .done();
+    })
+
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+    if (!response.result.length) {
+        return {
+            error: true,
+            message: `Error: la reposición de caja chica <em>no contiene gastos asociados</em>. Por favor revise.`
+        };
+    }
+
+    let gastos = response.result;   
+    let partida = {}; 
+    let partidas = []; 
+    let totalMontoGastos = 0;       // sumarizamos el total de los gastos, más iva, para agregar una partida 'resumen' al final del asiento 
+    
+    for (let gasto of gastos) { 
+
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // leemos la cuenta contable asociada al gasto; debe existir una en forma específica para la cia Contab seleccionada ... 
+        query = `Select rc.CuentaContableID From CajaChica_RubrosCuentasContables rc Inner Join CuentasContables c 
+                 On rc.CuentaContableID = c.ID Where rc.Rubro = ? And c.Cia = ? 
+                `;
+
+        response = null;
+        response = Async.runSync(function(done) {
+            sequelize.query(query, { replacements: [ gasto.rubro, companiaContab.numero ], type: sequelize.QueryTypes.SELECT })
+                .then(function(result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        });
+
+        if (response.error) {
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+
+        if (!response.result.length) {
+            return {
+                error: true,
+                message: `Error: no hemos podido leer una cuenta contable definida para el rubro indicado para el gasto <em>${gasto.descripcion}</em>. <br /> 
+                          Por favor note que debe existir una <em>cuenta contable asociada</em> a cada rubro indicado en la caja chica.<br /> 
+                          Por favor revise.`
+            };
+        }
+
+        let cuentaContableRubro = response.result[0]; 
+        
+        let debe = 0; 
+
+        if (gasto.montoNoImponible) { debe += gasto.montoNoImponible; }; 
+        if (gasto.monto) { debe += gasto.monto; }; 
+
+        let referencia = ""; 
+        if (gasto.numeroDocumento) { 
+            // nos aseguramos que el valor usado como referencia no pase de 20 chars 
+            referencia = gasto.numeroDocumento.length > 20 ? gasto.numeroDocumento.substr(0, 20) : gasto.numeroDocumento; 
+        }
+
+        partida = { 
+            cuentaContableID: cuentaContableRubro.CuentaContableID, 
+            descripcion: gasto.descripcion.length > 75 ? gasto.descripcion.substr(0, 75) : gasto.descripcion,       // la descripción no debe ser mayor a 75 
+            referencia: referencia, 
+            debe: debe,  
+            haber: 0 
+        }
+
+        partidas.push(partida); 
+        totalMontoGastos += debe; 
+
+        // si hay un monto para el Iva, agregamos una nueva partida 
+        if (gasto.iva) { 
+            partida = { 
+                cuentaContableID: cuentaContableIvaID, 
+                descripcion: gasto.descripcion.length > 75 ? gasto.descripcion.substr(0, 75) : gasto.descripcion,
+                referencia: referencia, 
+                debe: gasto.iva,  
+                haber: 0 
+            }
+
+            partidas.push(partida); 
+            totalMontoGastos += gasto.iva; 
+        }
+    }
+
+
+    // finalmente, agregamos una partida para 'cuadrar' el asiento contra la cuenta 'puente' de caja chica ... 
+    let descripcionPartidaFinal = `Caja chica # ${entidadOriginal.reposicion.toString()} de fecha ${moment(entidadOriginal.fecha).format("DD-MMM-YYYY")} - ${entidadOriginal.observaciones}`; 
+    descripcionPartidaFinal = descripcionPartidaFinal.length > 75 ?
+                              descripcionPartidaFinal.substr(0, 75) :
+                              descripcionPartidaFinal,
+    partida = { 
+        cuentaContableID: parametrosCajaChica.cuentaContablePuenteID, 
+        descripcion: descripcionPartidaFinal, 
+        referencia: "", 
+        debe: 0,  
+        haber: totalMontoGastos 
+    }
+    partidas.push(partida); 
+
+
+    // ----------------------------------------------------------------------------
+    // finalmente, agregamos el asiento contable y sus partidas 
+    response = null;
+    response = Async.runSync(function (done) {
+        AsientosContables_sql.create(asientoContable_sql)
+            .then(function (result) { done(null, result); })
+            .catch(function (err) { done(err, null); })
+            .done();
+    });
+
+    if (response.error) { 
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+        
+    let asientoAgregado = response.result.dataValues;
+
+
+    // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
+    // que las de mayor monto vayan primero
+    let numeroPartida = 0;
+    lodash(partidas).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
+
+        // renumeramos la partida ...
+        numeroPartida += 10;
+
+        partida.numeroAutomatico = asientoAgregado.numeroAutomatico; 
+        partida.partida = numeroPartida;
+
+        response = Async.runSync(function(done) {
+            dAsientosContables_sql.create(partida)
+                .then(function(result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        })
+
+        if (response.error) {
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+    })
+
+
+    return {
+        asientoContableAgregadoID: asientoAgregado.numeroAutomatico
+    };
+}
+
+

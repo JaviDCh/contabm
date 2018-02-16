@@ -26,20 +26,20 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     let companiaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
     let companiaContab = {};
 
-    if (companiaContabSeleccionada)
+    if (companiaContabSeleccionada) { 
         companiaContab = Companias.findOne(companiaContabSeleccionada.companiaID);
+    }
     // ------------------------------------------------------------------------------------------------
 
     // construimos el url que se debe usar para obtener el reporte (sql server reporting services - asp.net)
-
     $scope.reportLink = "#";
     if (desde && hasta && contabSysNet_app_address) {
         $scope.reportLink = `${contabSysNet_app_address}/ReportViewer4.aspx?user=${Meteor.userId()}&cia=${companiaContab.numero}&report=cuentasYMovimientos&desde=${desde}&hasta=${hasta}`;
-    };
+    }
 
     $scope.regresarALista = function () {
         $state.go("contab.consulta_cuentasYMovimientos.filtro", { origen: $scope.origen });
-    };
+    }
 
     $scope.exportarExcel = function() {
 

@@ -11,9 +11,12 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 import { Temp_Consulta_Bancos_CajaChica } from '/imports/collections/bancos/temp.bancos.consulta.cajaChica'; 
+import { CajaChica_Reposiciones_SimpleSchema } from '/imports/collections/bancos/cajaChica.reposiciones'; 
+import { userHasRole } from '../../../imports/clientGlobalMethods/userHasRoles';
 
 angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
-['$stateParams', '$state', '$scope', '$modal', 'uiGridConstants', function ($stateParams, $state, $scope,  $modal, uiGridConstants) {
+['$stateParams', '$state', '$scope', '$modal', 'uiGridConstants', '$interval', 
+function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
     $scope.showProgress = false;
 
@@ -26,19 +29,29 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 
     $scope.origen = $stateParams.origen;
 
+    // establecemos si el usuario es administrador de caja chica; solo si lo es, puede cambiar estados y contabilizar. 
+    let user_is_cajaChica_admin = userHasRole([ 'caja_chica_admin' ]); 
+
+    // para obtener el reporte de la reposición, necesitamos el address de ContabSysNet; está en settings 
+    let contabSysNet_app_address = Meteor.settings.public.contabSysNet_app_address;
+
     // ui-bootstrap alerts ...
     $scope.alerts = [];
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.setIsEdited = function (value) {
-        if ($scope.proveedor.docState)
-            return;
+        if (!$scope.reposicion.docState) { 
+            $scope.reposicion.docState = 2;
+        }
 
-        $scope.proveedor.docState = 2;
-    };
+        return;
+    }
+
+    // para saber cual era el estado original de la caja chica luego que el usuario lo cambie e intente grabar 
+    let estadoOriginalCajaChica = ""; 
 
     $scope.estadosCajaChicaArray = [
         { estado: "AB", descripcion: "Abierta" },
@@ -70,34 +83,46 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 
 
     $scope.refresh0 = function () {
-        if ($scope.proveedor && $scope.proveedor.docState) {
-            var promise = DialogModal($modal,
-                                    "<em>Bancos - Proveedores</em>",
-                                    `Aparentemente, Ud. ha efectuado cambios; aún así,
-                                        desea <em>refrescar el registro</em> y perder los cambios?`,
-                                    true);
+        if ($scope.reposicion && $scope.reposicion.docState && $scope.reposicion.docState === 1) { 
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `Ud. está ahora agregando un registro nuevo, no hay nada que refrescar.<br />
+                                 Ud. puede deshacer los cambios y, nuevamente, intentar agregar un nuevo registro, si hace un  
+                                 <em>click</em> en <em>Nuevo, e indica que desea perder los cambios. <br /><br />
+                                 También puede hacer un <em>click</em> en <em>Regresar</em>, para deshacer los cambios y regresar a la lista. 
+                                 `,
+                                false); 
+            return; 
+        }
 
-            promise.then(
+        if ($scope.reposicion && $scope.reposicion.docState) {
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `Aparentemente, Ud. ha efectuado cambios; aún así,
+                                desea <em>refrescar el registro</em> y perder los cambios?`,
+                                true).then(
                 function (resolve) {
-                    $scope.refresh();
+                    refresh();
                 },
                 function (err) {
                     return true;
-                });
+                })
 
             return;
         }
-        else
-            $scope.refresh();
+        else { 
+            refresh();
+        }
     }
 
-    $scope.refresh = () => {
-        // si el usuario hace un click en Refresh, leemos nuevamente el proveedor seleccionado en la lista ...
-        $scope.proveedor = {};
+    refresh = () => {
+        // si el usuario hace un click en Refresh, leemos nuevamente el item seleccionado en la lista ...
+        $scope.reposicion = {};
         // $scope.aplicarFiltro();
 
         if (itemSeleccionado) {
-            inicializarItem(itemSeleccionado.proveedor, $scope);
+            // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+            inicializarItem(itemSeleccionado.reposicion, $scope, contabSysNet_app_address).then((result) => { 
+                estadoOriginalCajaChica = result.estadoActual; 
+            })
         }
 
         $scope.alerts = [];
@@ -112,8 +137,8 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     $scope.activeTab = { tab1: true, tab2: false, tab3: false, };
 
     let reposiciones_ui_grid_api = null;
-    let itemSeleccionado = {};
 
+    let itemSeleccionado = {};
     let itemSeleccionadoParaSerEliminado = false;
 
     $scope.reposiciones_ui_grid = {
@@ -144,11 +169,14 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
                     }
 
                     // leemos, desde sql, el registro seleccionado en la lista
-                    inicializarItem(itemSeleccionado.reposicion, $scope);
+                    // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+                    inicializarItem(itemSeleccionado.reposicion, $scope, contabSysNet_app_address).then((result) => { 
+                        estadoOriginalCajaChica = result.estadoActual; 
+                    })
                 }
                 else
                     return;
-            });
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -170,7 +198,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
             enableColumnMenu: false,
             enableSorting: false,
-            pinnedLeft: true,
             width: 25
         },
         {
@@ -184,7 +211,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'number'
         },
         {
@@ -198,7 +224,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'date'
         },
         {       
@@ -211,7 +236,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -367,11 +391,43 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     }
 
     $scope.eliminar = function () {
+
+        if ($scope.reposicion && $scope.reposicion.docState && $scope.reposicion.docState === 1) {
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `La reposición de caja chica que Ud. intenta eliminar es <em>nueva</em>. No hay nada que 
+                                 eliminar (pues no se ha grabado aún).<br />
+                                 Ud. puede <em>revertir</em> la creación del registro si ejecuta cualquier otra acción e indica que desea 
+                                 <em>perder los cambios</em> que ha registrado hasta ahora, para el registro nuevo. 
+                                `,
+                                false).then();
+            return;
+        }
+
         $scope.reposicion.docState = 3;
     }
 
     $scope.nuevo = function () {
-        inicializarItem(0, $scope);
+        if ($scope.reposicion && $scope.reposicion.docState) {
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `Aparentemente, Ud. ha efectuado cambios; aún así,
+                                desea <em>agregar un nuevo registro</em> y perder los cambios?`,
+                                true).then(
+                function (resolve) {
+                    // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+                    inicializarItem(0, $scope, contabSysNet_app_address).then((result) => { 
+                        estadoOriginalCajaChica = result.estadoActual; 
+                    })
+                },
+                function (err) {
+                    return;
+                })
+        }
+        else { 
+            // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+            inicializarItem(0, $scope, contabSysNet_app_address).then((result) => { 
+                estadoOriginalCajaChica = result.estadoActual; 
+            })
+        }
     }
 
     // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
@@ -425,12 +481,14 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     }
 
     let gastos_ui_grid_api = null;
+    let angularInterval = null;           // para detener el interval que usamos más abajo
+
     let itemSeleccionado_gastos = {};
 
     $scope.gastos_ui_grid = {
 
         enableSorting: true,
-        showColumnFooter: false,
+        showColumnFooter: true,
         showGridFooter: true,
         enableFiltering: true,
         enableRowSelection: true,
@@ -451,7 +509,16 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
                 else { 
                     return;
                 }
-            })
+            }), 
+
+            // -----------------------------------------------------------------------------------------------------
+            // cuando el ui-grid está en un bootstrap tab y tiene más columnas de las que se pueden ver,
+            // al hacer horizontal scrolling los encabezados no se muestran sincronizados con las columnas;
+            // lo que sigue es un 'workaround'
+            // -----------------------------------------------------------------------------------------------------
+            angularInterval = $interval(function() {
+                gastos_ui_grid_api.core.handleWindowResize();
+            }, 200)
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -461,6 +528,12 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             return row.id;
         }
     }
+
+    // para detener el angular $Interval que usamos en el ui-gris arriba, cuando el $scope es destruido ...
+    $scope.$on('$destroy', function() {
+        // Make sure that the interval is destroyed too
+        $interval.cancel(angularInterval);
+    })
 
     $scope.rubrosCajaChica = []; 
     $scope.proveedores = []; 
@@ -475,9 +548,23 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: brown; font: xx-small; padding-top: 8px; "></span>' +
             '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
             enableColumnMenu: false,
+            enableCellEdit: false,
             enableSorting: false,
-            pinnedLeft: true,
             width: 25
+        },
+        {
+            name: 'id',
+            field: 'id',
+            displayName: '##',
+            width: 40,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableCellEdit: false,
+            enableSorting: true,
+            enableFiltering: true,
+            filterCellFiltered: true,
+            type: 'number'
         },
         {
             name: 'rubro',
@@ -497,7 +584,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'number'
         },
         {       
@@ -511,7 +597,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -532,7 +617,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'number'
         },
         {       
@@ -546,7 +630,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'string'
         },
         {       
@@ -560,7 +643,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -575,7 +657,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'date'
         },
         {       
@@ -589,7 +670,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -603,7 +683,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: false,
             type: 'string'
         },
         {
@@ -624,7 +703,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
-            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -645,7 +723,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
-            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -660,7 +737,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
-            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -681,7 +757,6 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
-            pinnedLeft: false,
             type: 'number'
         },
         {
@@ -702,35 +777,125 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             footerCellFilter: 'currencyFilter',
             footerCellClass: 'ui-grid-rightCell',
 
-            pinnedLeft: false,
             type: 'number'
         },
         {
             name: 'afectaLibroCompras ',
-            field: 'total',
+            field: 'afectaLibroCompras',
             displayName: 'Libro comp?',
-            width: '60',
-            headerCellClass: 'ui-grid-rightCell',
-            cellClass: 'ui-grid-rightCell',
-            cellFilter: 'currencyFilter',
+            width: '85',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            cellFilter: 'boolFilter',
             enableFiltering: true,
             enableCellEdit: true,
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: false,
             type: 'boolean'
         },
         {
             name: 'delButton',
             displayName: '',
+            cellClass: 'ui-grid-centerCell',
             cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',
             enableCellEdit: false,
             enableSorting: false,
-            pinnedLeft: false,
             width: 25
         },
     ]
 
+
+    $scope.deleteItem = function (item) {
+        if (item.docState && item.docState === 1) { 
+            // si el item es nuevo, simplemente lo eliminamos del array
+            ldoash.remove($scope.reposicion.cajaChica_reposicion_gastos, (x) => { return x._id === item._id; });
+        } 
+        else { 
+            item.docState = 3;
+        } 
+
+        if (!$scope.reposicion.docState) { 
+            $scope.reposicion.docState = 2; 
+        }
+    }
+
+    $scope.nuevoGasto = function () {
+        // el pk para cada gasto en sql en un Identity. Determinamos un valor consecutivo para cada gasto al agregar, pero al grabar en 
+        // el server ponemos en cero para registros nuevos para que sql server determine el verdadero valor al agregar el registro ... 
+        let id = {}; 
+        if (Array.isArray($scope.reposicion.cajaChica_reposicion_gastos) && $scope.reposicion.cajaChica_reposicion_gastos.length) { 
+            id = lodash.maxBy($scope.reposicion.cajaChica_reposicion_gastos, "id"); 
+        }
+
+        let usuario = Meteor.users.findOne(Meteor.userId());
+
+        let item = {
+            id: id && lodash.isFinite(id.id) ? id.id + 1 : 0,       // isFiniite is true even if the argument is zero  
+            reposicion: $scope.reposicion.reposicion, 
+            fechaDocumento: new Date(), 
+            afectaLibroCompras: false, 
+            nombreUsuario: usuario.emails[0].address, 
+            docState: 1
+        };
+
+        $scope.reposicion.cajaChica_reposicion_gastos.push(item);
+
+        if (!$scope.reposicion.docState) { 
+            $scope.reposicion.docState = 2; 
+        }
+    }
+
+
+    $scope.calcularGastos = function() { 
+        // primero leemos el % default para el Iva, para asignarlo cuando no exista. Luego, intentamos calcular el Iva 
+        // y el total para cada gasto ... 
+        if (!Array.isArray($scope.reposicion.cajaChica_reposicion_gastos)) { 
+            return; 
+        }
+
+        let parametrosGlobalBancos = ParametrosGlobalBancos.findOne(); 
+        let ivaPorc_default = 5; 
+
+        if (parametrosGlobalBancos && parametrosGlobalBancos.ivaPorc) { 
+            ivaPorc_default = parametrosGlobalBancos.ivaPorc; 
+        }
+
+        for (let gasto of $scope.reposicion.cajaChica_reposicion_gastos) { 
+            if (gasto.monto) { 
+                if (!gasto.ivaPorc) { 
+                    gasto.ivaPorc = ivaPorc_default; 
+                }
+                gasto.iva = gasto.monto * gasto.ivaPorc / 100; 
+            }
+
+            if (!gasto.monto) { 
+                gasto.monto = 0; 
+            }
+
+            if (!gasto.iva) { 
+                gasto.iva = 0; 
+            }
+
+            if (!gasto.montoNoImponible) { 
+                gasto.montoNoImponible = 0; 
+            }
+
+            gasto.total = gasto.montoNoImponible + gasto.monto + gasto.iva; 
+
+            gasto.iva = lodash.round(gasto.iva, 2); 
+            gasto.total = lodash.round(gasto.total, 2); 
+
+            if (!gasto.docState) { 
+                gasto.docState = 2; 
+            }
+        }
+
+        $scope.gastos_ui_grid.data = $scope.reposicion.cajaChica_reposicion_gastos;
+
+        if (!$scope.reposicion.docState) { 
+            $scope.reposicion.docState = 2; 
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------------
     // si hay un filtro anterior, lo usamos
@@ -831,12 +996,29 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
     $scope.grabar = function () {
 
         if (!$scope.reposicion.docState) {
-            DialogModal($modal, "<em>Reposiciones de caja chica</em>",
-                                `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
-                                No hay nada que grabar.`,
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `Aparentemente, <em>no se han efectuado cambios</em> en el registro. No hay nada que grabar.`,
                                 false).then();
             return;
-        };
+        }
+
+        // controlamos que no administradores solo registren reposiciones con estado AB 
+        let modificacionPermitida_solo_admin = false; 
+
+        // no administradores: una caja chica debe ser siempre de estado AB 
+        if ($scope.reposicion.estadoActual != "AB" || estadoOriginalCajaChica != "AB") { 
+            modificacionPermitida_solo_admin = true; 
+        }
+
+        if (modificacionPermitida_solo_admin && !user_is_cajaChica_admin) { 
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+                                `Error: los permisos asociados a su usuario solo permiten registrar o modificar reposiciones 
+                                de caja chica cuyo estado sea <b>abierto</b>. <br /> 
+                                Por favor establezca <b>abierto</b> como valor para el estado de la caja chica. 
+                                `,
+                                false).then();
+            return;
+        }
 
         grabar2();
     }
@@ -853,11 +1035,11 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         let errores = [];
 
         if (editedItem.docState != 3) {
-            isValid = Proveedores_SimpleSchema.namedContext().validate(editedItem);
+            isValid = CajaChica_Reposiciones_SimpleSchema.namedContext().validate(editedItem);
 
             if (!isValid) {
-                Proveedores_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
-                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Proveedores_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
+                CajaChica_Reposiciones_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
+                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + CajaChica_Reposiciones_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
                 });
             }
         }
@@ -881,10 +1063,10 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
             return;
         }
 
-        Meteor.call('proveedoresSave', editedItem, (err, result) => {
+        Meteor.call('bancos.cajaChica.save', editedItem, (err, result) => {
 
             if (err) {
-            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
@@ -920,7 +1102,10 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
                 // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
                 // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
                 // encontrar nada ...
-                inicializarItem(claveUnicaRegistro, $scope);
+                // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+                inicializarItem(claveUnicaRegistro, $scope, contabSysNet_app_address).then((result) => { 
+                    estadoOriginalCajaChica = result.estadoActual; 
+                })  
             }
         })
     }
@@ -963,12 +1148,45 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
         $scope.rubrosCajaChica = catalogos.rubrosCajaChica; 
         $scope.proveedores = catalogos.proveedores; 
 
-        $scope.gastos_ui_grid.columnDefs[1].editDropdownOptionsArray = $scope.rubrosCajaChica;
-        $scope.gastos_ui_grid.columnDefs[3].editDropdownOptionsArray = $scope.proveedores; 
+        $scope.gastos_ui_grid.columnDefs[2].editDropdownOptionsArray = $scope.rubrosCajaChica;
+        $scope.gastos_ui_grid.columnDefs[4].editDropdownOptionsArray = $scope.proveedores; 
 
         $scope.showProgress = false;
         $scope.$apply();
     })
+
+
+    $scope.asientoContable = function() {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'client/generales/asientosContablesAsociados/asientosContablesAsociadosModal.html',
+            controller: 'AsientosContablesAsociados_Controller',
+            size: 'lg',
+            resolve: {
+                provieneDe: () => {
+                    return "Caja chica";
+                },
+                entidadID: () => {
+                    return $scope.reposicion.reposicion;
+                },
+                ciaSeleccionada: () => {
+                    return $scope.companiaSeleccionada;
+                },
+                origen: () => {
+                    return $scope.origen;
+                },
+                docState: () => {
+                    return $scope.reposicion.docState ? $scope.reposicion.docState : "";
+                },
+            },
+        }).result.then(
+              function (resolve) {
+                  return true;
+              },
+              function (cancel) {
+                  return true;
+              });
+    }
 
     // ------------------------------------------------------------------------------------------------
     // cuando el usuario sale de la página, nos aseguramos de detener (ie: stop) el subscription,
@@ -982,79 +1200,111 @@ angular.module("contabm").controller("Bancos_CajaChica_Reposiciones_Controller",
 ])
 
 
-function inicializarItem(itemID, $scope) {
-    if (itemID == 0) {
-        $scope.showProgress = true;
-        $scope.reposicion = {};
-        let usuario =  Meteor.user();
-        $scope.reposicion =
-        {
-            reposicion: 0,
-            fecha: new Date(),
-            docState: 1
-        };
+function inicializarItem(itemID, $scope, contabSysNet_app_address) {
 
-        $scope.gastos_ui_grid.data = []; 
+    return new Promise(function(resolve, reject) { 
+        if (itemID == 0) {
+            $scope.showProgress = true;
+            $scope.reposicion = {};
+            let usuario =  Meteor.user();
+    
+            $scope.reposicion = {
+                reposicion: 0,
+                fecha: new Date(),
+                estadoActual: "AB", 
+                cajaChica_reposicion_gastos: [], 
+                docState: 1
+            };
+    
+            $scope.gastos_ui_grid.data = $scope.reposicion.cajaChica_reposicion_gastos;
+    
+            $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
+            $scope.reportLink = "#";                // para invalidar el link que permite imprimir, hasta que el usuario grabe ... 
+            $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
+            $scope.showProgress = false;
+            
+            resolve($scope.reposicion); 
+        }
+        else {
+            $scope.showProgress = true;
+    
+            // nótese que ejecutamos un promise que lee el item en la base de datos (server) y lo regresa 
+            item_leerByID_desdeSql(itemID, $scope).then( 
+    
+                function (result) { 
+                    $scope.reposicion = {};
+                    $scope.gastos_ui_grid.data = []; 
+                    $scope.reposicion = JSON.parse(result);
+    
+                    if (!$scope.reposicion || ($scope.reposicion && lodash.isEmpty($scope.reposicion))) {
+                        // el usuario eliminó el registro y, por eso, no pudo se leído desde sql
+                        $scope.reposicion = {};
+                        $scope.showProgress = false;
+                        $scope.$apply();
+    
+                        return;
+                    }
+    
+                    // las fechas vienen serializadas como strings; convertimos nuevamente a dates ...
+                    $scope.reposicion.fecha = $scope.reposicion.fecha ? moment($scope.reposicion.fecha).toDate() : null;
+    
+                    if ($scope.reposicion.cajaChica_reposicion_gastos) { 
+                        $scope.reposicion.cajaChica_reposicion_gastos.forEach((g) => { 
+                            g.fechaDocumento = g.fechaDocumento ? moment(g.fechaDocumento).toDate() : null;
+                        })
+                    }
+    
+                    if (!Array.isArray($scope.reposicion.cajaChica_reposicion_gastos)) { 
+                        $scope.reposicion.cajaChica_reposicion_gastos = [];
+                    } 
+    
+                    $scope.gastos_ui_grid.data = $scope.reposicion.cajaChica_reposicion_gastos;
+    
+                    // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
+                    $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
+    
+                    $scope.showProgress = false;
+                    $scope.$apply();
 
-        $scope.showProgress = false;$scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
-        $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
-    }
-    else {
-      $scope.showProgress = true;
-      item_leerByID_desdeSql(itemID, $scope);
-    }
+                    resolve($scope.reposicion); 
+    
+                }).catch(function(err) { 
+    
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+    
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
+                    });
+    
+                    $scope.showProgress = false;
+    
+                    $scope.$apply();
+                    reject(err); 
+                })
+        }
+        
+
+        // construimos el link que permite obtener el reporte para la reposición, desde ContabSysNet ... 
+        $scope.reportLink = "#";
+        if (itemID && contabSysNet_app_address) {
+            $scope.reportLink = `${contabSysNet_app_address}/ReportViewer4.aspx?user=${Meteor.userId()}&cia=${$scope.companiaSeleccionada.numero}&report=reposicionCajaChica&reposicion=${itemID}`;
+        }
+    })
 }
 
 
 function item_leerByID_desdeSql(pk, $scope) {
-    // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
-    Meteor.call('reposicionesCajaChica.leerByID.desdeSql', pk, (err, result) => {
+    return new Promise(function(resolve, reject) { 
+        // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
+        Meteor.call('reposicionesCajaChica.leerByID.desdeSql', pk, (err, result) => {
 
-        if (err) {
-            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
-
-            $scope.alerts.length = 0;
-            $scope.alerts.push({
-                type: 'danger',
-                msg: errorMessage
-            });
-
-            $scope.showProgress = false;
-
-            $scope.$apply();
-            return;
-        }
-
-        $scope.reposicion = {};
-        $scope.reposicion = JSON.parse(result);
-
-        if (!$scope.reposicion || ($scope.reposicion && lodash.isEmpty($scope.reposicion))) {
-            // el usuario eliminó el empleado y, por eso, no pudo se leído desde sql
-            $scope.reposicion = {};
-            $scope.showProgress = false;
-            $scope.$apply();
-
-            return;
-        }
-
-        // las fechas vienen serializadas como strings; convertimos nuevamente a dates ...
-        $scope.reposicion.fecha = $scope.reposicion.fecha ? moment($scope.reposicion.fecha).toDate() : null;
-
-        if ($scope.reposicion.cajaChica_reposicion_gastos) { 
-            $scope.reposicion.cajaChica_reposicion_gastos.forEach((g) => { 
-                g.fechaDocumento = g.fechaDocumento ? moment(g.fechaDocumento).toDate() : null;
-            })
-        }
-
-        $scope.gastos_ui_grid.data = []; 
-        if ($scope.reposicion.cajaChica_reposicion_gastos) { 
-            $scope.gastos_ui_grid.data = $scope.reposicion.cajaChica_reposicion_gastos;
-        } 
-
-        // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
-        $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
-
-        $scope.showProgress = false;
-        $scope.$apply();
+            if (err) {
+                reject(err); 
+            } else { 
+                resolve(result); 
+            }
+        })
     })
 }

@@ -149,7 +149,6 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
               enableFiltering: false,
               width: 25
           },
-
           {
               name: 'rubro',
               field: 'rubro',
@@ -283,7 +282,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
               _.remove($scope.cuentasContablesDefinicion, (x) => { return x._id === item._id; });
           else
               item.docState = 3;
-      };
+      }
 
       $scope.nuevo = function () {
           let item = {
@@ -297,13 +296,13 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
 
           $scope.cuentasContables_ui_grid.data = [];
           $scope.cuentasContables_ui_grid.data = $scope.cuentasContablesDefinicion;
-      };
+      }
 
 
       // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
       $scope.limpiarFiltro = function () {
           $scope.filtro = {};
-      };
+      }
 
       // -------------------------------------------------------------------------------------------
       // leemos una lista de proveedores (solo id y abreviatura) para el ddl

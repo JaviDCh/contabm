@@ -20,12 +20,30 @@ export const CajaChica_Rubros_sql = sequelize.define('cajaChica_Rubros', {
      tableName: 'CajaChica_Rubros'
 })
 
+export const CajaChica_Parametros_sql = sequelize.define('cCajaChica_Parametros', {
+    id: { type: Sequelize.INTEGER, field: 'ID', primaryKey: true, autoIncrement: true, allowNull: false, },
+    tipoAsiento: { type: Sequelize.STRING, field: 'TipoAsiento', allowNull: false, validate: { len: [1, 6] }, },
+    cuentaContablePuenteID: { type: Sequelize.INTEGER, field: 'CuentaContablePuenteID', allowNull: false, },
+    cia: { type: Sequelize.INTEGER, field: 'Cia', allowNull: false, },
+}, {
+     tableName: 'CajaChica_Parametros'
+})
+
+
+export const CajaChica_RubrosCuentasContables = sequelize.define('cajaChica_RubrosCuentasContables', {
+    id: { type: Sequelize.INTEGER, field: 'ID', primaryKey: true, autoIncrement: true, allowNull: false, },
+    rubro: { type: Sequelize.INTEGER, field: 'Rubro', allowNull: false, },
+    CuentaContableID: { type: Sequelize.INTEGER, field: 'CuentaContableID', allowNull: false, },
+}, {
+     tableName: 'CajaChica_RubrosCuentasContables'
+})
+
 
 export const CajaChica_Reposiciones_sql = sequelize.define('cajaChica_Reposiciones', {
     reposicion: { type: Sequelize.INTEGER, field: 'Reposicion', primaryKey: true, autoIncrement: true, allowNull: false, },
     fecha: { type: Sequelize.DATE, field: 'Fecha', allowNull: false, },
     cajaChica: { type: Sequelize.INTEGER, field: 'CajaChica', allowNull: false, },
-    observaciones: { type: Sequelize.INTEGER, field: 'Observaciones', allowNull: true, validate: { len: [1, 250] }, },
+    observaciones: { type: Sequelize.STRING, field: 'Observaciones', allowNull: true, validate: { len: [1, 250] }, },
     estadoActual: { type: Sequelize.STRING, field: 'EstadoActual', allowNull: false, validate: { len: [1, 2] }, },
 }, {
      tableName: 'CajaChica_Reposiciones'
@@ -36,7 +54,7 @@ export const CajaChica_Reposiciones_Gastos_sql = sequelize.define('cajaChica_Rep
     id: { type: Sequelize.INTEGER, field: 'ID', primaryKey: true, autoIncrement: true, allowNull: false, },
     reposicion: { type: Sequelize.INTEGER, field: 'Reposicion', allowNull: false,  },
     rubro: { type: Sequelize.INTEGER, field: 'Rubro', allowNull: false, },
-    descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },
+    descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, validate: { len: [1, 150] },},
     montoNoImponible: { type: Sequelize.DECIMAL(12, 2), field: 'MontoNoImponible', allowNull: true, },
     monto: { type: Sequelize.DECIMAL(12, 2), field: 'Monto', allowNull: false, },
     ivaPorc: { type: Sequelize.DECIMAL(12, 2), field: 'IvaPorc', allowNull: true, },
