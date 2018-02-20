@@ -3,7 +3,7 @@
 
 import SimpleSchema from 'simpl-schema';
 
-// estas tablas no existe en mongo; creamos este schema para validar cuando el usuario edita ... 
+// estas tablas no existen en mongo; creamos este schema para validar cuando el usuario edita ... 
 // aunque las tablas solo existen en sql, estos schemas nos ayudan a validar que los datos sean correctos. 
 export const CajaChica_Reposiciones_Gastos_SimpleSchema = new SimpleSchema({
     id: { type: SimpleSchema.Integer, label: 'ID', optional: false, },

@@ -1,4 +1,6 @@
 
+
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa

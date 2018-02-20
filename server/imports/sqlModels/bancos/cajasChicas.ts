@@ -33,7 +33,7 @@ export const CajaChica_Parametros_sql = sequelize.define('cCajaChica_Parametros'
 export const CajaChica_RubrosCuentasContables = sequelize.define('cajaChica_RubrosCuentasContables', {
     id: { type: Sequelize.INTEGER, field: 'ID', primaryKey: true, autoIncrement: true, allowNull: false, },
     rubro: { type: Sequelize.INTEGER, field: 'Rubro', allowNull: false, },
-    CuentaContableID: { type: Sequelize.INTEGER, field: 'CuentaContableID', allowNull: false, },
+    cuentaContableID: { type: Sequelize.INTEGER, field: 'CuentaContableID', allowNull: false, },
 }, {
      tableName: 'CajaChica_RubrosCuentasContables'
 })

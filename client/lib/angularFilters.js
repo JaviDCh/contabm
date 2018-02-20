@@ -4,6 +4,7 @@ import moment from "moment";
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { Empleados } from '/models/nomina/empleados'; 
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 // ---------------------------------------------------------------------------------------
 // ui-grid: para formatear fields numéricos y dates

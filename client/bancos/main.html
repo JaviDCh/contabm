@@ -15,9 +15,11 @@ vieneDeAfuera es true cuando una página, como factura, es abierta desde otro m�
         <div class="collapse navbar-collapse" id="navbar-collapse-1">
             <ul class="nav navbar-nav">
 
-                <li class="dropdown" ng-if="userHasRole(['bancos_catalogos'])">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catálogos <b class="caret"></b></a>
+                <!-- Nótese como usamos ui-show, en vez de ui-if, pues sub-menu parece no funcionar de otra forma ...  -->
+                <li class="dropdown" ng-show="userHasRole(['bancos_catalogos'])">
+                    <a href=" #" class="dropdown-toggle" data-toggle="dropdown">Catálogos <b class="caret"></b></a>
                     <ul class="dropdown-menu">
+
                         <li><a ui-sref="bancos.monedas">Monedas</a></li>
                         <li><a ui-sref="bancos.cuentasBancarias">Cuentas bancarias</a></li>
                         <li class="divider"></li>
@@ -29,9 +31,21 @@ vieneDeAfuera es true cuando una página, como factura, es abierta desde otro m�
                         <li><a ui-sref="bancos.parametros">Parámetros</a></li>
                         <li><a ui-sref="bancos.parametrosGlobal">Parámetros globales</a></li>
                         <li class="divider"></li>
+
+                        <li class="dropdown dropdown-submenu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Caja chica</a>
+                            <ul class="dropdown-menu">
+                                <li><a ui-sref="bancos.cajaChica_cajasChicas">Cajas chicas</a></li>
+                                <li><a ui-sref="bancos.cajaChica_rubros">Rubros</a></li>
+                                <li><a ui-sref="bancos.cajaChica_cuentasContables">Cuentas contables - asociación</a></li>
+                                <li><a ui-sref="bancos.cajaChica_parametros">Parámetros</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="divider"></li>
                         <li><a ui-sref="bancos.companias">Compañías</a></li>
                     </ul>
-                </li>
+                </li> 
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Facturas y pagos <b class="caret"></b></a>

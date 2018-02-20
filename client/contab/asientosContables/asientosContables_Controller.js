@@ -4,6 +4,7 @@ import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMe
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 angular.module("contabm").controller("Contab_AsientosContables_Controller", ['$scope', '$stateParams', '$state', function ($scope, $stateParams, $state) {
 
@@ -20,7 +21,7 @@ angular.module("contabm").controller("Contab_AsientosContables_Controller", ['$s
     if (CuentasContables2.find().count() === 0) { 
         let message = `Aparentemente, la <em>tabla de cuentas contables</em> no existe en el navegador. Por esta razón, 
                        es probable que Ud. no vea las cuentas contables en la lista para cada partida del asiento.<br /><br />
-                       Para corregir esta situación, Ud. debe ejecuar la opción <em>contab / generales / persistir cuentas contables</em>. <br />
+                       Para corregir esta situación, Ud. debe ejecutar la opción <em>contab / generales / persistir cuentas contables</em>. <br />
                        Luego puede regresar a esta función para editar o consultar los asientos contables.`; 
 
         $scope.alerts.length = 0;

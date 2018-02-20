@@ -57,6 +57,31 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             controller: 'Catalogos_Bancos_DefinicionCuentasContables_Controller',
             parent: 'bancos'
         })
+        // caja chica 
+        .state('bancos.cajaChica_cajasChicas', {
+            url: '/cajaChica_cajasChicas',
+            templateUrl: 'client/bancos/catalogos/cajaChica/cajasChicas/cajasChicas.html',
+            controller: 'Catalogos_Bancos_CajaChica_CajasChicas_Controller',
+            parent: 'bancos'
+        })
+        .state('bancos.cajaChica_rubros', {
+            url: '/cajaChica_rubros',
+            templateUrl: 'client/bancos/catalogos/cajaChica/rubros/rubros.html',
+            controller: 'Catalogos_Bancos_CajaChica_Rubros_Controller',
+            parent: 'bancos'
+        })
+        .state('bancos.cajaChica_cuentasContables', {
+            url: '/cajaChica_cuentasContables',
+            templateUrl: 'client/bancos/catalogos/cajaChica/cuentasContables/cuentasContables.html',
+            controller: 'Catalogos_Bancos_CajaChica_CuentasContables_Controller',
+            parent: 'bancos'
+        })
+        .state('bancos.cajaChica_parametros', {
+            url: '/cajaChica_parametros',
+            templateUrl: 'client/bancos/catalogos/cajaChica/parametros/parametros.html',
+            controller: 'Catalogos_Bancos_CajaChica_Parametros_Controller',
+            parent: 'bancos'
+        })
 
         // -------------------------------------------------------------------------------------------
         // Generales

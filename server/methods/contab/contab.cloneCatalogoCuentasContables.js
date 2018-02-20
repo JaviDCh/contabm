@@ -1,5 +1,6 @@
 
 import numeral from 'numeral';
+import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 
 Meteor.methods(
 {
