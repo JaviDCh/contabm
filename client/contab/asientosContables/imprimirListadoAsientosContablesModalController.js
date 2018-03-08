@@ -2,6 +2,8 @@
 import lodash from 'lodash';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
+import { Filtros } from '/imports/collections/general/filtros'; 
+
 angular.module("contabm").controller('ImprimirListadoAsientosContablesModalController',
 ['$scope', '$modalInstance', '$modal', 'ciaSeleccionada',
 function ($scope, $modalInstance, $modal, ciaSeleccionada) {

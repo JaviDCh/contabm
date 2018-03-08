@@ -1,9 +1,12 @@
 
 import moment from 'moment';
 import lodash from 'lodash';
+
 import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Filtros } from '/imports/collections/general/filtros'; 
+
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Contab_Consultas_CuentasYMovimientos_Filtro_Controller",

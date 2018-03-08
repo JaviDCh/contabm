@@ -6,6 +6,7 @@ import { Monedas } from '/imports/collections/monedas.js';
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 
 angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista_Controller",
 ['$stateParams', '$scope', '$meteor', '$modal', function ($stateParams, $scope, $meteor, $modal) {

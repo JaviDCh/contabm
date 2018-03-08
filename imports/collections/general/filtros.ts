@@ -1,6 +1,6 @@
 
 import { Mongo } from 'meteor/mongo';
-import SimpleSchema from 'simpl-schema';﻿
+import SimpleSchema from 'simpl-schema';
 
 // -----------------------------------------------------------------------
 // filtros
@@ -13,5 +13,5 @@ var schema = new SimpleSchema({
     reportConfig: { type: Object, optional: true, blackbox: true },
 });
 
-Filtros = new Mongo.Collection("filtros");
+export const Filtros: any = new Mongo.Collection("filtros");
 Filtros.attachSchema(schema);

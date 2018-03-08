@@ -1,4 +1,5 @@
 
+import lodash from 'lodash';
 import numeral from 'numeral';
 import moment from 'moment';
 import { Monedas } from '/imports/collections/monedas';
@@ -27,11 +28,10 @@ Meteor.methods(
             });
 
         // -------------------------------------------------------------------------------------------------------------
-        // debugger;
         // siempre 1er. día de la fecha inicial
         let ultimoDiaMesAnterior_InicioConsulta = new Date(filtro.periodo.desde.getFullYear(), filtro.periodo.desde.getMonth(), 1);
 
-        // ahora restamos 1 día y obtenemos el último día del mes anteior ...
+        // ahora restamos 1 día y obtenemos el último día del mes anterior ...
         // la idea es que podamos leer los saldos para el mes *anterior* a la fecha inicial del período indicado.
         // Además, esta fecha (día final del mes anterior al período) será usada como fecha de los saldos iniciales
         // para el proceso de consulta (más en la 'descripción' que otra cosa!)...
@@ -40,25 +40,26 @@ Meteor.methods(
         // con esta función determinamos el mes y año  fiscal para la fecha de inicio de la consulta
         let mesAnoFiscal = ContabFunctions.determinarMesFiscal(filtro.periodo.desde, ciaContabSeleccionada.numero);
 
-        if (mesAnoFiscal.error)
+        if (mesAnoFiscal.error) { 
             throw new Meteor.Error("error-determinar-mes-fiscal", mesAnoFiscal.errorMessage);
-
+        }
+            
         // determinamos el mes de saldos a leer, en base al mes y año fiscal indicado
         let mesFiscalAnterior = "";
 
-        // TODO: completar !!!
         // esta función regresa el nombre de la columna en la tabla de saldos que corresponde al mes fiscal; por ejemplo:
         // si el mes fiscal es 5 - nombreMesFiscal = Mes05; nombreMesFiscalAnterior = mes04.
         let nombreMesFiscal = ContabFunctions.nombreMesFiscalTablaSaldos(mesAnoFiscal.mesFiscal);
 
-        if (nombreMesFiscal.error)
+
+        if (nombreMesFiscal.error) { 
             throw new Meteor.Error("error-determinar-nombre-mes-fiscal", nombreMesFiscal.errorMessage);
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // valores para reportar el progreso
         let numberOfItems = CodificacionesContables_codigos.
-                                find({ codificacionContable_ID: codificacionContable._id, detalle: { $eq: true }}).
+                                find({ codificacionContable_ID: codificacionContable._id, detalle: { $eq: true }, suspendido: { $ne: true } }).
                                 count();
 
         let reportarCada = Math.floor(numberOfItems / 25);
@@ -108,9 +109,9 @@ Meteor.methods(
                         .done();
                 });
 
-                if (response.error)
+                if (response.error) { 
                     throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+                }
 
                 let cuentaContable = response.result[0];
 
@@ -120,7 +121,7 @@ Meteor.methods(
 
                 // selector.cuentaID = cuenta.id;
 
-                // TODO: leemos los saldos que corresponden a la cuenta contable
+                // leemos los saldos que corresponden a la cuenta contable
                 // preparamos el query para leer los saldos de las cuentas contables, para el *anterior* al mes de la consulta
                 query = `Select ${nombreMesFiscal.nombreMesFiscalAnterior} As saldoInicial,
                         s.CuentaContableID,
@@ -131,13 +132,13 @@ Meteor.methods(
                         s.CuentaContableID = ${cuenta.id}`;
 
 
-                if (_.isArray(filtro.moneda) && filtro.moneda.length) {
+                if (Array.isArray(filtro.moneda) && filtro.moneda.length) {
                     query += ` And s.Moneda = ${filtro.moneda[0].toString()}`;
-                };
+                }
 
-                if (_.isArray(filtro.monedaOriginal) && filtro.monedaOriginal.length) {
+                if (Array.isArray(filtro.monedaOriginal) && filtro.monedaOriginal.length) {
                     query += ` And s.MonedaOriginal = ${filtro.monedaOriginal[0].toString()}`;
-                };
+                }
 
 
                 response = Async.runSync(function(done) {
@@ -147,9 +148,10 @@ Meteor.methods(
                         .done();
                 });
 
-                if (response.error)
+                if (response.error) { 
                     throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+                }
+                    
                 // guardamos el array de saldos; el usuario puede indicar que desea excluir cuentas sin saldos
                 // ni movimientos; de esta forma, evaluamos más adelante ...
                 let saldosArray = response.result;
@@ -168,13 +170,13 @@ Meteor.methods(
                         '${moment(filtro.periodo.hasta).format('YYYY-MM-DD')}' And
                         d.CuentaContableID = ${cuenta.id}`;
 
-                if (_.isArray(filtro.moneda) && filtro.moneda.length) {
+                if (Array.isArray(filtro.moneda) && filtro.moneda.length) {
                     query += ` And a.Moneda = ${filtro.moneda[0].toString()}`;
-                };
+                }
 
-                if (_.isArray(filtro.monedaOriginal) && filtro.monedaOriginal.length) {
+                if (Array.isArray(filtro.monedaOriginal) && filtro.monedaOriginal.length) {
                     query += ` And a.MonedaOriginal = ${filtro.monedaOriginal[0].toString()}`;
-                };
+                }
 
 
                 response = Async.runSync(function(done) {
@@ -182,14 +184,12 @@ Meteor.methods(
                         .then(function(result) { done(null, result); })
                         .catch(function (err) { done(err, null); })
                         .done();
-                });
+                })
 
-                if (response.error)
+                if (response.error) { 
                     throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
-
-
+                }
+                    
                 // -------------------------------------------------------------------------------
                 // primero imprimimos los saldos; la idea es no hacerlo si el usuario quiere
                 // excluir cuentas sin saldos ni movimientos
@@ -202,13 +202,13 @@ Meteor.methods(
                         movimiento = {
                             _id: new Mongo.ObjectID()._str,
                             codificacionContable_ID: codificacionContable._id,
-                            simboloMoneda: _.find(monedasArray, (m) => { return m.moneda === x.moneda; }).simbolo,
+                            simboloMoneda: lodash.find(monedasArray, (m) => { return m.moneda === x.moneda; }).simbolo,
                             codigoContable: codigo.codigo,
                             nombreCodigoContable: codigo.descripcion,
                             cuentaContable: cuentaContable ? cuentaContable.cuenta : 'Indefinido',
                             nombreCuentaContable: cuentaContable ? cuentaContable.descripcion : 'Indefinido',
                             fecha: ultimoDiaMesAnterior_InicioConsulta,
-                            simboloMonedaOriginal: _.find(monedasArray, (m) => { return m.moneda === x.monedaOriginal; }).simbolo,
+                            simboloMonedaOriginal: lodash.find(monedasArray, (m) => { return m.moneda === x.monedaOriginal; }).simbolo,
                             comprobante: "",
                             descripcion: `Saldo inicial - ${moment(ultimoDiaMesAnterior_InicioConsulta).format("DD-MM-YYYY")}`,
                             referencia: "",
@@ -220,10 +220,10 @@ Meteor.methods(
                             user: this.userId,
                         };
                         CodificacionesContables_movimientos.insert(movimiento);
-                    };
-                });
+                    }
+                })
 
-                // ahora agregamos los movimientos; es normal que una cuenta no tenga cuentas en el
+                // ahora agregamos los movimientos; es normal que una cuenta no tenga movimientos en el
                 // período indicado; el usuario puede indicar que quiere excluir cuentas sin saldos ni
                 // movimientos ...
                 response.result.forEach((x) => {
@@ -231,13 +231,13 @@ Meteor.methods(
                     movimiento = {
                         _id: new Mongo.ObjectID()._str,
                         codificacionContable_ID: codificacionContable._id,
-                        simboloMoneda: _.find(monedasArray, (m) => { return m.moneda === x.moneda; }).simbolo,
+                        simboloMoneda: lodash.find(monedasArray, (m) => { return m.moneda === x.moneda; }).simbolo,
                         codigoContable: codigo.codigo,
                         nombreCodigoContable: codigo.descripcion,
                         cuentaContable: cuentaContable ? cuentaContable.cuenta : 'Indefinido',
                         nombreCuentaContable: cuentaContable ? cuentaContable.descripcion : 'Indefinido',
                         fecha: x.fecha,
-                        simboloMonedaOriginal: _.find(monedasArray, (m) => { return m.moneda === x.monedaOriginal; }).simbolo,
+                        simboloMonedaOriginal: lodash.find(monedasArray, (m) => { return m.moneda === x.monedaOriginal; }).simbolo,
                         comprobante: x.numero,
                         descripcion: x.descripcion,
                         referencia: x.referencia,
@@ -249,10 +249,10 @@ Meteor.methods(
                         user: this.userId,
                     };
                     CodificacionesContables_movimientos.insert(movimiento);
-                });
+                })
 
                 cantidadCuentasContables++;
-            });
+            })
 
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
@@ -274,16 +274,16 @@ Meteor.methods(
                                           message: 'Leyendo y actualizando saldos y movimientos para la codificación selecciondada ...'
                                         });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
 
             cantidadCodigosContables++;
-        });
+        })
 
         return `Ok, los datos han sido actualizados en la base de datos.<br /><br />
                 En total, se han leído movimientos para
                 <b>${cantidadCuentasContables.toString()}</b> cuentas contables desde <em>Contab</em>, que corresponden a
                 <b>${cantidadCodigosContables.toString()}</b> códigos contables en la codificación contable seleccionada.`;
     }
-});
+})

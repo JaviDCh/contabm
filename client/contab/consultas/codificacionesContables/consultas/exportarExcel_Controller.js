@@ -1,6 +1,7 @@
 
 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 
 angular.module("contabm").controller('ContabCodificacionesContablesConsultaExportarExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'codificacionContable', 'ciaSeleccionada',

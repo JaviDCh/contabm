@@ -1,6 +1,7 @@
 
 import lodash from 'lodash';
 import { Monedas } from '/imports/collections/monedas'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_ConciliacionesBancarias_Filter_Controller",

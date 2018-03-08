@@ -1,11 +1,12 @@
 
 import lodash from 'lodash';
-import { Monedas } from '/imports/collections/monedas';
 
+import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 

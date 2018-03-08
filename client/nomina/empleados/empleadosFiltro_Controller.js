@@ -2,6 +2,7 @@
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 
 angular.module("contabm").controller("Nomina_EmpleadosFilter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',

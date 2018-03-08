@@ -1,9 +1,12 @@
 
 
 import numeral from 'numeral'; 
+
 import { Empleados } from '/models/nomina/empleados'; 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Filtros } from '/imports/collections/general/filtros'; 
+
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 // Este controller (angular) se carga con la página primera del programa

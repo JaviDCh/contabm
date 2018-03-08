@@ -68,6 +68,12 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             controller: 'Catalogos_FiltrosConsultasContab_Controller',
             parent: 'contab'
         })
+        .state('contab.activosFijos', {
+            url: '/activosFijos',
+            templateUrl: 'client/contab/catalogos/activosFijos/activosFijos.html',
+            controller: 'Catalogos_ActivosFijos_Controller',
+            parent: 'contab'
+        })
 
         // -------------------------------------------------------------------------------------------
         // Generales

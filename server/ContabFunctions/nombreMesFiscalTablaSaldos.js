@@ -2,11 +2,10 @@
 
 let nombreMesFiscalTablaSaldos = (mesFiscal) => {
 
-    // debugger;
     if (!Number.isInteger(mesFiscal)) {
         let errMessage = `Error: el valor pasado a la función 'nombreMesFiscalTablaSaldos' no es del tipo 'entero'.`;
         return { error: true, errorMessage: errorMessage };
-    };
+    }
 
     let nombreMesFiscalAnterior = 0;
     let nombreMesFiscal = 0;
@@ -49,7 +48,7 @@ let nombreMesFiscalTablaSaldos = (mesFiscal) => {
             nombreMesFiscal = "Mes09";
             break;
         case 10:
-            mesFiscalAnterior = "Mes09";
+            nombreMesFiscalAnterior = "Mes09";
             nombreMesFiscal = "Mes10";
             break;
         case 11:
@@ -63,9 +62,9 @@ let nombreMesFiscalTablaSaldos = (mesFiscal) => {
         default:
             let errMessage = `Error: el valor pasado a la función 'nombreMesFiscalTablaSaldos' no es un valor válido (1 a 12).`;
             return { error: true, errorMessage: errorMessage };
-    };
+    }
 
     return { error: false, nombreMesFiscalAnterior: nombreMesFiscalAnterior, nombreMesFiscal: nombreMesFiscal };
-};
+}
 
 ContabFunctions.nombreMesFiscalTablaSaldos = nombreMesFiscalTablaSaldos;

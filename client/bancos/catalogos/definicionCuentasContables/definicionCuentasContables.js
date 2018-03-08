@@ -5,6 +5,7 @@ import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Filtros } from '/imports/collections/general/filtros'; 
 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
