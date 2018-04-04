@@ -1,9 +1,12 @@
 
 
+import lodash from 'lodash'; 
+
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { Monedas } from '/imports/collections/monedas'; 
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancarias_Controller",
@@ -146,7 +149,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                       agenciaSeleccionada = row.entity;
                       $scope.cuentasBancarias_ui_grid.data =
                             agenciaSeleccionada.cuentasBancarias ?
-                            _.filter(agenciaSeleccionada.cuentasBancarias, (x) => {
+                            lodash.filter(agenciaSeleccionada.cuentasBancarias, (x) => {
                                 return x.cia === companiaSeleccionadaDoc.numero;
                             }) :
                             [];
@@ -163,8 +166,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
-
+      }
 
       $scope.agencias_ui_grid.columnDefs = [
           {
@@ -251,7 +253,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
               enableSorting: true,
               type: 'string'
           },
-      ];
+      ]
 
       let cuentasBancarias_ui_grid_api = null;
       let cuentaBancariaSeleccionada = {};
@@ -300,14 +302,13 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                                       {
                                           numeroCuenta: cuentaBancariaSeleccionada.cuentaInterna },
                                           { sort: { numeroChequera: 1 }
-                                      }).fetch();;
+                                      });
                               },
-                          });
+                          })
 
                           $scope.chequeras_ui_grid.data = $scope.chequerasList;
 
-                          $scope.cuentaBancaria_ChequeraSeleccionada = bancoSeleccionado.nombre +
-                                                                       " - " +
+                          $scope.cuentaBancaria_ChequeraSeleccionada = bancoSeleccionado.nombre + " - " +
                                                                        cuentaBancariaSeleccionada.cuentaBancaria;
 
                           $scope.showProgress = false;
@@ -326,7 +327,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
 
       $scope.cuentasBancarias_ui_grid.columnDefs = [
@@ -443,7 +444,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
               enableSorting: true,
               type: 'string'
           },
-      ];
+      ]
 
       let chequeras_ui_grid_api = null;
       let chequeraSeleccionada = {};
@@ -493,7 +494,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
       $scope.chequeras_ui_grid.columnDefs = [
           {
@@ -653,40 +654,40 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
               enableSorting: false,
               width: 25
           },
-      ];
-
-
+      ]
 
       $scope.deleteItem = function (item) {
-          if (item.docState && item.docState === 1)
-              // si el item es nuevo, simplemente lo eliminamos del array
-              _.remove($scope.chequerasList, (x) => { return x._id === item._id; });
-          else
-              item.docState = 3;
-      };
+          if (item.docState && item.docState === 1) { 
+            // si el item es nuevo, simplemente lo eliminamos del array
+            lodash.remove($scope.chequerasList, (x) => { return x._id === item._id; });
+          }  
+          else { 
+            item.docState = 3;
+          }
+      }
 
       $scope.nuevaChequera = function () {
 
-          if (!bancoSeleccionado || _.isEmpty(bancoSeleccionado)) {
+          if (!bancoSeleccionado || lodash.isEmpty(bancoSeleccionado)) {
               DialogModal($modal, "<em>Chequeras - Agregar chequeras</em>",
                                   `Ud. debe seleccionar un banco en la lista.`,
                                  false).then();
               return;
-          };
+          }
 
-          if (!agenciaSeleccionada || _.isEmpty(agenciaSeleccionada)) {
+          if (!agenciaSeleccionada || lodash.isEmpty(agenciaSeleccionada)) {
               DialogModal($modal, "<em>Chequeras - Agregar chequeras</em>",
                                   `Ud. debe seleccionar una agencia en la lista.`,
                                  false).then();
               return;
-          };
+          }
 
-          if (!cuentaBancariaSeleccionada || _.isEmpty(cuentaBancariaSeleccionada)) {
+          if (!cuentaBancariaSeleccionada || lodash.isEmpty(cuentaBancariaSeleccionada)) {
               DialogModal($modal, "<em>Chequeras - Agregar chequeras</em>",
                                   `Ud. debe seleccionar una cuenta bancaria en la lista.`,
                                  false).then();
               return;
-          };
+          }
 
           // el catálogo que mantenemos en mongo no es idéntico al que existe (real) en sql. En mongo,
           // cuando hacemos 'Copiar catálogos' agregamos una cantidad de items adicionales para facilidad
@@ -721,45 +722,52 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
           $scope.chequerasList.push(item);
 
           $scope.chequeras_ui_grid.data = [];
-          if (_.isArray($scope.chequerasList)) {
+          if (lodash.isArray($scope.chequerasList)) {
               $scope.chequeras_ui_grid.data = $scope.chequerasList;
           }
-      };
+      }
 
-      $scope.corregirChequera = () => {
+    $scope.corregirChequera = () => {
 
-          if (!chequeraSeleccionada || _.isEmpty(chequeraSeleccionada)) {
-              DialogModal($modal, "<em>Bancos - Chequeras - Corregir chequeras</em>",
-                                  "Ud. debe seleccionar la chequera que desea corregir antes de intentar ejecutar esta función.",
-                                  false).then();
-              return;
-          };
+        if (!chequeraSeleccionada || lodash.isEmpty(chequeraSeleccionada)) {
+            DialogModal($modal, "<em>Bancos - Chequeras - Corregir chequeras</em>",
+                                "Ud. debe seleccionar la chequera que desea corregir antes de intentar ejecutar esta función.",
+                                false).then();
+            return;
+        }
 
-          $scope.showProgress = true;
+        $scope.showProgress = true;
 
-          $meteor.call('corregirChequera', chequeraSeleccionada.numeroChequera).then(
-              function (data) {
+        $meteor.call('corregirChequera', chequeraSeleccionada.numeroChequera).then(
+            function (data) {
 
-                  if (data.error) {
-                      // el método que intenta grabar los cambis puede regresar un error cuando,
-                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: data.message
-                      });
-                      $scope.showProgress = false;
-                  } else {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'info',
-                          msg: data.message
-                      });
+                if (data.error) {
+                    // el método que intenta grabar los cambis puede regresar un error cuando,
+                    // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data.message
+                    });
+                    $scope.showProgress = false;
+                } else {
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'info',
+                        msg: data.message
+                    });
 
-                      $scope.showProgress = false;
-                  };
-              },
-              function (err) {
+                    $scope.showProgress = false;
+
+                    DialogModal($modal, "<em>Bancos - Chequeras - Corregir chequeras</em>",
+                                        `Ok, la chequera seleccionada en la lista, número: 
+                                            <b>${chequeraSeleccionada.numeroChequera.toString()}</b>, ha sido corregida en forma satisfactoria. 
+                                        `,
+                                        false).then();
+                    return;
+                }
+            },
+            function (err) {
 
                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
@@ -770,21 +778,21 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                 });
 
                 $scope.showProgress = false;
-              });
-      };
+            })
+    }
 
 
-      $scope.helpers({
-          bancos: () => {
-            return Bancos.find({}, { sort: { nombre: 1 } });
-          }
-      });
+    $scope.helpers({
+        bancos: () => {
+        return Bancos.find({}, { sort: { nombre: 1 } });
+        }
+    })
 
 
     $scope.save = function () {
          $scope.showProgress = true;
 
-         let editedItems = _.filter($scope.chequerasList, function (item) { return item.docState; });
+         let editedItems = lodash.filter($scope.chequerasList, function (item) { return item.docState; });
 
          // nótese como validamos cada item antes de intentar guardar (en el servidor)
          let isValid = false;
@@ -800,7 +808,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                      });
                  }
              }
-         });
+         })
 
          if (errores && errores.length) {
              $scope.alerts.length = 0;
@@ -819,7 +827,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
 
              $scope.showProgress = false;
              return;
-         };
+         }
 
          $meteor.call('bancos.chequerasSave', editedItems).then(
            function (data) {
@@ -849,14 +857,13 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                                {
                                    numeroCuenta: cuentaBancariaSeleccionada.cuentaInterna },
                                    { sort: { numeroChequera: 1 }
-                               }).fetch();;
+                               });
                        },
-                   });
+                   })
 
                    $scope.chequeras_ui_grid.data = $scope.chequerasList;
 
-                   $scope.cuentaBancaria_ChequeraSeleccionada = bancoSeleccionado.nombre +
-                                                                " - " +
+                   $scope.cuentaBancaria_ChequeraSeleccionada = bancoSeleccionado.nombre + " - " +
                                                                 cuentaBancariaSeleccionada.cuentaBancaria;
 
                    $scope.showProgress = false;
@@ -873,10 +880,8 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
                });
 
                $scope.showProgress = false;
-           });
-       };
-
-
+           })
+       }
 
       $scope.bancos_ui_grid.data = $scope.bancos;
       $scope.agencias_ui_grid.data = [];
@@ -887,7 +892,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
       $scope.$on("$destroy", () => {
           if (chequerasSubscriptionHandle && chequerasSubscriptionHandle.stop) {
               chequerasSubscriptionHandle.stop();
-          };
-      });
+          }
+      })
 }
-]);
+])

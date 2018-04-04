@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import moment from 'moment';
 import numeral from 'numeral';
 import { TimeOffset } from '/globals/globals'; 
+import { Departamentos_sql } from '/server/imports/sqlModels/nomina/catalogos/departamentos';
 
 Meteor.methods(
 {

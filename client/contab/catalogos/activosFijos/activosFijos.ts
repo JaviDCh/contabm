@@ -2,7 +2,7 @@
 
 
 import * as numeral from 'numeral';
-import moment from 'moment';
+import * as moment from 'moment';
 import * as lodash from 'lodash';
 import * as angular from 'angular';
 
@@ -40,8 +40,8 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     }
 
     $scope.setIsEdited = function (value) {
-        if (!$scope.reposicion.docState) { 
-            $scope.reposicion.docState = 2;
+        if (!$scope.activoFijo.docState) { 
+            $scope.activoFijo.docState = 2;
         }
 
         return;
@@ -104,7 +104,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
         if (itemSeleccionado) {
             // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
-            inicializarItem(itemSeleccionado.reposicion, $scope, contabSysNet_app_address).then((result) => { 
+            inicializarItem(itemSeleccionado.reposicion, $scope).then((result) => { 
                 // en este momento, podemos hacer algo con el registro que se leyó de la base de datos ... 
             })
         }
@@ -120,10 +120,12 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     // establecer el tab 'activo' en ui-bootstrap ...
     $scope.activeTab = { tab1: true, tab2: false, tab3: false, };
 
-    let reposiciones_ui_grid_api = null;
+    let activosFijos_ui_grid_api: any = null;
 
     let itemSeleccionado = {} as any;
     let itemSeleccionadoParaSerEliminado = false;
+
+    let angularInterval = null;           // para detener el interval que usamos más abajo
 
     $scope.activosFijos_ui_grid = {
 
@@ -140,7 +142,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
         onRegisterApi: function (gridApi) {
 
-            reposiciones_ui_grid_api = gridApi;
+            activosFijos_ui_grid_api = gridApi;
             gridApi.selection.on.rowSelectionChanged($scope, function (row) {
                 itemSeleccionado = {};
                 if (row.isSelected) {
@@ -151,10 +153,25 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
                         itemSeleccionadoParaSerEliminado = false;
                         return;
                     }
+
+                    // leemos, desde sql, el registro seleccionado en la lista
+                    // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
+                    inicializarItem(itemSeleccionado.claveUnica, $scope).then((result) => { 
+                        // aquí podemos hacer algo con el item que se ha leído desde sql server ... 
+                    })
                 }
                 else
                     return;
-            })
+            }), 
+
+            // -----------------------------------------------------------------------------------------------------
+            // cuando el ui-grid está en un bootstrap tab y tiene más columnas de las que se pueden ver,
+            // al hacer horizontal scrolling los encabezados no se muestran sincronizados con las columnas;
+            // lo que sigue es un 'workaround'
+            // -----------------------------------------------------------------------------------------------------
+            angularInterval = $interval(function() {
+                activosFijos_ui_grid_api.core.handleWindowResize();
+            }, 200)
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -164,6 +181,13 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             return row._id;
         }
     }
+
+
+    // para detener el angular $Interval que usamos en el ui-gris arriba, cuando el $scope es destruido ...
+    $scope.$on('$destroy', function() {
+        // Make sure that the interval is destroyed too
+        $interval.cancel(angularInterval);
+    })
 
     $scope.activosFijos_ui_grid.columnDefs = [
         {
@@ -179,8 +203,8 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             width: 25
         },
         {
-            name: 'reposicion',
-            field: 'reposicion',
+            name: 'claveUnica',
+            field: 'claveUnica',
             displayName: '##',
             width: 60,
             enableFiltering: true,
@@ -191,10 +215,61 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableSorting: true,
             type: 'number'
         },
+        {       
+            name: 'descripcion',
+            field: 'descripcion',
+            displayName: 'Descripción',
+            width: 200,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'string'
+        },
         {
-            name: 'fecha',
-            field: 'fecha',
-            displayName: 'Fecha',
+            name: 'departamento',
+            field: 'departamento',
+            displayName: 'Departamento',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
+            name: 'tipoProducto',
+            field: 'tipoProducto',
+            displayName: 'Tipo',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
+            name: 'proveedor',
+            field: 'proveedor',
+            displayName: 'Proveedor',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            pinnedLeft: false,
+            type: 'string'
+        },
+        {
+            name: 'fechaCompra',
+            field: 'fechaCompra',
+            displayName: 'F compra',
             width: '80',
             enableFiltering: false,
             cellFilter: 'dateFilter',
@@ -205,61 +280,45 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             type: 'date'
         },
         {       
-            name: 'estadoActual',
-            field: 'estadoActual',
-            displayName: 'Estado',
-            width: 80,
-            enableFiltering: true,
-            headerCellClass: 'ui-grid-centerCell',
-            cellClass: 'ui-grid-centerCell',
-            enableColumnMenu: false,
-            enableSorting: true,
-            type: 'string'
-        },
-        {
-            name: 'cajaChica',
-            field: 'cajaChica',
-            displayName: 'Caja chica',
+            name: 'serial',
+            field: 'serial',
+            displayName: 'Serial',
             width: 80,
             enableFiltering: true,
             headerCellClass: 'ui-grid-leftCell',
             cellClass: 'ui-grid-leftCell',
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: false,
             type: 'string'
         },
-        {
-            name: 'observaciones',
-            field: 'observaciones',
-            displayName: 'Observaciones',
-            width: 200,
+        {       
+            name: 'modelo',
+            field: 'modelo',
+            displayName: 'Modelo',
+            width: 80,
             enableFiltering: true,
             headerCellClass: 'ui-grid-leftCell',
             cellClass: 'ui-grid-leftCell',
             enableColumnMenu: false,
             enableSorting: true,
-            pinnedLeft: false,
+            type: 'string'
+        },
+        {       
+            name: 'placa',
+            field: 'placa',
+            displayName: 'Placa',
+            width: 80,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-leftCell',
+            cellClass: 'ui-grid-leftCell',
+            enableColumnMenu: false,
+            enableSorting: true,
             type: 'string'
         },
         {
-            name: 'lineas',
-            field: 'lineas',
-            displayName: 'Lineas',
-            width: 60,
-            enableFiltering: true,
-            headerCellClass: 'ui-grid-centerCell',
-            cellClass: 'ui-grid-centerCell',
-
-            enableColumnMenu: false,
-            enableSorting: true,
-            pinnedLeft: false,
-            type: 'number'
-        },
-        {
-            name: 'montoNoImponible',
-            field: 'montoNoImponible',
-            displayName: 'No imponible',
+            name: 'costoTotal',
+            field: 'costoTotal',
+            displayName: 'Costo total',
             width: '120',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
@@ -267,19 +326,13 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableFiltering: true,
             enableColumnMenu: false,
             enableSorting: true,
-
-            aggregationType: uiGridConstants.aggregationTypes.sum,
-            aggregationHideLabel: true,
-            footerCellFilter: 'currencyFilter',
-            footerCellClass: 'ui-grid-rightCell',
-
             pinnedLeft: false,
             type: 'number'
         },
         {
-            name: 'montoImponible',
-            field: 'montoImponible',
-            displayName: 'Imponible',
+            name: 'valorResidual',
+            field: 'valorResidual',
+            displayName: 'Valor residual',
             width: '120',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
@@ -287,19 +340,13 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableFiltering: true,
             enableColumnMenu: false,
             enableSorting: true,
-
-            aggregationType: uiGridConstants.aggregationTypes.sum,
-            aggregationHideLabel: true,
-            footerCellFilter: 'currencyFilter',
-            footerCellClass: 'ui-grid-rightCell',
-
             pinnedLeft: false,
             type: 'number'
         },
         {
-            name: 'iva',
-            field: 'iva',
-            displayName: 'Iva',
+            name: 'montoADepreciar',
+            field: 'montoADepreciar',
+            displayName: 'Monto a depreciar',
             width: '100',
             headerCellClass: 'ui-grid-rightCell',
             cellClass: 'ui-grid-rightCell',
@@ -307,34 +354,34 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableFiltering: true,
             enableColumnMenu: false,
             enableSorting: true,
-
-            aggregationType: uiGridConstants.aggregationTypes.sum,
-            aggregationHideLabel: true,
-            footerCellFilter: 'currencyFilter',
-            footerCellClass: 'ui-grid-rightCell',
-
             pinnedLeft: false,
             type: 'number'
         },
         {
-            name: 'total',
-            field: 'total',
-            displayName: 'Total',
-            width: '120',
-            headerCellClass: 'ui-grid-rightCell',
-            cellClass: 'ui-grid-rightCell',
-            cellFilter: 'currencyFilter',
-            enableFiltering: true,
+            name: 'desincorporadoFlag',
+            field: 'desincorporadoFlag',
+            displayName: 'Desincorp?',
+            width: '80',
+            enableFiltering: false,
+            cellFilter: 'boolFilter',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
-
-            aggregationType: uiGridConstants.aggregationTypes.sum,
-            aggregationHideLabel: true,
-            footerCellFilter: 'currencyFilter',
-            footerCellClass: 'ui-grid-rightCell',
-
-            pinnedLeft: false,
-            type: 'number'
+            type: 'boolean'
+        },
+        {
+            name: 'fechaDesincorporacion',
+            field: 'fechaDesincorporacion',
+            displayName: 'F desincorp',
+            width: '80',
+            enableFiltering: false,
+            cellFilter: 'dateFilter',
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            enableColumnMenu: false,
+            enableSorting: true,
+            type: 'date'
         },
         {
             name: 'delButton',
@@ -392,7 +439,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
                                 true).then(
                 function (resolve) {
                     // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
-                    inicializarItem(0, $scope, contabSysNet_app_address).then((result) => { 
+                    inicializarItem(0, $scope).then((result) => { 
                         // en este momento, podemos hacer algo con el registro que se ha recién leído en la base de datos
                     })
                 },
@@ -402,7 +449,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         }
         else { 
             // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
-            inicializarItem(0, $scope, contabSysNet_app_address).then((result) => { 
+            inicializarItem(0, $scope).then((result) => { 
                 // en este momento, podemos hacer algo con el registro que se ha recién leído en la base de datos
             })
         }
@@ -551,10 +598,151 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // -------------------------------------------------------------------------
+    // Grabar las modificaciones hechas al registro
+    // -------------------------------------------------------------------------
+    $scope.grabar = function () {
+
+        if (!$scope.activoFijo.docState) {
+            DialogModal($modal, "<em>Contab - Inventario de activos fijos</em>",
+                                `Aparentemente, <em>no se han efectuado cambios</em> en el registro. No hay nada que grabar.`,
+                                false).then();
+            return;
+        }
+
+        grabar2();
+    }
+
+
+    function grabar2() {
+        $scope.showProgress = true;
+
+        // obtenemos un clone de los datos a guardar ...
+        let editedItem = lodash.cloneDeep($scope.activoFijo);
+
+        // nótese como validamos cada item antes de intentar guardar en el servidor
+        let isValid = false;
+        let errores = [];
+
+        if (editedItem.docState != 3) {
+            isValid = CajaChica_Reposiciones_SimpleSchema.namedContext().validate(editedItem);
+
+            if (!isValid) {
+                CajaChica_Reposiciones_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
+                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + CajaChica_Reposiciones_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
+                });
+            }
+        }
+
+        if (errores && errores.length) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
+                    errores.reduce(function (previous, current) {
+
+                        if (previous == "")
+                            // first value
+                            return current;
+                        else
+                            return previous + "<br />" + current;
+                    }, "")
+            });
+
+            $scope.showProgress = false;
+            return;
+        }
+
+        Meteor.call('bancos.cajaChica.save', editedItem, (err, result) => {
+
+            if (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+            if (result.error) {
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: result.message
+                });
+                $scope.showProgress = false;
+                $scope.$apply();
+            } else {
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: result.message
+                });
+
+                // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
+                let claveUnicaRegistro = result.id;
+
+                // nótese que siempre, al registrar cambios, leemos el registro desde sql server; la idea es
+                // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
+                // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
+                // encontrar nada ...
+                // inicializarItem regresa un promise; cuando se ejecuta, regresa el registro ... 
+                inicializarItem(claveUnicaRegistro, $scope).then((result) => { 
+                    // aquí podemos aplicar algunas modificaciones al registro 
+                })  
+            }
+        })
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // ------------------------------------------------------------------------------------------------------
     // para recibir los eventos desde la tarea en el servidor ...
-    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'bancos', process: 'leerBancosCajaChicaDesdeSqlServer' });
-    EventDDP.addListener('bancos_cajaChica_reportProgressDesdeSqlServer', function(process) {
+    EventDDP.setClient({ myuserId: Meteor.userId(), app: 'contab', process: 'leerContabActivosFijosDesdeSqlServer' });
+    EventDDP.addListener('contab_activosFijos_reportProgressDesdeSqlServer', function(process) {
 
         $scope.processProgress.current = process.current;
         $scope.processProgress.max = process.max;
@@ -584,12 +772,9 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
         let catalogos = JSON.parse(result);
 
-        $scope.cajasChicas = catalogos.cajasChicas;
-        $scope.rubrosCajaChica = catalogos.rubrosCajaChica; 
+        $scope.departamentos = catalogos.departamentos;
+        $scope.tiposProducto = catalogos.tiposProducto; 
         $scope.proveedores = catalogos.proveedores; 
-
-        $scope.gastos_ui_grid.columnDefs[2].editDropdownOptionsArray = $scope.rubrosCajaChica;
-        $scope.gastos_ui_grid.columnDefs[4].editDropdownOptionsArray = $scope.proveedores; 
 
         $scope.showProgress = false;
         $scope.$apply();
@@ -607,7 +792,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 ])
 
 
-function inicializarItem(itemID, $scope, contabSysNet_app_address) {
+function inicializarItem(itemID, $scope) {
 
     return new Promise(function(resolve:any, reject:any) { 
         if (itemID == 0) {
@@ -638,7 +823,6 @@ function inicializarItem(itemID, $scope, contabSysNet_app_address) {
     
                 function (result:any) { 
                     $scope.activoFijo = {};
-                    $scope.activosFijos_ui_grid.data = []; 
                     $scope.activoFijo = JSON.parse(result);
     
                     if (!$scope.activoFijo || ($scope.activoFijo && lodash.isEmpty($scope.activoFijo))) {
@@ -651,18 +835,11 @@ function inicializarItem(itemID, $scope, contabSysNet_app_address) {
                     }
     
                     // las fechas vienen serializadas como strings; convertimos nuevamente a dates ...
-                    $scope.activoFijo.fecha = $scope.activoFijo.fecha ? moment($scope.activoFijo.fecha).toDate() : null;
-    
-                    if ($scope.activoFijo.cajaChica_reposicion_gastos) { 
-                        $scope.activoFijo.cajaChica_reposicion_gastos.forEach((g) => { 
-                            g.fechaDocumento = g.fechaDocumento ? moment(g.fechaDocumento).toDate() : null;
-                        })
-                    }
-    
-                    if (!Array.isArray($scope.activoFijo.cajaChica_reposicion_gastos)) { 
-                        $scope.activoFijo.cajaChica_reposicion_gastos = [];
-                    } 
-    
+                    $scope.activoFijo.fechaCompra = $scope.activoFijo.fechaCompra ? moment($scope.activoFijo.fechaCompra).toDate() : null;
+                    $scope.activoFijo.fechaDesincorporacion = $scope.activoFijo.fechaDesincorporacion ? moment($scope.activoFijo.fechaDesincorporacion).toDate() : null;
+                    $scope.activoFijo.ingreso = $scope.activoFijo.ingreso ? moment($scope.activoFijo.ingreso).toDate() : null;
+                    $scope.activoFijo.ultAct = $scope.activoFijo.ultAct ? moment($scope.activoFijo.ultAct).toDate() : null;
+
                     // nótese como establecemos el tab 'activo' en ui-bootstrap; ver nota arriba acerca de ésto ...
                     $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
     
@@ -687,13 +864,6 @@ function inicializarItem(itemID, $scope, contabSysNet_app_address) {
                     reject(err); 
                 })
         }
-        
-
-        // construimos el link que permite obtener el reporte para la reposición, desde ContabSysNet ... 
-        $scope.reportLink = "#";
-        if (itemID && contabSysNet_app_address) {
-            $scope.reportLink = `${contabSysNet_app_address}/ReportViewer4.aspx?user=${Meteor.userId()}&cia=${$scope.companiaSeleccionada.numero}&report=reposicionCajaChica&reposicion=${itemID}`;
-        }
     })
 }
 
@@ -701,7 +871,7 @@ function inicializarItem(itemID, $scope, contabSysNet_app_address) {
 function item_leerByID_desdeSql(pk, $scope) {
     return new Promise(function(resolve, reject) { 
         // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
-        Meteor.call('reposicionesCajaChica.leerByID.desdeSql', pk, (err, result) => {
+        Meteor.call('contab.activosFijos.leerByID.desdeSql', pk, (err, result) => {
 
             if (err) {
                 reject(err); 

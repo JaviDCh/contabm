@@ -12,13 +12,6 @@ Bancos_sql = sequelize.define('bancos', {
      tableName: 'Bancos'
 });
 
-Departamentos_sql = sequelize.define('departamentos', {
-    departamento: { type: Sequelize.INTEGER, field: 'Departamento', allowNull: false, primaryKey: true, autoIncrement: true, },
-    descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },
-}, {
-     tableName: 'tDepartamentos'
-});
-
 Cargos_sql = sequelize.define('cargos', {
     cargo: { type: Sequelize.INTEGER, field: 'Cargo', allowNull: false, primaryKey: true, autoIncrement: true, },
     descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },

@@ -1,15 +1,18 @@
 
+
+import moment from 'moment'; 
+import lodash from 'lodash'; 
 import { TimeOffset } from '/globals/globals'; 
 
 Meteor.methods(
 {
     'bancos.chequerasSave': function (items) {
 
-        if (!_.isArray(items) || items.length == 0) {
+        if (!lodash.isArray(items) || items.length == 0) {
             throw new Meteor.Error(`Aparentemente, no se han editado los datos en la forma. No hay nada que actualizar.`);
         }
 
-        var inserts = _.chain(items).
+        var inserts = lodash.chain(items).
                       filter(function (item) { return item.docState && item.docState == 1; }).
                       map(function (item) { delete item.docState; return item; }).
                       value();
@@ -34,9 +37,10 @@ Meteor.methods(
                         .done();
                 });
 
-                if (response.error)
+                if (response.error) { 
                     throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+                }
+                    
                 if (response.result) {
                     throw new Meteor.Error(`Error: ya existe una chequera <b>genérica</b> para esta cuenta bancaria.<br />
                                             Una cuenta bancaria debe tener solo una chequera del tipo <b>genérica</b>.<br />
@@ -44,15 +48,12 @@ Meteor.methods(
                 }
             }
 
-
-
             let usuario = Meteor.user();
 
             item.fechaAsignacion = moment(item.fechaAsignacion).subtract(TimeOffset, 'hours').toDate();
             item.usuario = usuario.emails[0].address;
             item.ingreso = moment(new Date()).subtract(TimeOffset, 'hours').toDate();
             item.ultAct = moment(new Date()).subtract(TimeOffset, 'hours').toDate();
-
 
             if (item.generica) {
                 item.desde = null;
@@ -78,9 +79,10 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+            }
+                
             // el registro, luego de ser grabado en sql, es regresado en response.result.dataValues ...
             let savedItem = response.result.dataValues;
 
@@ -93,7 +95,7 @@ Meteor.methods(
         });
 
 
-        var updates = _.chain(items).
+        var updates = lodash.chain(items).
                         filter(function (item) { return item.docState && item.docState == 2; }).
                         map(function (item) { delete item.docState; return item; }).                // eliminamos docState del objeto
                         map(function (item) { return { _id: item._id, object: item }; }).           // separamos el _id del objeto
@@ -115,8 +117,9 @@ Meteor.methods(
                         .done();
                 });
 
-                if (response.error)
+                if (response.error) { 
                     throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+                }
 
                 if (response.result) {
                     throw new Meteor.Error(`Error: ya existe una chequera <b>genérica</b> para esta cuenta bancaria.<br />
@@ -131,14 +134,16 @@ Meteor.methods(
                 item.object.cantidadDeChequesUsados = null;
                 item.object.cantidadDeCheques = null;
                 item.object.ultimoChequeUsado = null;
-            };
+                item.object.desde = null;
+                item.object.hasta = null;
+            }
 
             if (!item.object.generica) {
                 // una chequera de tipo no genérico (real) debe tener valores en estos fields
                 if (!item.object.fechaAsignacion || !item.object.desde || !item.object.hasta || !item.object.asignadaA) {
                     throw new Meteor.Error(`Error: la chequera <b>${item.object.numeroChequera.toString()}</b> debe tener valores en
                                             los campos: 'fecha de asignación', 'desde', 'hasta' y 'asignada a', pues
-                                            <b>no es genérica</b>.`);
+                                            <b>no es del tipo genérica</b>.`);
                 }
             }
 
@@ -154,22 +159,24 @@ Meteor.methods(
             item_sql.usuario = usuario.emails[0].address;
 
             response = Async.runSync(function(done) {
-                Chequeras_sql.update(item_sql, { where: { id: item_sql.id }})
+                Chequeras_sql.update(item_sql, { where: { id: item.object.numeroChequera }})
                     .then(function(result) { done(null, result); })
                     .catch(function (err) { done(err, null); })
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
 
 
             Chequeras.update({ _id: item._id }, { $set: item.object }, {}, function (error, result) {
                 //The list of errors is available on `error.invalidKeys` or by calling Books.simpleSchema().namedContext().invalidKeys()
-                if (error)
+                if (error) { 
                     throw new Meteor.Error("validationErrors", error.invalidKeys.toString());
+                }
             });
-        });
+        })
 
 
         // ordenamos por numNiveles (en forma descendente) para que siempre validemos primero las cuentas de más
@@ -192,14 +199,15 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
 
-
-            if (response.result > 0)
+            if (response.result.length) {
                 throw new Meteor.Error(`Error: la chequera <b>${item.numeroChequera.toString()}</b> tiene movimientos
                                         bancarios asociados; no puede ser eliminada.`);
-
+            }
+                
             // finalmente, si la chequera no falla las validaciones, la eliminamos ...
             response = Async.runSync(function(done) {
                 Chequeras_sql.destroy({ where: { id: item.numeroChequera }})
@@ -208,11 +216,12 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
 
             Chequeras.remove({ _id: item._id });
-        });
+        })
 
         return "Ok, los datos han sido actualizados en la base de datos.";
     }

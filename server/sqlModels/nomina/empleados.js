@@ -2,6 +2,8 @@
 import { sequelize } from '../_globals/_loadThisFirst/_globals';
 import Sequelize from 'sequelize';
 
+import { Departamentos_sql } from '/server/imports/sqlModels/nomina/catalogos/departamentos';
+
 Empleados_sql = sequelize.define('empleados', {
     empleado: { type: Sequelize.INTEGER, field: 'Empleado', allowNull: false, primaryKey: true, autoIncrement: true, },
     cedula: { type: Sequelize.STRING, field: 'Cedula', allowNull: false, },

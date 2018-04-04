@@ -10,17 +10,12 @@ Meteor.methods(
 {
     bancos_facturas_LeerDesdeSql: function (filtro, ciaContab) {
 
-        // debugger;
         let filtro2 = JSON.parse(filtro);
 
         new SimpleSchema({
             filtro2: { type: Object, blackbox: true, optional: false, },
             ciaContab: { type: Number, optional: false, },
         }).validate({ filtro2, ciaContab, });
-
-        // if (!asientoContable || !asientoContable.docState) {
-        //     throw new Meteor.Error("Aparentemente, no se han editado los datos en la forma. No hay nada que actualizar.");
-        // };
 
         let where = "";
 
@@ -30,7 +25,7 @@ Meteor.methods(
             }
             else
                 where = `(f.FechaEmision = '${moment(filtro2.fechaEmision1).format('YYYY-MM-DD')}')`;
-        };
+        }
 
         if (filtro2.fechaRecepcion1) {
 
@@ -44,7 +39,7 @@ Meteor.methods(
             }
             else
                 where += `(f.FechaRecepcion = '${moment(filtro2.fechaRecepcion1).format('YYYY-MM-DD')}')`;
-        };
+        }
 
         if (lodash.isFinite(filtro2.monto1)) {
 
@@ -58,7 +53,7 @@ Meteor.methods(
             }
             else
                 where += `(mb.Monto = ${filtro2.monto1})`;
-        };
+        }
 
         // ambos, número de factura y número de control, son de tipo String; sin embargo, casi siempre
         // el usuario registra números alli. Por ahora, simplemente, leemos facturas que tengan éstos
@@ -71,7 +66,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(f.NumeroFactura = '${filtro2.numeroFactura}')`;
-        };
+        }
 
         if (filtro2.numeroControl) {
 
@@ -81,7 +76,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(f.NumeroControl = '${filtro2.numeroControl}')`;
-        };
+        }
 
         if (filtro2.concepto) {
             if (where)
@@ -95,7 +90,7 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(f.Concepto Like '${criteria}')`;
-        };
+        }
 
         if (filtro2.numeroComprobante) {
             if (where)
@@ -109,7 +104,7 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(f.NumeroComprobante Like '${criteria}')`;
-        };
+        }
 
         if (filtro2.lote) {
             if (where)
@@ -123,7 +118,7 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(f.Lote Like '${criteria}')`;
-        };
+        }
 
         if (filtro2.nombreCompania) {
             if (where)
@@ -137,7 +132,7 @@ Meteor.methods(
             criteria = `%${criteria}%`;
 
             where += `(p.Nombre Like '${criteria}')`;
-        };
+        }
 
 
         if (filtro2.soloFacturasConRetencionIva) {
@@ -147,7 +142,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(f.RetencionSobreIva Is Not Null And f.RetencionSobreIva <> 0)`;
-        };
+        }
 
         if (filtro2.soloFacturasConRetencionIslr) {
             if (where)
@@ -156,7 +151,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(f.ImpuestoRetenido Is Not Null And f.ImpuestoRetenido <> 0)`;
-        };
+        }
 
         if (filtro2.soloNotasDeCredito) {
             if (where)
@@ -165,7 +160,7 @@ Meteor.methods(
                 where = "(1 = 1) And ";
 
             where += `(f.NcNdFlag Is Not Null And f.NcNdFlag <> '')`;
-        };
+        }
 
 
         if (where)
@@ -194,7 +189,7 @@ Meteor.methods(
 
             lista += ")";
             where += `(f.Estado In ${lista})`;
-        };
+        }
 
         // cxcCxPFlag (CxC, CxP, ...)
         if (_.isArray(filtro2.cxcCxP) && filtro2.cxcCxP.length > 0) {
@@ -215,7 +210,7 @@ Meteor.methods(
 
             lista += ")";
             where += `(f.CxCCxPFlag In ${lista})`;
-        };
+        }
 
         // compañías
         if (_.isArray(filtro2.proveedores) && filtro2.proveedores.length > 0) {
@@ -236,7 +231,7 @@ Meteor.methods(
 
             lista += ")";
             where += `(f.Proveedor In ${lista})`;
-        };
+        }
 
 
         if (!where)
@@ -262,7 +257,7 @@ Meteor.methods(
                                      Inner Join Pagos p On dp.ClaveUnicaPago = p.ClaveUnica
                                      Where ${periodoPago} And p.Cia = ${ciaContab.toString()}
                                 )`;
-        };
+        }
 
 
         // ---------------------------------------------------------------------------------------------------
@@ -309,7 +304,7 @@ Meteor.methods(
 
         if (response.result.length == 0) {
             return "Cero registros han sido leídos desde sql server.";
-        };
+        }
 
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
@@ -363,4 +358,4 @@ Meteor.methods(
 
         return "Ok, las facturas han sido leídos desde sql server.";
     }
-});
+})

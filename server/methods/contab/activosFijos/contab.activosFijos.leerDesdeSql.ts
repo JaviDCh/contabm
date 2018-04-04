@@ -28,41 +28,21 @@ Meteor.methods(
 
         if (filtro2.fechaCompra1) {
             if (filtro2.fechaCompra2) {
-                where = `(af.Fecha Between '${moment(filtro2.fechaCompra1).format('YYYY-MM-DD')}' And '${moment(filtro2.fechaCompra2).format('YYYY-MM-DD')}')`;
+                where = `(af.FechaCompra Between '${moment(filtro2.fechaCompra1).format('YYYY-MM-DD')}' And '${moment(filtro2.fechaCompra2).format('YYYY-MM-DD')}')`;
             }
             else { 
-                where = `(af.Fecha = '${moment(filtro2.fechaCompra1).format('YYYY-MM-DD')}')`;
+                where = `(af.FechaCompra = '${moment(filtro2.fechaCompra1).format('YYYY-MM-DD')}')`;
             }  
         }
 
         if (filtro2.fechaDesincorporacion1) {
             if (filtro2.fechaDesincorporacion2) {
-                where = `(af.Fecha Between '${moment(filtro2.fechaDesincorporacion1).format('YYYY-MM-DD')}' And '${moment(filtro2.fechaDesincorporacion2).format('YYYY-MM-DD')}')`;
+                where = `(af.FechaDesincorporacion Between '${moment(filtro2.fechaDesincorporacion1).format('YYYY-MM-DD')}' And '${moment(filtro2.fechaDesincorporacion2).format('YYYY-MM-DD')}')`;
             }
             else { 
-                where = `(af.Fecha = '${moment(filtro2.fechaDesincorporacion1).format('YYYY-MM-DD')}')`;
+                where = `(af.FechaDesincorporacion = '${moment(filtro2.fechaDesincorporacion1).format('YYYY-MM-DD')}')`;
             }  
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // descripcion 
         if (filtro2.descripcion) {
@@ -134,25 +114,6 @@ Meteor.methods(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if (where) { 
             where += " And ";
         }  
@@ -167,7 +128,7 @@ Meteor.methods(
 
         let query = `Select af.ClaveUnica as claveUnica, af.Descripcion as descripcion, 
                      d.Descripcion as departamento, tp.Descripcion as tipoProducto, 
-                     pr.Abreviatura, af.FechaCompra as fechaCompra, af.Serial as serial, 
+                     pr.Abreviatura as proveedor, af.FechaCompra as fechaCompra, af.Serial as serial, 
                      af.Modelo as modelo, af.Placa as placa, af.CostoTotal as costoTotal, 
                      af.ValorResidual as valorResidual, af.MontoADepreciar as montoADepreciar, 
                      af.DesincorporadoFlag as desincorporadoFlag, af.FechaDesincorporacion as fechaDesincorporacion 
@@ -207,8 +168,8 @@ Meteor.methods(
         let cantidadRecs = 0;
         let numberOfProcess = 1;
         let currentProcess = 1;
-        EventDDP.matchEmit('bancos_cajaChica_reportProgressDesdeSqlServer',
-                            { myuserId: this.userId, app: 'bancos', process: 'leerBancosCajaChicaDesdeSqlServer' },
+        EventDDP.matchEmit('contab_activosFijos_reportProgressDesdeSqlServer',
+                            { myuserId: this.userId, app: 'contab', process: 'leerContabActivosFijosDesdeSqlServer' },
                             { current: 1, max: numberOfProcess, progress: '0 %' });
         // -------------------------------------------------------------------------------------------------------------
 
@@ -234,16 +195,16 @@ Meteor.methods(
             cantidadRecs++;
             if (numberOfItems <= 30) {
                 // hay menos de 20 registros; reportamos siempre ...
-                EventDDP.matchEmit('bancos_cajaChica_reportProgressDesdeSqlServer',
-                                    { myuserId: this.userId, app: 'bancos', process: 'leerBancosCajaChicaDesdeSqlServer' },
+                EventDDP.matchEmit('contab_activosFijos_reportProgressDesdeSqlServer',
+                                    { myuserId: this.userId, app: 'contab', process: 'leerContabActivosFijosDesdeSqlServer' },
                                     { current: currentProcess, max: numberOfProcess,
                                       progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
             }
             else {
                 reportar++;
                 if (reportar === reportarCada) {
-                    EventDDP.matchEmit('bancos_cajaChica_reportProgressDesdeSqlServer',
-                                        { myuserId: this.userId, app: 'bancos', process: 'leerBancosCajaChicaDesdeSqlServer' },
+                    EventDDP.matchEmit('contab_activosFijos_reportProgressDesdeSqlServer',
+                                        { myuserId: this.userId, app: 'contab', process: 'leerContabActivosFijosDesdeSqlServer' },
                                         { current: currentProcess, max: numberOfProcess,
                                           progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;

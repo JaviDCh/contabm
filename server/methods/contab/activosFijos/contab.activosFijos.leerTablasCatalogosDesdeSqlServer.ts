@@ -1,24 +1,24 @@
 
 
 import SimpleSchema from 'simpl-schema';
-import { CajaChica_Rubros_sql, CajaChica_CajasChicas_sql } from '../../../imports/sqlModels/bancos/cajasChicas'; 
 import { Proveedores_sql } from '../../../imports/sqlModels/bancos/proveedores'; 
+import { Departamentos_sql } from '../../../imports/sqlModels/nomina/catalogos/departamentos'; 
+import { TiposDeProducto_sql } from '../../../imports/sqlModels/contab/tiposProducto'; 
 
 // leemos los catálogos necesarios para el registro de proveedores desde sql server
 // nota: algunos católogos existen siempre en mongo; éstos no y hay que leerlos siempre desde sql
 Meteor.methods(
     {
-        'bancos.cajaChica.leerTablasCatalogosDesdeSqlServer': function (ciaContab) {
+        'contab.activosFijos.leerTablasCatalogosDesdeSqlServer': function (ciaContab) {
 
             new SimpleSchema({
                 ciaContab: { type: Number, optional: false, },
             }).validate({ ciaContab, });
     
-            // cajas chicas 
+            // tDepartamentos
             let response: any = null;
             response = Async.runSync(function(done) {
-                CajaChica_CajasChicas_sql.findAll({ 
-                    where: { ciaContab: ciaContab }, 
+                Departamentos_sql.findAll({ 
                     order: [ ['descripcion', 'ASC'] ], 
                     raw: true, })
                     .then(function(result) { done(null, result); })
@@ -30,12 +30,12 @@ Meteor.methods(
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
             }
 
-            let cajasChicas = response.result;
+            let departamentos = response.result;
 
-            // rubros de caja chica 
+            // TiposDeProducto
             response = null;
             response = Async.runSync(function(done) {
-                CajaChica_Rubros_sql.findAll({ 
+                TiposDeProducto_sql.findAll({ 
                     order: [ ['descripcion', 'ASC'] ], 
                     raw: true, })
                     .then(function(result) { done(null, result); })
@@ -47,7 +47,7 @@ Meteor.methods(
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
             }
             
-            let rubrosCajaChica = response.result; 
+            let tiposProducto = response.result; 
 
             // proveedores
             response = null;
@@ -68,9 +68,9 @@ Meteor.methods(
             let proveedores = response.result; 
     
             return JSON.stringify({
-                cajasChicas: cajasChicas,
-                rubrosCajaChica: rubrosCajaChica, 
+                departamentos: departamentos,
+                tiposProducto: tiposProducto, 
                 proveedores: proveedores, 
             });
         }
-    })
+    });

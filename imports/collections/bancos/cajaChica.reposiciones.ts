@@ -32,7 +32,7 @@ export const CajaChica_Reposiciones_Gastos_SimpleSchema = new SimpleSchema({
 
 export const CajaChica_Reposiciones_SimpleSchema = new SimpleSchema({
     reposicion: { type: SimpleSchema.Integer, label: 'Número', optional: false },
-    fecha: { type: Date, label: 'Fecha', optional: false, min: 1, max: 70, },
+    fecha: { type: Date, label: 'Fecha', optional: false, },
     cajaChica: { type: SimpleSchema.Integer, label: 'Caja chica', optional: false,  },
     estadoActual: { type: String, label: 'Estado actual', optional: false, min: 1, max: 2, },
     observaciones: { type: String, label: 'Observaciones', optional: false, min: 1, max: 250, },
