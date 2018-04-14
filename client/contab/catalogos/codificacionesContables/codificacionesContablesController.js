@@ -619,6 +619,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
 
           enableSorting: true,
           showColumnFooter: false,
+          enableFiltering: true,
           enableCellEdit: false,
           enableCellEditOnFocus: true,
           enableRowSelection: true,
@@ -688,6 +689,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableColumnMenu: false,
               enableCellEdit: true,
               enableSorting: true,
+              enableFiltering: true,
               type: 'string'
           },
           {
@@ -700,6 +702,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableColumnMenu: false,
               enableCellEdit: true,
               enableSorting: true,
+              enableFiltering: true,
               type: 'string'
           },
           {
@@ -770,32 +773,14 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               (x) => { return x.codificacionContable_ID === codificacionSeleccionada._id; });
       };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       let codigos_ui_grid_api2 = null;
 
       $scope.codigos_ui_grid2 = {
 
           enableSorting: true,
           showColumnFooter: false,
-        //   enableCellEdit: false,
-        //   enableCellEditOnFocus: true,
           enableRowSelection: true,
+          enableFiltering: true,
           enableRowHeaderSelection: false,
           multiSelect: false,
           enableSelectAll: false,
@@ -845,6 +830,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableColumnMenu: false,
               enableCellEdit: true,
               enableSorting: true,
+              enableFiltering: true,
               type: 'string'
           },
           {
@@ -857,30 +843,10 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableColumnMenu: false,
               enableCellEdit: true,
               enableSorting: true,
+              enableFiltering: true,
               type: 'string'
           },
-      ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      ]
 
       // ui-grid para mostrar las cuentas contables asociadas a cada codigo (en la codificación seleccionada)
 
@@ -903,7 +869,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
 
       $scope.codigosCuentasContables_ui_grid.columnDefs = [
@@ -943,7 +909,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableFiltering: false,
               width: 25,
           },
-      ];
+      ]
 
 
 
@@ -959,25 +925,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
           // refrescamos las cuentas contables en el ui-grid ...
           $scope.codigosCuentasContables_ui_grid.data = _.filter($scope.codificacionesContables_codigos_cuentasContables,
                                                                  (x) => { return x.codigoContable_ID == codigoSeleccionado._id; });
-      };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      }
 
 
       let cuentaContableSeleccionada = {};
@@ -1056,13 +1004,13 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
           getRowIdentity: function (row) {
               return row._id;
           }
-      };
+      }
 
       // para detener el angular $Interval que usamos en el ui-gris arriba, cuando el $scope es destruido ...
       $scope.$on('$destroy', function() {
           // Make sure that the interval is destroyed too
           $interval.cancel(angularInterval);
-        });
+        })
 
 
       $scope.cuentasContables_ui_grid.columnDefs = [
@@ -1132,21 +1080,10 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Contab_Codifica
               enableSorting: true,
               type: 'number'
           },
-      ];
-
-
-
-
-
-
-
-
-
-
+      ]
 
 
       $scope.grabar = function () {
-        //   debugger;
 
         // antes de intentar validar y grabar como lo hacemos normalmente, hacemos una validación previa
         let validacionResultado = validarCodigoContable($scope.codificacionesContables,

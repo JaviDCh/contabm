@@ -89,28 +89,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         $scope.showProgress = true;
 
         // cuando el usuario cambia la fecha, intentamos leer e inicializar el factor de cambio ...
-        Meteor.call('leerFactorCambioMasReciente', $scope.asientoContable.fecha, (err, result) => {
+        Meteor.call('contab.asientos.leerFactorCambioMasReciente', $scope.asientoContable.fecha, (err, result) => {
 
             if (err) {
-                let errorMessage = "<b>Error:</b> se ha producido un error al intentar ejecutar la operación.";
-                if (err.errorType)
-                    errorMessage += " (" + err.errorType + ")";
-
-                errorMessage += "<br />";
-
-                if (err.message)
-                    // aparentemente, Meteor compone en message alguna literal que se regrese en err.reason ...
-                    errorMessage += err.message + " ";
-                else {
-                    if (err.reason)
-                        errorMessage += err.reason + " ";
-
-                    if (err.details)
-                        errorMessage += "<br />" + err.details;
-                };
-
-                if (!err.message && !err.reason && !err.details)
-                    errorMessage += err.toString();
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({

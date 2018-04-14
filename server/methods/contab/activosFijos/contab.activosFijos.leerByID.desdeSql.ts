@@ -35,9 +35,9 @@ Meteor.methods(
 
             // ajustamos las fechas para revertir la conversión que ocurre, para intentar convertir desde utc a local
             activoFijo.fechaCompra = activoFijo.fechaCompra ? moment(activoFijo.fechaCompra).add(TimeOffset, 'hours').toDate() : null;
-            activoFijo.fechaDesincorporacion = activoFijo.fechaCompra ? moment(activoFijo.fechaCompra).add(TimeOffset, 'hours').toDate() : null;
-            activoFijo.ingreso = activoFijo.fechaCompra ? moment(activoFijo.fechaCompra).add(TimeOffset, 'hours').toDate() : null;
-            activoFijo.ultAct = activoFijo.fechaCompra ? moment(activoFijo.fechaCompra).add(TimeOffset, 'hours').toDate() : null;
+            activoFijo.fechaDesincorporacion = activoFijo.fechaDesincorporacion ? moment(activoFijo.fechaDesincorporacion).add(TimeOffset, 'hours').toDate() : null;
+            activoFijo.ingreso = activoFijo.ingreso ? moment(activoFijo.ingreso).add(TimeOffset, 'hours').toDate() : null;
+            activoFijo.ultAct = activoFijo.ultAct ? moment(activoFijo.ultAct).add(TimeOffset, 'hours').toDate() : null;
         }
 
         return JSON.stringify(activoFijo);

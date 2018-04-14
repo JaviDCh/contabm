@@ -1,10 +1,9 @@
 
 Meteor.methods(
 {
-    leerFactorCambioMasReciente: function (fecha) {
-        // debugger;
+    'contab.asientos.leerFactorCambioMasReciente': function (fecha) {
         check(fecha, Date);
         let factorCambio = ContabFunctions.leerCambioMonedaMasReciente(fecha);
         return factorCambio;
     }
-});
+})

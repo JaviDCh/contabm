@@ -1,6 +1,5 @@
 
 
-
 import * as numeral from 'numeral';
 import * as moment from 'moment';
 import * as lodash from 'lodash';
@@ -10,6 +9,9 @@ import { Companias } from '../../../../imports/collections/companias';
 import { CompaniaSeleccionada } from '../../../../imports/collections/companiaSeleccionada';
 import { Filtros } from '../../../../imports/collections/general/filtros'; 
 import { Temp_Consulta_Contab_ActivosFijos } from '../../../../imports/collections/contab/temp.contab.consulta.activosFijos'; 
+import { Empleados } from '../../../../models/nomina/empleados'; 
+
+import { ActivosFijos_SimpleSchema } from '../../../../imports/collections/contab/inventarioActivosFijos'; 
 
 import { DialogModal } from '../../../generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
@@ -65,10 +67,18 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         },
     })
 
+    $scope.helpers({
+        empleados: () => {
+            return Empleados.find({ cia:  $scope.companiaSeleccionada ? $scope.companiaSeleccionada.numero : -999 },
+                                  { fields: { empleado: 1, alias: 1 },
+                                    sort: { alias: 1 }});
+        },
+    });
+
 
     $scope.refresh0 = function () {
-        if ($scope.reposicion && $scope.reposicion.docState && $scope.reposicion.docState === 1) { 
-            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
+        if ($scope.activoFijo && $scope.activoFijo.docState && $scope.activoFijo.docState === 1) { 
+            DialogModal($modal, "<em>Contab - Activos fijos</em>",
                                 `Ud. está ahora agregando un registro nuevo, no hay nada que refrescar.<br />
                                  Ud. puede deshacer los cambios y, nuevamente, intentar agregar un nuevo registro, si hace un  
                                  <em>click</em> en <em>Nuevo, e indica que desea perder los cambios. <br /><br />
@@ -78,10 +88,9 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             return; 
         }
 
-        if ($scope.reposicion && $scope.reposicion.docState) {
-            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
-                                `Aparentemente, Ud. ha efectuado cambios; aún así,
-                                desea <em>refrescar el registro</em> y perder los cambios?`,
+        if ($scope.activoFijo && $scope.activoFijo.docState) {
+            DialogModal($modal, "<em>Contab - Activos fijos</em>",
+                                `Aparentemente, Ud. ha efectuado cambios; aún así, desea <em>refrescar el registro</em> y perder los cambios?`,
                                 true).then(
                 function (resolve) {
                     refresh();
@@ -99,12 +108,12 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
     let refresh = () => {
         // si el usuario hace un click en Refresh, leemos nuevamente el item seleccionado en la lista ...
-        $scope.reposicion = {};
+        $scope.activoFijo = {};
         // $scope.aplicarFiltro();
 
         if (itemSeleccionado) {
             // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
-            inicializarItem(itemSeleccionado.reposicion, $scope).then((result) => { 
+            inicializarItem(itemSeleccionado.claveUnica, $scope).then((result) => { 
                 // en este momento, podemos hacer algo con el registro que se leyó de la base de datos ... 
             })
         }
@@ -200,6 +209,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
             enableColumnMenu: false,
             enableSorting: false,
+            pinnedLeft: true,
             width: 25
         },
         {
@@ -213,6 +223,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {       
@@ -225,6 +236,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             cellClass: 'ui-grid-leftCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -397,22 +409,15 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     $scope.deleteItem = function (item) {
         // nótese como  indicamos que el usuario no quiere seleccionar el item en la lista, solo marcarlo para ser eliminado;
         // la idea es que el item se marque para ser eliminado, pero no se muestre (sus detalles) en el tab que sigue ...
-        if (item.docState && item.docState === 1) {
-            // si el item es nuevo, simplemente lo eliminamos del array
-            lodash.remove($scope.activosFijos, (x:any) => { return x._id === item._id; });
-            itemSeleccionadoParaSerEliminado = true;
-        }
-        else {
-            item.docState = 3;
 
-            if (lodash.some($scope.activosFijos, (x:any) => { return x._id === item._id; })) {
-                // creo que ésto no debería ser necesario! sin embargo, al actualizar item arriba no se actualiza el item que corresponde en
-                // el array ($scope.proveedores)
-                lodash.find($scope.activosFijos, (x:any) => { return x._id === item._id; }).docState = 3;
-            }
-
-            itemSeleccionadoParaSerEliminado = true;
+        if (item.docState === 3) {
+            delete $scope.activosFijos.find(x => x.claveUnica === item.claveUnica).docState; 
         }
+        else { 
+            $scope.activosFijos.find(x => x.claveUnica === item.claveUnica).docState = 3;
+        }
+
+        itemSeleccionadoParaSerEliminado = true;
     }
 
     $scope.eliminar = function () {
@@ -433,9 +438,8 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
     $scope.nuevo = function () {
         if ($scope.reposicion && $scope.reposicion.docState) {
-            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
-                                `Aparentemente, Ud. ha efectuado cambios; aún así,
-                                desea <em>agregar un nuevo registro</em> y perder los cambios?`,
+            DialogModal($modal, "<em>Contab - Activos fijos</em>",
+                                `Aparentemente, Ud. ha efectuado cambios; aún así, desea <em>agregar un nuevo registro</em> y perder los cambios?`,
                                 true).then(
                 function (resolve) {
                     // inicializarItem regresa un promise; cuando se ejecuta, regresa la reposición ... 
@@ -458,6 +462,72 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     // para limpiar el filtro, simplemente inicializamos el $scope.filtro ...
     $scope.limpiarFiltro = function () {
         $scope.filtro = {};
+    }
+
+
+    // solo para eliminar los registros que el usuario 'marca' en la lista
+    $scope.grabarEliminaciones = () => {
+
+        if (!$scope.activosFijos.find((x: any) => x.docState && x.docState === 3)) {
+            DialogModal($modal, "<em>Contab - Activos fijos - Eliminar desde la lista</em>",
+                                `Aparentemente, <em>Ud. no ha marcado</em> registros en la lista para ser eliminados.<br />.<br />
+                                 Recuerde que mediante esta función Ud. puede eliminar los registros que se hayan <em>marcado</em> (
+                                 haciendo un <em>click</em> en la x roja al final de cada registro) para ello en la lista.`,
+                                false).then();
+            return;
+        }
+
+        grabarEliminaciones2();
+    }
+
+    let grabarEliminaciones2 = function() {
+
+        $scope.showProgress = true;
+        let registrosAEliminar = $scope.activosFijos.filter((x) => x.docState && x.docState === 3);
+
+        Meteor.call('contab.activosFijos.eliminar', registrosAEliminar, (err, resolve) => {
+
+            if (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+                $scope.showProgress = false;
+                $scope.$apply()
+
+                return;
+            }
+
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'info',
+                msg: resolve
+            });
+
+            Meteor.call('getCollectionCount', 'Temp_Consulta_Contab_ActivosFijos', (err, result) => {
+
+                if (err) {
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+    
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
+                    });
+    
+                    $scope.showProgress = false;
+                    $scope.$apply();
+                    return;
+                }
+    
+                // el método regresa la cantidad de items en el collection (siempre para el usuario)
+                recordCount = result;
+                $scope.leerRegistrosDesdeServer(limit, false);      // false para que no muestre su propio mensaje y se mantenga el de arriba   
+            })  
+        })
     }
 
     $scope.aplicarFiltro = function () {
@@ -548,7 +618,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
 
     let subscriptionHandle = {} as any;
-    $scope.leerRegistrosDesdeServer = function (limit) {
+    $scope.leerRegistrosDesdeServer = function (limit, mostrarPropioMensaje = true) {
         // la idea es 'paginar' los registros que se suscriben, de 50 en 50
         // el usuario puede indicar 'mas', para leer 50 más; o todos, para leer todos los registros ...
         $scope.showProgress = true;
@@ -575,13 +645,15 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
             $scope.activosFijos_ui_grid.data = $scope.activosFijos;
 
-            $scope.alerts.length = 0;
-            $scope.alerts.push({
-                type: 'info',
-                msg: `${numeral($scope.activosFijos.length).format('0,0')} registros
-                    (de ${numeral(recordCount).format('0,0')}) han sido seleccionados ...`
-            });
-
+            if (mostrarPropioMensaje) { 
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: `${numeral($scope.activosFijos.length).format('0,0')} registros
+                        (de ${numeral(recordCount).format('0,0')}) han sido seleccionados ...`
+                });
+            }
+            
             $scope.showProgress = false;
             $scope.$apply();
         })
@@ -597,24 +669,6 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         limit = recordCount;
         $scope.leerRegistrosDesdeServer(limit);     // cada vez se leen 50 más ...
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -645,11 +699,11 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         let errores = [];
 
         if (editedItem.docState != 3) {
-            isValid = CajaChica_Reposiciones_SimpleSchema.namedContext().validate(editedItem);
+            isValid = ActivosFijos_SimpleSchema.namedContext().validate(editedItem);
 
             if (!isValid) {
-                CajaChica_Reposiciones_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
-                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + CajaChica_Reposiciones_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'.");
+                ActivosFijos_SimpleSchema.namedContext().validationErrors().forEach(function (error) {
+                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + ActivosFijos_SimpleSchema.label(error.name) + "'; error de tipo '" + error.type + "'." as never);
                 });
             }
         }
@@ -673,7 +727,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             return;
         }
 
-        Meteor.call('bancos.cajaChica.save', editedItem, (err, result) => {
+        Meteor.call('contab.activosFijos.save', editedItem, (err, result) => {
 
             if (err) {
                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
@@ -721,22 +775,28 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     }
 
 
+    $scope.calcularDepreciacion = function() { 
+        let result = calcularDepreciacion($scope.activoFijo); 
 
+        if (result.error) { 
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: result.message
+            });
+        } else { 
+            $scope.activoFijo.depreciarDesdeMes = result.activoFijo.depreciarDesdeMes; 
+            $scope.activoFijo.depreciarDesdeAno = result.activoFijo.depreciarDesdeAno; 
+            $scope.activoFijo.depreciarHastaMes = result.activoFijo.depreciarHastaMes; 
+            $scope.activoFijo.depreciarHastaAno = result.activoFijo.depreciarHastaAno; 
+            $scope.activoFijo.cantidadMesesADepreciar = result.activoFijo.cantidadMesesADepreciar; 
+            $scope.activoFijo.montoDepreciacionMensual = result.activoFijo.montoDepreciacionMensual; 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if (!$scope.activoFijo.docState) { 
+                $scope.activoFijo.docState = 2;
+            }
+        }
+    }
 
 
     // ------------------------------------------------------------------------------------------------------
@@ -798,16 +858,20 @@ function inicializarItem(itemID, $scope) {
         if (itemID == 0) {
             $scope.showProgress = true;
             $scope.reposicion = {};
-            let usuario =  Meteor.user();
+            let usuario: any =  Meteor.user();
     
-            $scope.reposicion = {
-                reposicion: 0,
-                fecha: new Date(),
-                estadoActual: "AB", 
-                cajaChica_reposicion_gastos: [], 
+            $scope.activoFijo = {
+                claveUnica: 0,
+                fechaCompra: new Date(),
+
+                ingreso: new Date(), 
+                ultAct: new Date(), 
+                usuario: usuario.emails[0].address,
+                cia: $scope.companiaSeleccionada.numero, 
+
                 docState: 1
             };
-    
+
             $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
             $scope.reportLink = "#";                // para invalidar el link que permite imprimir, hasta que el usuario grabe ... 
             $scope.activeTab = { tab1: false, tab2: false, tab3: true, };
@@ -880,4 +944,64 @@ function item_leerByID_desdeSql(pk, $scope) {
             }
         })
     })
+}
+
+
+function calcularDepreciacion(activoFijo) { 
+
+    if (!activoFijo.fechaCompra || !activoFijo.montoADepreciar || !activoFijo.numeroDeAnos) { 
+        return { 
+            error: true, 
+            message: `Antes de intentar determinar la depreciación del activo, debe haber valores indicados para los siguientes campos: 
+                      fecha de compra, monto a depreciar y cantidad de años.<br /><br /> 
+                      Por favor indique valores para estos campos y luego regrese a ejecutar esta función. 
+                     `
+        }
+    }
+
+    let depreciarDesde_mes: number; 
+    let depreciarDesde_ano: number; 
+
+    if (!activoFijo.depreciarDesdeMes) { 
+        depreciarDesde_mes = activoFijo.fechaCompra.getMonth() + 1; 
+    } else { 
+        depreciarDesde_mes = activoFijo.depreciarDesdeMes;
+    }
+
+    if (!activoFijo.depreciarDesdeAno) { 
+        depreciarDesde_ano = activoFijo.fechaCompra.getFullYear();
+    } else { 
+        depreciarDesde_ano = activoFijo.depreciarDesdeAno;
+    }
+
+    let fechaDepreciar_desde = new Date(depreciarDesde_ano, depreciarDesde_mes -1, 1); 
+    let fechaDepreciar_hasta = moment(fechaDepreciar_desde).add((activoFijo.numeroDeAnos * 12) -1, 'months').toDate();
+
+    let depreciarHasta_mes = fechaDepreciar_hasta.getMonth() + 1;
+    let depreciarHasta_ano = fechaDepreciar_hasta.getFullYear();
+
+    // determinamos la cantidad de meses entre ambas fechas 
+    let hasta = moment(fechaDepreciar_hasta);
+    let desde = moment(fechaDepreciar_desde);
+
+    let cantidadMeses = hasta.diff(desde, 'months') + 1;
+
+    let montoDepreciacionMensual = 0; 
+
+    if (cantidadMeses) {
+        montoDepreciacionMensual = activoFijo.montoADepreciar / cantidadMeses;
+        montoDepreciacionMensual = lodash.round(montoDepreciacionMensual, 4);
+    }
+
+    activoFijo.depreciarDesdeMes = depreciarDesde_mes; 
+    activoFijo.depreciarDesdeAno = depreciarDesde_ano; 
+    activoFijo.depreciarHastaMes = depreciarHasta_mes; 
+    activoFijo.depreciarHastaAno = depreciarHasta_ano; 
+    activoFijo.cantidadMesesADepreciar = cantidadMeses; 
+    activoFijo.montoDepreciacionMensual = montoDepreciacionMensual; 
+
+    return { 
+        error: false, 
+        activoFijo: activoFijo, 
+    }
 }

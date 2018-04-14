@@ -52,7 +52,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     // -------------------------------------------------------------------------------------------
     // leemos los catálogos en el $scope
-
     $scope.helpers({
         tiposAsientoContable: () => {
             return TiposAsientoContable.find();

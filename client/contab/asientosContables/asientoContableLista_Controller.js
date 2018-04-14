@@ -7,7 +7,7 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Contab_AsientoContableLista_Controller",
-['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
+['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 
 function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.origen = $stateParams.origen;
@@ -129,6 +129,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     let asientosContables_ui_grid_api = null;
     let asientoContableSeleccionado = {};
 
+    let itemSeleccionadoParaSerEliminado = false;
+
     $scope.asientosContables_ui_grid = {
 
         enableSorting: true,
@@ -149,11 +151,19 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
                 if (row.isSelected) {
                     asientoContableSeleccionado = row.entity;
+
+                    if (itemSeleccionadoParaSerEliminado) {
+                        // cuando el usuario hace un click en 'x' para eliminar el item en la lista, no lo mostramos en el tab que sigue
+                        itemSeleccionadoParaSerEliminado = false;
+                        return;
+                    }
+
                     asientoContable_leerByID_desdeSql(asientoContableSeleccionado.numeroAutomatico);
                 }
-                else
+                else { 
                     return;
-            });
+                } 
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row) {
@@ -162,10 +172,23 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         getRowIdentity: function (row) {
             return row._id;
         }
-    };
+    }
 
 
     $scope.asientosContables_ui_grid.columnDefs = [
+        {
+            name: 'docState',
+            field: 'docState',
+            displayName: '',
+            cellTemplate:
+            '<span ng-show="row.entity[col.field] == 1" class="fa fa-asterisk" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 2" class="fa fa-pencil" style="color: #A5999C; font: xx-small; padding-top: 8px; "></span>' +
+            '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
+            enableColumnMenu: false,
+            enableSorting: false,
+            pinnedLeft: true,
+            width: 25
+        },
         {
             name: 'numero',
             field: 'numero',
@@ -176,6 +199,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {
@@ -189,6 +213,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'date'
         },
         {
@@ -201,6 +226,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -213,6 +239,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-leftCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -226,6 +253,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {
@@ -238,6 +266,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             headerCellClass: 'ui-grid-centerCell',
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
+            pinnedLeft: true,
             enableSorting: true,
             type: 'number'
         },
@@ -251,6 +280,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             cellClass: 'ui-grid-centerCell',
             enableColumnMenu: false,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {
@@ -343,7 +373,96 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             enableSorting: true,
             type: 'date'
         },
-    ];
+        {
+            name: 'delButton',
+            displayName: '',
+            cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',
+            enableCellEdit: false,
+            enableSorting: false,
+            pinnedLeft: false,
+            width: 25
+        },
+    ]
+
+    $scope.deleteItem = function (item) {
+        // nótese como  indicamos que el usuario no quiere seleccionar el item en la lista, solo marcarlo para ser eliminado;
+        // la idea es que el item se marque para ser eliminado, pero *no se muestre* (sus detalles) en el próximo state ...
+
+        if (item.docState === 3) {
+            delete $scope.asientosContables.find(x => x._id === item._id).docState; 
+        }
+        else { 
+            $scope.asientosContables.find(x => x._id === item._id).docState = 3;
+        }
+
+        itemSeleccionadoParaSerEliminado = true;
+    }
+
+    // solo para eliminar los registros que el usuario 'marca' en la lista
+    $scope.grabarEliminaciones = () => {
+
+        if (!$scope.asientosContables.find((x) => x.docState && x.docState === 3)) {
+            DialogModal($modal, "<em>Contab - Asientos contables - Eliminar desde la lista</em>",
+                                `Aparentemente, <em>Ud. no ha marcado</em> registros en la lista para ser eliminados.<br />.<br />
+                                 Recuerde que mediante esta función Ud. puede eliminar los registros que se hayan <em>marcado</em> (
+                                 haciendo un <em>click</em> en la x roja al final de cada registro) para ello en la lista.`,
+                                false).then();
+            return;
+        }
+
+        grabarEliminaciones2();
+    }
+
+    let grabarEliminaciones2 = function() {
+
+        $scope.showProgress = true;
+        let registrosAEliminar = $scope.asientosContables.filter((x) => x.docState && x.docState === 3).
+                                                          map(x => { return {  _id: x._id, 
+                                                                               numeroAutomatico: x.numeroAutomatico, 
+                                                                               fecha: x.fecha, 
+                                                                               asientoTipoCierreAnualFlag: x.asientoTipoCierreAnualFlag, 
+                                                                               cia: x.cia, 
+                                                                               docState: x.docState
+                                                                   }});
+
+        Meteor.call('contab.asientosContables.eliminar', registrosAEliminar, (err, resolve) => {
+
+            if (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+                $scope.showProgress = false;
+                $scope.$apply()
+
+                return;
+            }
+
+            $scope.asientosContables_ui_grid.data = [];
+
+            // suscribimos a los asientos que se han leído desde sql y grabado a mongo para el usuario
+            Meteor.subscribe('tempConsulta_asientosContables', () => {
+
+                $scope.helpers({
+                    asientosContables: () => Temp_Consulta_AsientosContables.find({ user: Meteor.userId() }, { sort: { fecha: true, numero: true }}), 
+                })
+
+                $scope.asientosContables_ui_grid.data = $scope.asientosContables;
+
+                $scope.$parent.alerts.length = 0;
+                $scope.$parent.alerts.push({
+                    type: 'info',
+                    msg: resolve
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+            })
+        })
+    }
 
 
     function asientoContable_leerByID_desdeSql(pk) {
@@ -384,9 +503,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     $scope.showProgress = true;
     Meteor.subscribe('tempConsulta_asientosContables', () => {
 
-        $scope.asientosContables = Temp_Consulta_AsientosContables.find({ user: Meteor.userId() },
-                                                                        { sort: { fecha: true, numero: true }})
-                                                                  .fetch();
+        $scope.helpers({
+            asientosContables: () => Temp_Consulta_AsientosContables.find({ user: Meteor.userId() }, { sort: { fecha: true, numero: true }}), 
+        })
 
         $scope.asientosContables_ui_grid.data = $scope.asientosContables;
 

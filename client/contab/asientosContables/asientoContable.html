@@ -219,22 +219,9 @@
                         <br />
 
                         <div class="row row-centered">
-                            <div class="col-sm-3 col-centered">
-                            </div>
-                            <div class="col-sm-3 col-centered">
-                            </div>
-                            <div class="col-sm-3 col-centered">
-                                <div class="form-group">
-                                    <label class="col-sm-3">Cia: </label>
-                                    <span class="col-sm-9">{{ asientoContable.cia | companiaNombreCortoFilter_byNumeroContab }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <br />
-
-                        <div class="row" style="background-color: #F2F2F2; border: 1px solid darkgray; font-size: x-small; ">
+                            <div class="col-sm-11 col-centered" style="background-color: #F2F2F2; border: 1px solid darkgray; font-size: x-small; "> 
                                 <!-- ingreso, ult actualización y usuario  -->
-                                <div class="col-sm-4 col-centered" style="text-align: center; ">
+                                <div class="col-sm-4" style="text-align: center; ">
                                     <label style="font-size: x-small; ">Ingreso: </label>
                                     <br />
                                     <span>{{ asientoContable.ingreso | date:'dd-MM-yyyy hh:mm a' }} </span>

@@ -33,10 +33,10 @@ export const InventarioActivosFijos_sql = sequelize.define('inventarioActivosFij
     autorizadoPor: { type: Sequelize.INTEGER, field: 'AutorizadoPor', allowNull: true, },
     motivoDesincorporacion: { type: Sequelize.STRING, field: 'MotivoDesincorporacion', allowNull: true, validate: { len: [1, 500] },},
 
-    DepreciarDesdeMes: { type: Sequelize.INTEGER, field: 'DepreciarDesdeMes', allowNull: false, },
-    DepreciarDesdeAno: { type: Sequelize.INTEGER, field: 'DepreciarDesdeAno', allowNull: false, },
-    DepreciarHastaMes: { type: Sequelize.INTEGER, field: 'DepreciarHastaMes', allowNull: false, },
-    DepreciarHastaAno: { type: Sequelize.INTEGER, field: 'DepreciarHastaAno', allowNull: false, },
+    depreciarDesdeMes: { type: Sequelize.INTEGER, field: 'DepreciarDesdeMes', allowNull: false, },
+    depreciarDesdeAno: { type: Sequelize.INTEGER, field: 'DepreciarDesdeAno', allowNull: false, },
+    depreciarHastaMes: { type: Sequelize.INTEGER, field: 'DepreciarHastaMes', allowNull: false, },
+    depreciarHastaAno: { type: Sequelize.INTEGER, field: 'DepreciarHastaAno', allowNull: false, },
     cantidadMesesADepreciar: { type: Sequelize.INTEGER, field: 'CantidadMesesADepreciar', allowNull: false, },
     montoDepreciacionMensual: { type: Sequelize.DECIMAL(12, 2), field: 'MontoDepreciacionMensual', allowNull: false, },
 

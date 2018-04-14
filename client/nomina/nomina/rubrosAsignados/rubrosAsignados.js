@@ -59,12 +59,12 @@ angular.module("contabm").controller("RubrosAsignados_Controller",
 
       $scope.helpers({
           maestraRubros: () => {
-            return MaestraRubros.find({}, { items: { rubro: 1, nombreCortoRubro: 1 },
+            return MaestraRubros.find({}, { fields: { rubro: 1, nombreCortoRubro: 1 },
                                             sort: { nombreCortoRubro: 1 } });
           },
           empleados: () => {
               return Empleados.find({ cia:  companiaSeleccionada ? companiaSeleccionada.numero : -999 },
-                                    { items: { empleado: 1, alias: 1 },
+                                    { fields: { empleado: 1, alias: 1 },
                                       sort: { alias: 1 }});
           },
       });

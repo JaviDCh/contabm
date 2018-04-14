@@ -5,7 +5,7 @@ import SimpleSchema from 'simpl-schema';
 // estas tablas no existen en mongo; creamos este schema para validar cuando el usuario edita ... 
 // aunque las tablas solo existen en sql, estos schemas nos ayudan a validar que los datos sean correctos. 
 
-export const CajaChica_Reposiciones_SimpleSchema = new SimpleSchema({
+export const ActivosFijos_SimpleSchema = new SimpleSchema({
     claveUnica: { type: SimpleSchema.Integer, label: 'Clave única', optional: false },
 
     producto: { type: String, label: 'Producto', optional: true, min: 0, max: 15, },
@@ -32,10 +32,10 @@ export const CajaChica_Reposiciones_SimpleSchema = new SimpleSchema({
     autorizadoPor: { type: SimpleSchema.Integer, label: 'Autorizado por', optional: true, },
     motivoDesincorporacion: { type: String, label: 'Motivo de desincorporación', optional: true, min: 0, max: 500, },
 
-    DepreciarDesdeMes: { type: SimpleSchema.Integer, label: 'Depreciar desde - mes', optional: false, },
-    DepreciarDesdeAno: { type: SimpleSchema.Integer, label: 'Depreciar desde - año', optional: false, },
-    DepreciarHastaMes: { type: SimpleSchema.Integer, label: 'Depreciar hasta - mes', optional: false, },
-    DepreciarHastaAno: { type: SimpleSchema.Integer, label: 'Depreciar hasta - año', optional: false, },
+    depreciarDesdeMes: { type: SimpleSchema.Integer, label: 'Depreciar desde - mes', optional: false, },
+    depreciarDesdeAno: { type: SimpleSchema.Integer, label: 'Depreciar desde - año', optional: false, },
+    depreciarHastaMes: { type: SimpleSchema.Integer, label: 'Depreciar hasta - mes', optional: false, },
+    depreciarHastaAno: { type: SimpleSchema.Integer, label: 'Depreciar hasta - año', optional: false, },
     cantidadMesesADepreciar: { type: SimpleSchema.Integer, label: 'Cant meses a depreciar', optional: false, },
     montoDepreciacionMensual: { type: Number, label: 'Monto depreciación mensual', optional: false, },
 
