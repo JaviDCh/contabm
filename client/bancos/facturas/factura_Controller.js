@@ -592,19 +592,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 type: 'number'
             },
             {
-                name: 'codigo',
-                field: 'codigo',
-                displayName: 'Código',
-                width: 60,
-                enableFiltering: false,
-                headerCellClass: 'ui-grid-centerCell',
-                cellClass: 'ui-grid-centerCell',
-                enableColumnMenu: false,
-                enableCellEdit: true,
-                enableSorting: true,
-                type: 'string'
-            },
-            {
                 name: 'montoBase',
                 field: 'montoBase',
                 displayName: 'Monto base',
@@ -631,19 +618,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 enableCellEdit: true,
                 enableSorting: true,
                 type: 'number'
-            },
-            {
-                name: 'tipoAlicuota',
-                field: 'tipoAlicuota',
-                displayName: 'Tipo alícuota',
-                width: 80,
-                enableFiltering: false,
-                headerCellClass: 'ui-grid-centerCell',
-                cellClass: 'ui-grid-centerCell',
-                enableColumnMenu: false,
-                enableCellEdit: true,
-                enableSorting: true,
-                type: 'string'
             },
             {
                 name: 'montoAntesSustraendo',
@@ -686,6 +660,32 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 enableCellEdit: true,
                 enableSorting: true,
                 type: 'number'
+            },
+            {
+                name: 'codigo',
+                field: 'codigo',
+                displayName: 'Código',
+                width: 60,
+                enableFiltering: false,
+                headerCellClass: 'ui-grid-centerCell',
+                cellClass: 'ui-grid-centerCell',
+                enableColumnMenu: false,
+                enableCellEdit: true,
+                enableSorting: true,
+                type: 'string'
+            },
+            {
+                name: 'tipoAlicuota',
+                field: 'tipoAlicuota',
+                displayName: 'Tipo alícuota',
+                width: 80,
+                enableFiltering: false,
+                headerCellClass: 'ui-grid-centerCell',
+                cellClass: 'ui-grid-centerCell',
+                enableColumnMenu: false,
+                enableCellEdit: true,
+                enableSorting: true,
+                type: 'string'
             },
             {
                 name: 'fechaRecepcionPlanilla',
@@ -791,21 +791,19 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             // para hacerlo, leemos datos de parametrización que se registran para la compañía
             let contribuyenteEspecialFlag = false;
 
-            if ($scope.proveedor.contribuyenteEspecialFlag)
+            if ($scope.proveedor.contribuyenteEspecialFlag) { 
                 contribuyenteEspecialFlag = $scope.proveedor.contribuyenteEspecialFlag;
-
+            }
+                
             // inicialmente, obtenemos todos los valores que necesitamos para determinar impuestos y retenciones
-            let sujetoARetencionFlag = false;
+            // (solo con respecto al Iva y ret Iva; para retención de Islr, todo lo leemos en el catáglo respectivo más abajo)
             let ivaPorc = null;
             let retencionIvaPorc = null;
-            let retencionIslrPorc = null;
-            let impuestoRetenidoIslrSustraendo = null;
-            let codigoConceptoRetencionIslr = "";
 
-            if ($scope.proveedor.aplicaIvaFlag && $scope.parametrosGlobalBancos.ivaPorc)
+            if ($scope.proveedor.aplicaIvaFlag && $scope.parametrosGlobalBancos.ivaPorc) { 
                 ivaPorc = $scope.parametrosGlobalBancos.ivaPorc;
-
-
+            }
+                
             // determinamos el porcentaje de retención Iva para la compañía ...
             switch ($scope.factura.cxCCxPFlag) {
                 case 1: {
@@ -821,33 +819,23 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                                 retencionIvaPorc = $scope.proveedor.nuestraRetencionSobreIvaPorc;
                             } else {
                                 retencionIvaPorc = $scope.parametrosBancos.retencionSobreIvaPorc;
-                            };
-                        };
+                            }
+                        }
                         break;
                     }
                 case 2: {
                         // cuentas por cobrar (factura a un cliente)
                         if ($scope.proveedor.contribuyenteEspecialFlag) {
-                            if ($scope.proveedor.retencionSobreIvaPorc)
+                            if ($scope.proveedor.retencionSobreIvaPorc) { 
                                 retencionIvaPorc = $scope.proveedor.retencionSobreIvaPorc;
-                            else
+                            } 
+                            else { 
                                 retencionIvaPorc = $scope.parametrosBancos.retencionSobreIvaPorc;
-                        };
+                            }   
+                        }
                         break;
-                    };
-            };
-
-
-            if ($scope.proveedor.sujetoARetencionFlag && $scope.proveedor.porcentajeDeRetencion) {
-                sujetoARetencionFlag = true;
-                retencionIslrPorc = $scope.proveedor.porcentajeDeRetencion;
-
-                if ($scope.proveedor.retencionIslrSustraendo)
-                    impuestoRetenidoIslrSustraendo = $scope.proveedor.retencionIslrSustraendo;
-
-                if ($scope.proveedor.codigoConceptoRetencion)
-                    codigoConceptoRetencionIslr = $scope.proveedor.codigoConceptoRetencion;
-            };
+                    }
+            }
 
             // -------------------------------------------------------------------------------
             // 1) agregamos un registro a Facturas_Impuestos para el impuesto Iva
@@ -970,13 +958,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             // -------------------------------------------------------------------------------
             // 3) agregamos un registro a Facturas_Impuestos para la retención Islr
             if ($scope.factura.montoFacturaSinIva || $scope.factura.montoFacturaConIva) {
-                if (sujetoARetencionFlag && retencionIslrPorc) {
+                if ($scope.proveedor.sujetoARetencionFlag) {        
 
                     // la compañía indica que se debe aplicar un impuesto Iva; Nota: debemos buscar una definición en la tabla
                     // ImpuestosRetenciones_Definicion, para el valor predefinido 3 ...
-                    let definicionItem = _.find($scope.impuestosRetencionesDefinicion, (x) => {
-                        return x.Predefinido === 3;
-                    });
+                    let definicionItem = $scope.impuestosRetencionesDefinicion.find(x => x.Predefinido === 3);
 
                     if (!definicionItem) {
                         let message = `Error: aunque en el registro de la compañía se inidica que se debe aplicar
@@ -992,91 +978,161 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                         });
 
                         return;
-                    };
+                    }
 
-                    let montoBase = null;
-                    if ($scope.proveedor.baseRetencionISLR) {
-                        if (($scope.proveedor.baseRetencionISLR == 1 || $scope.proveedor.baseRetencionISLR == 3) &&
-                            $scope.factura.montoFacturaSinIva)
-                            montoBase = $scope.factura.montoFacturaSinIva;
+                    // el método recibe el proveedor, para leer su categoría de retención y su tipo de persona ... 
+                    if (!$scope.factura.fechaRecepcion || !$scope.factura.proveedor) { 
+                        let message = `Error: parece que la factura no ha sido completada aún, al menos no los datos necesarios para 
+                                       determinar su retención de Islr.<br /> 
+                                       Por favor indique la compañía y la fecha de recepción de la factura. 
+                                      `;
 
-                        if (($scope.proveedor.baseRetencionISLR == 2 || $scope.proveedor.baseRetencionISLR == 3) &&
-                            $scope.factura.montoFacturaConIva)
-                            montoBase = montoBase ? montoBase + $scope.factura.montoFacturaConIva : $scope.factura.montoFacturaConIva;
-                    } else {
-                        if (definicionItem.Base) {
-                            if ((definicionItem.Base == 1 || definicionItem.Base == 3) && $scope.factura.montoFacturaSinIva)
-                                montoBase = $scope.factura.montoFacturaSinIva;
+                        $scope.alerts.length = 0;
+                        $scope.alerts.push({
+                            type: 'danger',
+                            msg: message
+                        });
 
-                            if ((definicionItem.Base == 2 || definicionItem.Base == 3) && $scope.factura.montoFacturaConIva)
-                                montoBase = montoBase ? montoBase + $scope.factura.montoFacturaConIva : $scope.factura.montoFacturaConIva;
+                        return;
+                    }
+
+                    $scope.showProgress = true; 
+
+                    Meteor.call('bancos.facturas.leerRetencionIslr', $scope.factura.fechaRecepcion, $scope.factura.proveedor, (err, result) => {
+
+                        if (err) {
+                            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                            $scope.alerts.length = 0;
+                            $scope.alerts.push({
+                                type: 'danger',
+                                msg: errorMessage
+                            });
+
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
+                                  `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
+                                  false).then();
+
+                            return;
+                        }
+
+                        if (result.error) {
+                            let errorMessage = result.message;
+
+                            $scope.alerts.length = 0;
+                            $scope.alerts.push({
+                                type: 'danger',
+                                msg: errorMessage
+                            });
+
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
+                                  `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
+                                  false).then();
+
+                            return;
+                        }
+
+
+
+                        // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
+                        let aPartirDe = 1000 * result.unidadTributaria.monto / 12;          
+                        let sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
+                                         result.unidadTributaria.factor;      
+
+                        // determinamos el monto 'base' para el cálculo del la retención del Islr 
+                        let baseRetIslr = 0; 
+                        baseRetIslr += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0; 
+                        baseRetIslr += $scope.factura.montoFacturaConIva ? $scope.factura.montoFacturaConIva : 0; 
+
+                        
+                        if (baseRetIslr < aPartirDe) { 
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            return; 
+                        }
+                        
+                        // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Islr
+                        if (!Array.isArray($scope.factura.impuestosRetenciones)) {
+                            $scope.factura.impuestosRetenciones = [];
+                        }
+
+                        let impuestoRetencionItem = {
+                            _id: new Mongo.ObjectID()._str,
+                            id: 0,
+                            facturaID: $scope.factura.claveUnica,
+                            impRetID: definicionItem.ID,
+                            codigo: result.categoriaRetencion.codigoIslr,              
+                            montoBase: baseRetIslr,                             
+                            porcentaje: result.categoriaRetencion.porcentajeRetencion,
+                            sustraendo: sustraendo,
                         };
-                    };
 
-                    // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Islr
-                    if (!_.isArray($scope.factura.impuestosRetenciones)) {
-                        $scope.factura.impuestosRetenciones = [];
-                    };
+                        $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
 
-                    let impuestoRetencionItem = {
-                         _id: new Mongo.ObjectID()._str,
-                         id: 0,
-                         facturaID: $scope.factura.claveUnica,
-                         impRetID: definicionItem.ID,
-                         codigo: codigoConceptoRetencionIslr,
-                         montoBase: montoBase,
-                         porcentaje: retencionIslrPorc,
-                         sustraendo: impuestoRetenidoIslrSustraendo,
-                    };
-
-                    $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
+                        $scope.showProgress = false;
+                        $scope.$apply();
+                    })
 
                     if (!$scope.factura.docState) {
                         $scope.factura.docState = 2;
                     }
-                };
-            };
-        };
+                }
+            }
+        }
 
 
 
         $scope.calcularFactura = () => {
             let factura = $scope.factura;
 
-             if (!factura)
-                 return;
-
+             if (!factura) { 
+                return;
+             }
+                 
              let proveedor = $scope.proveedor;
 
              // -------------------------------------------------------------------------------
              // intentamos calcular los impuestos y retenciones que existan en la lista ...
              factura.impuestosRetenciones.forEach((impuesto) => {
-                 let definicionImpRet = null;
+                let definicionImpRet = null;
 
-                 // lo primero que hacemos es leer la definición del imp o ret en el catálogo
-                 definicionImpRet = _.find($scope.impuestosRetencionesDefinicion, (x) => {
-                     return x.ID === impuesto.impRetID;
-                 });
+                // lo primero que hacemos es leer la definición del imp o ret en el catálogo
+                definicionImpRet = $scope.impuestosRetencionesDefinicion.find(x => x.ID === impuesto.impRetID);
 
-                 // TODO: para impIva: intentar calcular tipoAlicuota, si no viene una
-                 // TODO: para retIslr: intentar determinar codigo y sustraendo, si no vienen estos valores
+                // TODO: para impIva: intentar calcular tipoAlicuota, si no viene una
+                // TODO: para retIslr: intentar determinar codigo y sustraendo, si no vienen estos valores
 
-                 // solo para rubros no 'predefinidos', intentamos usar el porcentaje de la definición si no viene uno
-                 // (aunque en estos casos, de imp/ret no predefinidos, el usuario indicará un % en forma manual)
-                 if (!impuesto.porcentaje)
-                     if (!definicionImpRet.Predefinido)
-                         if (definicionImpRet.Porcentaje)
-                             impuesto.porcentaje = definicionImpRet.Porcentaje;
+                // solo para rubros no 'predefinidos', intentamos usar el porcentaje de la definición si no viene uno
+                // (aunque en estos casos, de imp/ret no predefinidos, el usuario indicará un % en forma manual)
+                if (!impuesto.porcentaje) { 
+                    if (!definicionImpRet.Predefinido)  {
+                        if (definicionImpRet.Porcentaje) { 
+                            impuesto.porcentaje = definicionImpRet.Porcentaje;
+                        }  
+                    }  
+                }
+                 
+                // por un error de diseño en el análisis que hicimos hace bastante tiempo, aplicamos el sustraendo *luego* del 
+                // porcentaje de retención. Debe ser antes ... Nótese que esto aplica, generalmente, a la retención del Islr 
+                // y no la del Iva (para la cual no aplica un sustraendo) ... 
+                // ejemplo: monto: 100 - sust: 30 - %: 3. Hacíamos: RetIslr = (100 * 3%) - 30. Debe ser: RetIslr = (100 - 30) * 3%
 
+                if (impuesto.montoBase && impuesto.porcentaje) {
+                    impuesto.montoAntesSustraendo = lodash.round(impuesto.montoBase * impuesto.porcentaje / 100, 4);
+                    impuesto.monto = impuesto.montoAntesSustraendo; 
+                }
 
-                 if (impuesto.montoBase && impuesto.porcentaje) {
-                     impuesto.montoAntesSustraendo = lodash.round(impuesto.montoBase * impuesto.porcentaje / 100, 4);
-                     impuesto.monto = impuesto.montoAntesSustraendo;
-
-                     if (impuesto.sustraendo)
-                         impuesto.monto -= impuesto.sustraendo;
-                 };
-             });
+                if (impuesto.sustraendo) { 
+                    impuesto.monto -= impuesto.sustraendo;
+                }
+             })
 
              // arriba calculamos el monto de impuestos y retenciones (en el grid); ahora, calculamos los
              // montos generales de la factura ...
@@ -1095,26 +1151,30 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             // calcularFactura, para completar el calculo de la factura cuando ya están calculados
             // los montos en el grid
 
-             factura.iva = null;
-             factura.otrosImpuestos = null;
-             factura.totalAPagar = 0;
-             factura.retencionSobreIva = null;
-             factura.impuestoRetenido = null;
-             factura.impuestoRetenidoISLRAntesSustraendo = null;
-             factura.otrasRetenciones = null;
-             factura.saldo = 0;
+            factura.iva = null;
+            factura.otrosImpuestos = null;
+            factura.totalAPagar = 0;
+            factura.retencionSobreIva = null;
+            factura.impuestoRetenido = null;
+            factura.impuestoRetenidoISLRAntesSustraendo = null;
+            factura.otrasRetenciones = null;
+            factura.saldo = 0;
 
-             if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva)
-                 return;
+            if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva) { 
+                return;
+            }
+                 
+            factura.montoFactura = 0;
+            factura.totalFactura = 0;
 
-             factura.montoFactura = 0;
-             factura.totalFactura = 0;
+            if (factura.montoFacturaSinIva) { 
+                factura.montoFactura = factura.montoFacturaSinIva;
+            }
 
-             if (factura.montoFacturaSinIva)
-                 factura.montoFactura = factura.montoFacturaSinIva;
-
-             if (factura.montoFacturaConIva)
-                 factura.montoFactura += factura.montoFacturaConIva;
+            if (factura.montoFacturaConIva) { 
+                factura.montoFactura += factura.montoFacturaConIva;
+            }
+                 
 
              factura.totalFactura = factura.montoFactura;
 
@@ -1122,77 +1182,82 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
              // nótese que el iva está en la lista de impuestos y retenciones
              factura.impuestosRetenciones.forEach((impuesto) => {
                  // lo primero que hacemos es leer la definición del imp o ret en el catálogo
-                 let definicionImpRet = _.find($scope.impuestosRetencionesDefinicion, (x) => {
-                     return x.ID === impuesto.impRetID;
-                 });
+                 let definicionImpRet = $scope.impuestosRetencionesDefinicion.find(x => x.ID === impuesto.impRetID);
 
                  if (definicionImpRet.Predefinido && definicionImpRet.Predefinido == 1) {
-                     if (!factura.iva)
-                         factura.iva = 0;
-
+                     if (!factura.iva) { 
+                        factura.iva = 0;
+                     }
+                         
                      factura.iva += impuesto.monto ? impuesto.monto : 0;
-                 };
+                 }
 
                  // 'otros' impuestos; vienen de registros no predefinidos, pero de tipo impuestos
                  if (!definicionImpRet.Predefinido && definicionImpRet.ImpuestoRetencion === 1) {
-                     if (!factura.otrosImpuestos)
-                         factura.otrosImpuestos = 0;
-
+                     if (!factura.otrosImpuestos) { 
+                        factura.otrosImpuestos = 0;
+                     }
+                         
                      factura.otrosImpuestos += impuesto.monto;
-                 };
-             });
+                 }
+             })
 
 
-             if (factura.otrosImpuestos)
-                 factura.totalFactura += factura.otrosImpuestos;
+             if (factura.otrosImpuestos) { 
+                factura.totalFactura += factura.otrosImpuestos;
+             }
 
-             if (factura.iva)
-                 factura.totalFactura += factura.iva;
-
-
+             if (factura.iva) { 
+                factura.totalFactura += factura.iva;
+             }
+                 
              factura.impuestosRetenciones.forEach((impuesto) => {
                  // lo primero que hacemos es leer la definición del imp o ret en el catálogo
-                 let definicionImpRet = _.find($scope.impuestosRetencionesDefinicion, (x) => {
-                     return x.ID === impuesto.impRetID;
-                 });
+                 let definicionImpRet = $scope.impuestosRetencionesDefinicion.find(x => x.ID === impuesto.impRetID);
 
                  if (definicionImpRet.Predefinido && definicionImpRet.Predefinido === 2) {
-                     if (!factura.retencionSobreIva)
-                         factura.retencionSobreIva = 0;
-
+                     if (!factura.retencionSobreIva) { 
+                        factura.retencionSobreIva = 0;
+                     }
+                         
                      factura.retencionSobreIva += impuesto.monto ? impuesto.monto : 0;
-                 };
+                 }
 
                  // retención Islr
                  if (definicionImpRet.Predefinido && definicionImpRet.Predefinido === 3) {
-                     if (!factura.impuestoRetenido)
-                         factura.impuestoRetenido = 0;
-
+                     if (!factura.impuestoRetenido) { 
+                        factura.impuestoRetenido = 0;
+                     }
+                         
                      factura.impuestoRetenido += impuesto.monto ? impuesto.monto : 0;
-                 };
+                 }
 
                  // 'otras' retenciones
                  if (!definicionImpRet.Predefinido && definicionImpRet.ImpuestoRetencion == 2) {
-                     if (!factura.otrasRetenciones)
-                         factura.otrasRetenciones = 0;
-
+                     if (!factura.otrasRetenciones) { 
+                        factura.otrasRetenciones = 0;
+                     }
+                         
                      factura.otrasRetenciones += impuesto.monto ? impuesto.monto : 0;
-                 };
-             });
+                 }
+             })
 
 
              // por último calculamos el total a pagar y el saldo
              factura.totalAPagar = factura.totalFactura;
 
-             if (factura.impuestoRetenido)
-                 factura.totalAPagar -= factura.impuestoRetenido;
-
-             if (factura.retencionSobreIva)
-                 factura.totalAPagar -= factura.retencionSobreIva;
-
-             if (factura.otrasRetenciones)
-                 factura.totalAPagar -= factura.otrasRetenciones;
-
+             if (factura.impuestoRetenido) { 
+                factura.totalAPagar -= factura.impuestoRetenido;
+             }
+                 
+             if (factura.retencionSobreIva) { 
+                factura.totalAPagar -= factura.retencionSobreIva;
+             }
+                 
+             if (factura.otrasRetenciones) { 
+                factura.totalAPagar -= factura.otrasRetenciones;
+             }
+                 
              factura.totalAPagar = lodash.round(factura.totalAPagar, 4);
 
              factura.saldo = factura.totalAPagar;
@@ -1214,21 +1279,21 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
              } else {
                  factura.estado = 1;        // pendiente
              }
-         };
+         }
 
 
-     $scope.redondearFactura = () => {
+    $scope.redondearFactura = () => {
 
-         // la idea de esta funcion es redondear los montos de la factura a 2 decimales
-         // esto es necesario cuando algún impuesto o retención, al calcularse, produce
-         // más de 2 decimales; entonces, el resultado final de la factura puede tener
-         // también más de 2 decimales. Lo que hacemos es redondear montos de impuestos y
-         // retenciones a 2 decimales y recalcular la factura ...
+        // la idea de esta funcion es redondear los montos de la factura a 2 decimales
+        // esto es necesario cuando algún impuesto o retención, al calcularse, produce
+        // más de 2 decimales; entonces, el resultado final de la factura puede tener
+        // también más de 2 decimales. Lo que hacemos es redondear montos de impuestos y
+        // retenciones a 2 decimales y recalcular la factura ...
 
-         let factura = $scope.factura;
+        let factura = $scope.factura;
 
-         if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva)
-            return;
+        if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva)
+        return;
 
         // redondeamos los montos calculados (iva y retenciones de impuesto) a solo 2 decimales ...
         factura.impuestosRetenciones.forEach((impuesto) => {
@@ -1243,16 +1308,38 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 if (impuesto.sustraendo)
                     impuesto.monto -= impuesto.sustraendo;
             }
-        });
+        })
 
         // nótese que calcularFactura2 no calcula los montos en el grid (impuestos/retenciones);
         // solo los valores generales de la factura. La idea es recalcular la factura, una vez
         // redondeados los montos en el grid (imp/ret) ...
-         calcularFactura2(factura);
-     };
+            calcularFactura2(factura);
+    }
 
 
+    $scope.demostrarRetIslr = function() { 
 
+        var modalInstance = $modal.open({
+            templateUrl: 'client/bancos/facturas/demostrarRetIslr.html',
+            controller: 'DemostrarRetencionIslr_Modal_Controller',
+            size: 'lg',
+            resolve: {
+                companiaContabSeleccionada: () => {
+                    return $scope.companiaSeleccionada;
+                },
+                factura: () => {
+                    return $scope.factura;
+                },
+            }
+        }).result.then(
+              function (resolve) {
+                  return true;
+              },
+              function (cancel) {
+                  return true;
+              });
+
+    }
 
       // -------------------------------------------------------------------------
       // Grabar las modificaciones hechas al registro

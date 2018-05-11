@@ -1,5 +1,6 @@
 
 import * as lodash from 'lodash'; 
+import { Meteor } from 'meteor/meteor';
 
 export const userHasRole = function(rolesArray) {
 

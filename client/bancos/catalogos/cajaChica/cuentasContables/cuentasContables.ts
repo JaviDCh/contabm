@@ -1,13 +1,14 @@
 
 
+import * as angular from 'angular';
+import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
 
 import { CompaniaSeleccionada } from '../../../../../imports/collections/companiaSeleccionada';
 import { Companias } from '../../../../../imports/collections/companias';
 import { CuentasContables2 } from '../../../../../imports/collections/contab/cuentasContables2'; 
 
 import { CajaChica_RubrosCuentasContables_SimpleSchema } from '../../../../../imports/collections/bancos/cajaChica.cajasChicas'; 
-import * as angular from 'angular';
-import * as lodash from 'lodash';
 import { mensajeErrorDesdeMethod_preparar } from '../../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_Bancos_CajaChica_CuentasContables_Controller",

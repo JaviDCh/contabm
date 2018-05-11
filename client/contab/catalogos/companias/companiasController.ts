@@ -2,6 +2,8 @@
 
 import * as angular from 'angular';
 import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo'; 
 
 import { Companias } from '../../../../imports/collections/companias';
 import { Monedas } from '../../../../imports/collections/monedas';
@@ -166,7 +168,6 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Companias_Contr
 
     $scope.nuevo = function () {
         let item = {
-            // "new Mongo.ObjectID()._str" produce un error en TS (no está en la definición?),
             _id: new Mongo.ObjectID()._str,
             numero: 0,
             suspendidoFlag: false,

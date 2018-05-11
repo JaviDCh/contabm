@@ -51,13 +51,6 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
           { tipo: 2, descripcion: "Juridico" },
       ];
 
-      $scope.baseRetencionIslrArray = [
-          { tipo: 1, descripcion: "Monto no imponible" },
-          { tipo: 2, descripcion: "Monto imponible" },
-          { tipo: 3, descripcion: "Ambos" },
-          { tipo: 4, descripcion: "Manual" },
-      ];
-
       $scope.helpers({
           tiposProveedor: () => {
             return TiposProveedor.find({}, { sort: { descripcion: 1 } });

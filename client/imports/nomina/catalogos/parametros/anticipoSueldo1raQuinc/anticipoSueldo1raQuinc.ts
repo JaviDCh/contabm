@@ -1,6 +1,7 @@
 
 import * as angular from 'angular';
 import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
 
 import { mensajeErrorDesdeMethod_preparar } from '../../../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 import { DialogModal } from '../../../../../generales/angularGenericModal'; 

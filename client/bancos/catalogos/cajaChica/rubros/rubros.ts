@@ -1,8 +1,10 @@
 
 
-import { CajaChica_Rubros_SimpleSchema } from '../../../../../imports/collections/bancos/cajaChica.cajasChicas'; 
 import * as angular from 'angular';
 import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
+
+import { CajaChica_Rubros_SimpleSchema } from '../../../../../imports/collections/bancos/cajaChica.cajasChicas'; 
 import { mensajeErrorDesdeMethod_preparar } from '../../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_Bancos_CajaChica_Rubros_Controller",

@@ -1,12 +1,16 @@
 
 
-import lodash from 'lodash';
+import * as lodash from 'lodash';
+import * as moment from 'moment'; 
+
+import { CategoriasRetencion_sql } from '../../imports/sqlModels/bancos/categoriasRetencion'; 
+import { TimeOffset } from '../../../globals/globals'; 
 
 Meteor.methods(
 {
     'bancos.categoriasRetencion.leerDesdeSqlServer': function () {
 
-        let response = null;
+        let response: any = null;
         response = Async.runSync(function(done) {
             CategoriasRetencion_sql.findAll({ raw: true })
                 .then(function(result) { done(null, result); })
@@ -22,7 +26,11 @@ Meteor.methods(
 
         let message = "";
         if (response.result.length) {
-            // el registro puede no existir para la compañía contab seleccionada
+            
+            response.result.forEach((x) => { 
+                x.fechaAplicacion = x.fechaAplicacion ? moment(x.fechaAplicacion).add(TimeOffset, 'hours').toDate() : null;
+            })
+            
             categoriasRetencion = response.result;
             message = `Ok, las categorías de retención han sido leído desde la base de datos.`;
         } else {
@@ -47,8 +55,8 @@ Meteor.methods(
         }
 
         let inserts = lodash.chain(items).
-                      filter(function (item) { return item.docState && item.docState == 1; }).
-                      map(function (item) {
+                      filter(function (item: any) { return item.docState && item.docState == 1; }).
+                      map(function (item: any) {
                           delete item.docState;
                           item.categoria = 0;               // la categoria es el pk; viene con un valor; ponemos en cero; sql server inicializará ...
                           return item;
@@ -57,7 +65,9 @@ Meteor.methods(
 
         inserts.forEach(function (item) {
 
-            let response = null;
+            item.fechaAplicacion = item.fechaAplicacion ? moment(item.fechaAplicacion).subtract(TimeOffset, 'hours').toDate() : null;
+
+            let response: any = null;
             response = Async.runSync(function(done) {
                 CategoriasRetencion_sql.create(item)
                 .then(function(result) { done(null, result); })
@@ -74,14 +84,16 @@ Meteor.methods(
         })
 
 
-        var updates = _.chain(items).
-                        filter(function (item) { return item.docState && item.docState == 2; }).
+        var updates = lodash.chain(items).
+                        filter(function (item: any) { return item.docState && item.docState == 2; }).
                         map(function (item) { delete item.docState; return item; }).                // eliminamos docState del objeto
                         value();
 
         updates.forEach(function (item) {
 
-            let response = null;
+            item.fechaAplicacion = item.fechaAplicacion ? moment(item.fechaAplicacion).subtract(TimeOffset, 'hours').toDate() : null;
+
+            let response: any = null;
             response = Async.runSync(function(done) {
                 CategoriasRetencion_sql.update(item, {
                         where: { categoria: item.categoria
@@ -98,12 +110,12 @@ Meteor.methods(
 
 
         var removes = lodash(items).
-                      filter((item) => { return item.docState && item.docState == 3; }).
+                      filter((item: any) => { return item.docState && item.docState == 3; }).
                       value();
 
-        removes.forEach(function (item) {
+        removes.forEach(function (item: any) {
 
-            let response = null;
+            let response: any = null;
             response = Async.runSync(function(done) {
                 CategoriasRetencion_sql.destroy({ where: { categoria: item.categoria } })
                     .then(function(result) { done(null, result); })

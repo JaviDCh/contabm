@@ -39,6 +39,18 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             controller: 'Catalogos_CuentasBancarias_Controller',
             parent: 'bancos'
         })
+        .state('bancos.unidadTributaria', {
+            url: '/unidadTributaria',
+            templateUrl: 'client/imports/bancos/catalogos/unidadTributaria/unidadTributaria.html',
+            controller: 'Bancos_Catalogos_UnidadTributaria_Controller',
+            parent: 'bancos'
+        })
+        .state('bancos.categoriasRetencion', {
+            url: '/categoriasRetencion',
+            templateUrl: 'client/imports/bancos/catalogos/categoriasRetencion/categoriasRetencion.html',
+            controller: 'Bancos_Catalogos_CategoriasRetencion_Controller',
+            parent: 'bancos',
+        })
         .state('bancos.parametros', {
             url: '/parametros',
             templateUrl: 'client/bancos/catalogos/parametros/parametros.html',

@@ -84,13 +84,13 @@ Proveedores_SimpleSchema = new SimpleSchema({
     contacto2: { type: String, label: 'Contacto2', optional: true, min: 0, max: 50, },
     nacionalExtranjeroFlag: { type: Number, label: 'Nac/Ext', optional: false },
     sujetoARetencionFlag: { type: Boolean, label: 'SujetoARetencionFlag', optional: true },
-    codigoConceptoRetencion: { type: String, label: 'CodigoConceptoRetencion', optional: true, min: 0, max: 6, },
-    retencionISLRSustraendo: { type: Number, label: 'RetencionISLRSustraendo', optional: true, },
-    baseRetencionISLR: { type: Number, label: 'BaseRetencionISLR', optional: true, },
+    // codigoConceptoRetencion: { type: String, label: 'CodigoConceptoRetencion', optional: true, min: 0, max: 6, },
+    // retencionISLRSustraendo: { type: Number, label: 'RetencionISLRSustraendo', optional: true, },
+    // baseRetencionISLR: { type: Number, label: 'BaseRetencionISLR', optional: true, },
     monedaDefault: { type: Number, label: 'Moneda', optional: false },
     formaDePagoDefault: { type: Number, label: 'Forma de pago', optional: false, },
     proveedorClienteFlag: { type: Number, label: 'Proveedor/Cliente', optional: false },
-    porcentajeDeRetencion: { type: Number, label: 'PorcentajeDeRetencion', optional: true, },
+    // porcentajeDeRetencion: { type: Number, label: 'PorcentajeDeRetencion', optional: true, },
     aplicaIvaFlag: { type: Boolean, label: 'AplicaIvaFlag', optional: true },
     categoriaProveedor: { type: Number, label: 'CategoriaProveedor', optional: true },
     montoChequeEnMonExtFlag: { type: Boolean, label: 'MontoChequeEnMonExtFlag', optional: true },
@@ -104,3 +104,4 @@ Proveedores_SimpleSchema = new SimpleSchema({
 
     docState: { type: Number, optional: true, },
 });
+                

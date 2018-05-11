@@ -4,6 +4,8 @@ import * as numeral from 'numeral';
 import * as moment from 'moment';
 import * as lodash from 'lodash';
 import * as angular from 'angular';
+import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo'; 
 
 import { Companias } from '../../../../imports/collections/companias';
 import { CompaniaSeleccionada } from '../../../../imports/collections/companiaSeleccionada';
@@ -776,7 +778,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
 
     $scope.calcularDepreciacion = function() { 
-        let result = calcularDepreciacion($scope.activoFijo); 
+        let result: any = calcularDepreciacion($scope.activoFijo); 
 
         if (result.error) { 
             $scope.alerts.length = 0;

@@ -1,5 +1,6 @@
 
-import { Monedas } from '/imports/collections/monedas';
+
+import { Monedas } from '../../imports/collections/monedas';
 
 Meteor.publish('monedas', function () {
         return [

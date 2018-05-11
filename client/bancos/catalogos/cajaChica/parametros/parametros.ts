@@ -1,5 +1,8 @@
 
 
+import * as angular from 'angular';
+import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
 
 import { CompaniaSeleccionada } from '../../../../../imports/collections/companiaSeleccionada';
 import { Companias } from '../../../../../imports/collections/companias';
@@ -7,8 +10,6 @@ import { CuentasContables2 } from '../../../../../imports/collections/contab/cue
 import { TiposAsientoContable } from '../../../../../imports/collections/contab/tiposAsientoContable'; 
 
 import { CajaChica_Parametros_SimpleSchema } from '../../../../../imports/collections/bancos/cajaChica.cajasChicas'; 
-import * as angular from 'angular';
-import * as lodash from 'lodash';
 import { mensajeErrorDesdeMethod_preparar } from '../../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 import { DialogModal } from '../../../../generales/angularGenericModal'; 

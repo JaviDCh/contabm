@@ -1,14 +1,18 @@
 
-// leemos los catálogos necesarios para el registro de proveedores desde sql server
-// nota: algunos católogos existen siempre en mongo; éstos no y hay que leerlos siempre desde sql
+
+import { CategoriasRetencion_sql } from '../../imports/sqlModels/bancos/categoriasRetencion'; 
+
 Meteor.methods(
 {
     'bancos.proveedores.leerTablasCatalogosDesdeSqlServer': function () {
 
+        // leemos los catálogos necesarios para el registro de proveedores desde sql server
+        // nota: algunos católogos existen siempre en mongo; éstos no y hay que leerlos siempre desde sql
+
         // categorías de retención
         let response = null;
         response = Async.runSync(function(done) {
-            CategoriasRetencion_sql.findAll({ raw: true, })
+            CategoriasRetencion_sql.findAll({ attributes: ['categoria', 'descripcion'], raw: true, })
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();

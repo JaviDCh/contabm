@@ -1,8 +1,10 @@
 
-// import { Monedas } from '../../../../imports/collections/monedas';
-import { Monedas } from '../../../../imports/collections/monedas';
 import * as angular from 'angular';
 import * as lodash from 'lodash';
+import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo'; 
+
+import { Monedas } from '../../../../imports/collections/monedas';
 import { mensajeErrorDesdeMethod_preparar } from '../../../imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar';
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Controller",
@@ -157,7 +159,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Control
       $scope.deleteItem = function (item) {
           if (item.docState && item.docState === 1) {
               // si el item es nuevo, simplemente lo eliminamos del array
-              lodash.remove($scope.monedas, (x) => { return x._id === item._id; });
+              lodash.remove($scope.monedas, (x: any) => { return x._id === item._id; });
           }
           else if (item.docState && item.docState === 3) {
               // permitimos hacer un 'undelete' de un item que antes se había eliminado en la lista (antes de grabar) ...
@@ -170,7 +172,6 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Control
 
       $scope.nuevo = function () {
           let item = {
-              // "new Mongo.ObjectID()._str" produce un error en TS (no está en la definición?),
               _id: new Mongo.ObjectID()._str,
               moneda: 0,
               nacionalFlag: false,
