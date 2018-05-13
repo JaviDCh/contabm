@@ -12,11 +12,11 @@ Meteor.methods(
         // categorías de retención
         let response = null;
         response = Async.runSync(function(done) {
-            CategoriasRetencion_sql.findAll({ attributes: ['categoria', 'descripcion'], raw: true, })
+            CategoriasRetencion_sql.findAll({ attributes: [ 'categoria', 'descripcion', 'tipoPersona' ], raw: true, })
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
@@ -31,7 +31,7 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
@@ -46,7 +46,7 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
@@ -61,7 +61,7 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
         if (response.error) {
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
@@ -76,4 +76,4 @@ Meteor.methods(
             titulos: titulos,
         });
     }
-});
+})

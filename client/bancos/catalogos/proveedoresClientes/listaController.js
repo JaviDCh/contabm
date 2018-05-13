@@ -780,6 +780,8 @@ angular.module("contabm.bancos.catalogos").controller("ProveedoresClientes_Lista
          $scope.atributos = catalogos.atributos;
          $scope.titulos = catalogos.titulos;
 
+         $scope.categoriasRetencion.forEach(x => x.descripcion = `${x.descripcion} - ${x.tipoPersona ? x.tipoPersona.toLowerCase() : '(tipo pers indef)'}`)
+
          $scope.showProgress = false;
          $scope.$apply();
      })
