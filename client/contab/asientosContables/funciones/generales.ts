@@ -59,11 +59,17 @@ export let cuadrarAsientoContable = function (partidas, partidaSeleccionada) {
         sumOfHaber = sumOfHaber.plus(partida.haber); 
     }
 
+    let message = `Ok, el asiento contable ha sido cuadrado. Las sumatoria de los montos de sus partidas suman ahora cero.<br />
+                   Además <b>ningún</b> monto debe tener ahora más de dos decimales. <br /> 
+                   Las sumas del debe y el haber son ahora: <b>${numeral(sumOfDebe.toNumber()).format("0,0.000000")}</b> - 
+                   <b>${numeral(sumOfHaber.toNumber()).format("0,0.000000")}</b>.`
+    
+    // para eliminar '//' que typescript (???) agrega al string (cuando existen caracteres especiales, como new line) ... 
+    message = message.replace(/\/\//gi, "");
+
     return {
         error: false,
-        message: `Ok, el asiento contable ha sido cuadrado. Las sumatoria de los montos de sus partidas suman ahora cero.<br />
-                  Además <b>ningún</b> monto debe tener ahora más de dos decimales. <br /> 
-                  Las sumas del debe y el haber son ahora: <b>${numeral(sumOfDebe.toNumber()).format("0,0.000000")}</b> - <b>${numeral(sumOfHaber.toNumber()).format("0,0.000000")}</b>.`
+        message: message, 
     }
 
 }

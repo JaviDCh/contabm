@@ -24,7 +24,8 @@ let schema = new SimpleSchema({
     ano: { type: Number, label: "Año", optional: false, },
     tipo: { type: String, label: 'Tipo', optional: false, },
     fecha: { type: Date, label: "Fecha", optional: false, },
-    descripcion: { type: String, label: 'Descripción', optional: true, min: 0, max: 250, },
+    // hacemos que la descripción sea requerida, aunque no lo es en sql server ... 
+    descripcion: { type: String, label: 'Descripción', optional: false, min: 1, max: 250, },
     moneda: { type: Number, label: "Moneda", optional: false, },
     monedaOriginal: { type: Number, label: "Moneda original", optional: false, },
     convertirFlag: { type: Boolean, label: "Convertir?", optional: true, },

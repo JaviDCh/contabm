@@ -118,6 +118,24 @@
                                     <input type="text"
                                            class="form-control input-sm myinput-sm"
                                            ng-model="filtro.lote"
+                                           placeholder="Ej: 201703, 201703*, *03000*"
+                                           ng-model-options="{ updateOn: 'blur' }" />
+                                </div>
+
+                                <div class="col-sm-5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label input-label">Centro costo: </label>
+
+                                <div class="col-sm-5">
+                                    <input type="text"
+                                           class="form-control input-sm myinput-sm"
+                                           ng-model="filtro.centroCosto"
+                                           placeholder="Ej: cargill, carg*, *elm*"
                                            ng-model-options="{ updateOn: 'blur' }" />
                                 </div>
 
@@ -125,10 +143,6 @@
                                 </div>
 
                             </div>
-                        </div>
-
-                        <div class="col-sm-6">
-
                         </div>
 
                     </div>

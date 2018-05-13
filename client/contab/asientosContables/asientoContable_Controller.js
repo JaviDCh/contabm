@@ -205,7 +205,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
             $scope.alerts.length = 0; 
             if (result.error) {
-                $scope.alerts.push({ type: 'warning', msg: result.message });
+                // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, 
+                // como new line ... 
+                let message = result.message.replace(/\/\//gi, "");
+                $scope.alerts.push({ type: 'warning', msg: message });
             }
 
             $scope.showProgress = false;
@@ -272,8 +275,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         if (!$scope.asientoContable || !$scope.asientoContable.docState || $scope.asientoContable.docState != 1) {
             DialogModal($modal, "<em>Asientos contables</em>",
-                                "Aparentemente, el asiento que recibirá la copia no es nuevo (ya existía).<br />" +
-                                "Ud. debe importar un asiento siempre en un asiento nuevo; es decir, no en uno que ya exista.",
+                                `Aparentemente, el asiento que <em>recibirá la copia</em> no es nuevo (ya existía).<br /> 
+                                 Ud. debe importar un asiento siempre en un asiento <b>nuevo</b>; es decir, no en uno que ya exista.
+                                `,
                                 false).then();
 
             let inputFile = angular.element("#fileInput");
@@ -309,8 +313,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             try {
                 var content = e.target.result;
                 let asientoContable = JSON.parse(content);
-
-                // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
 
                 if (asientoContable.tipo) { 
                     $scope.asientoContable.tipo = asientoContable.tipo;
@@ -418,6 +420,14 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     // para que el input type file "limpie" el file indicado por el usuario
                     inputFile[0].value = null;
                 }
+
+                DialogModal($modal, "<em>Asientos contables - Importar asiento</em>",
+                            `Ok, el asiento contable ha sido importado en un asiento nuevo. 
+                             Ud. puede hacer modificaciones y <em>Grabar</em>.<br /> 
+                             La fecha del asiento, sin embargo, no ha sido inicializada. 
+                             Ud. debe indicar una y <em>salir del campo</em>, 
+                             para que el programa lea y asigne el <em>factor de cambio</em> más reciente.`,
+                            false).then();
                     
                 $scope.$apply();
             }
@@ -425,149 +435,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         reader.readAsText(userSelectedFile);
     }
-
-    // $scope.uploadFile = function(files) {
-
-    //     if (!$scope.asientoContable || !$scope.asientoContable.docState || $scope.asientoContable.docState != 1) {
-    //         DialogModal($modal, "<em>Asientos contables</em>",
-    //                             "Aparentemente, el asiento que recibirá la copia no es nuevo (ya existía).<br />" +
-    //                             "Ud. debe importar un asiento siempre en un asiento nuevo; es decir, no en uno que ya exista.",
-    //                             false).then();
-
-    //         let inputFile = angular.element("#fileInput");
-    //         if (inputFile && inputFile[0] && inputFile[0].value)
-    //             // para que el input type file "limpie" el file indicado por el usuario
-    //             inputFile[0].value = null;
-
-    //         return;
-    //     }
-
-    //     let userSelectedFile = files[0];
-
-    //     if (!userSelectedFile) {
-    //         DialogModal($modal, "<em>Asientos contables</em>",
-    //                             "Aparentemente, Ud. no ha seleccionado un archivo.<br />" +
-    //                             "Por favor seleccione un archivo que corresponda a un asiento contable <em>exportado</em> antes.",
-    //                             false).then();
-
-    //         let inputFile = angular.element("#fileInput");
-    //         if (inputFile && inputFile[0] && inputFile[0].value)
-    //             // para que el input type file "limpie" el file indicado por el usuario
-    //             inputFile[0].value = null;
-
-    //         return;
-    //     }
-
-    //     var reader = new FileReader();
-    //     let message = "";
-
-    //     reader.onload = function(e) {
-    //     //   debugger;
-    //         try {
-    //             var content = e.target.result;
-    //             let asientoContable = JSON.parse(content);
-
-    //             // TODO: agregar valores de propiedades en asientoContable a $scope.asientoContable (cómo hacerlo de la forma más fácil??? )
-
-    //             $scope.asientoContable.tipo = asientoContable.tipo ? asientoContable.tipo : "";
-    //             $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
-    //             $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
-    //             $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
-    //             $scope.asientoContable.factorDeCambio = asientoContable.factorDeCambio ? asientoContable.factorDeCambio : 0;
-
-    //             // si no viene la moneda, puede venir su simbolo (scrwebm)
-    //             if (!$scope.asientoContable.moneda && asientoContable.monedaSimbolo) {
-    //                 let moneda = Monedas.findOne({ simbolo: asientoContable.monedaSimbolo });
-    //                 if (moneda) {
-    //                     $scope.asientoContable.moneda = moneda.moneda;
-    //                 }
-    //             }
-
-    //             if (!$scope.asientoContable.monedaOriginal && asientoContable.monedaOriginalSimbolo) {
-    //                 let monedaOriginal = Monedas.findOne({ simbolo: asientoContable.monedaOriginalSimbolo });
-    //                 if (monedaOriginal) {
-    //                     $scope.asientoContable.monedaOriginal = monedaOriginal.moneda;
-    //                 }
-    //             }
-
-    //             if (lodash.isArray(asientoContable.partidas)) {
-
-    //                 if (!lodash.isArray($scope.asientoContable.partidas))
-    //                     $scope.asientoContable.partidas = [];
-
-    //                 asientoContable.partidas.forEach((p) => {
-
-    //                     // permitimos que el usuario haya agregado partidas (al asiento nuevo ....)
-    //                     let ultimaPartida = lodash.last( lodash.sortBy($scope.asientoContable.partidas, (x) => { return x.partida; }) );
-
-    //                     let partida = {
-    //                         _id: new Mongo.ObjectID()._str,
-    //                         partida: 10,
-    //                         debe: 0,
-    //                         haber: 0,
-    //                         docState: 1
-    //                     };
-
-    //                     if (ultimaPartida && !lodash.isEmpty(ultimaPartida)) {
-    //                         partida.partida = ultimaPartida.partida + 10;
-    //                     };
-
-    //                     // TODO: modificar para que, si el valor cuentaContableID no viene con la partida, y si viene
-    //                     // cuentaContable, buscar el id de la cuenta en el catálogo de cuenta y resolver.
-
-    //                     // la idea es resolver: el asiento que viene desde scrwebm no trae una cuentaContableID (ej: 2500) sino,
-    //                     // más bien, la cuenta contable (ej: cuentaContable: '1 001 001 01')
-
-    //                     partida.cuentaContableID = p.cuentaContableID ? p.cuentaContableID : null;
-    //                     partida.descripcion = p.descripcion ? p.descripcion : "";
-    //                     partida.referencia = p.referencia ? p.referencia : "";
-    //                     partida.debe = p.debe ? p.debe : 0;
-    //                     partida.haber = p.haber ? p.haber : 0;
-    //                     partida.centroCosto = p.centroCosto ? p.centroCosto : null;
-    //                     partida.docState = 1;
-
-    //                     // puede venir el código de la cuenta (scrwebm)
-    //                     if (!partida.cuentaContableID && p.cuentaContable) {
-    //                         let codigoCuenta = p.cuentaContable.trim();
-    //                         codigoCuenta = codigoCuenta.replace(/ /g, '');
-    //                         let cuentaContable = CuentasContables2.findOne({ cuenta: codigoCuenta });
-
-    //                         if (cuentaContable) {
-    //                             partida.cuentaContableID = cuentaContable.id;
-    //                         }
-    //                     }
-
-    //                     $scope.asientoContable.partidas.push(partida);
-    //                 });
-    //             };
-    //         }
-    //         catch(err) {
-    //             message = err.message ? err.message : err.toString();
-    //         }
-    //         finally {
-    //             if (message)
-    //                 DialogModal($modal, "<em>Asientos contables - Importar asientos contables</em>",
-    //                                     "Ha ocurrido un error al intentar ejecutar esta función:<br />" +
-    //                                     message,
-    //                                     false).then();
-    //             else {
-    //                 $scope.partidas_ui_grid.data = [];
-    //                 if (lodash.isArray($scope.asientoContable.partidas))
-    //                     $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
-    //             };
-
-    //             let inputFile = angular.element("#fileInput");
-    //             if (inputFile && inputFile[0] && inputFile[0].value)
-    //                 // para que el input type file "limpie" el file indicado por el usuario
-    //                 inputFile[0].value = null;
-
-    //             $scope.$apply();
-    //         };
-    //     };
-
-    //     reader.readAsText(userSelectedFile);
-    // }
-
 
     $scope.cuadrarAsientoContable = () => {
         // recorremos las partidas del asiento y 'cuadramos' en la partida que el usuario ha seleccionado ...
@@ -760,6 +627,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     let cuentasContablesLista = Array.isArray($scope.$parent.cuentasContablesLista) ? $scope.$parent.cuentasContablesLista : [];
     $scope.centrosCosto = $scope.$parent.centrosCosto; 
+    $scope.centrosCostoActivos = $scope.$parent.centrosCosto.filter(x => !x.suspendido); 
 
     $scope.partidas_ui_grid.columnDefs = [
         {
@@ -813,7 +681,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             name: 'descripcion',
             field: 'descripcion',
             displayName: 'Descripción',
-            width: 250,
+            width: 180,
             enableFiltering: true,
             headerCellClass: 'ui-grid-leftCell',
             cellClass: 'ui-grid-leftCell',
@@ -886,7 +754,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             editableCellTemplate: 'ui-grid/dropdownEditor',
             editDropdownIdLabel: 'centroCosto',
             editDropdownValueLabel: 'descripcion',
-            editDropdownOptionsArray: $scope.centrosCosto,
+            editDropdownOptionsArray: $scope.centrosCostoActivos,
             cellFilter: 'mapDropdown:row.grid.appScope.centrosCosto:"centroCosto":"descripcion"',
 
             enableColumnMenu: false,
@@ -1423,7 +1291,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                 let result = revisarSumasIguales($scope.asientoContable.partidas); 
 
                 if (result.error) { 
-                    $scope.alerts.push({ type: 'warning', msg: result.message });
+                    let message = result.message.replace(/\/\//gi, "");
+                    $scope.alerts.push({ type: 'warning', msg: message });
                 }
 
                 $scope.showProgress = false;

@@ -56,6 +56,12 @@ angular.module("contabm").config(['$urlRouterProvider', '$stateProvider', '$loca
             controller: 'Catalogos_MesesDelAnoFiscal_Controller',
             parent: 'contab'
         })
+        .state('contab.centrosCosto', {
+            url: '/centrosCosto',
+            templateUrl: 'client/imports/contab/catalogos/centrosCosto/centrosCosto.html',
+            controller: 'Contab_Catalogos_CentrosCosto_Controller',
+            parent: 'contab'
+        })
         .state('contab.parametrosContab', {
             url: '/parametrosContab',
             templateUrl: 'client/contab/catalogos/parametrosContab/parametrosContab.html',

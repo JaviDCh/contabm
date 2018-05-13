@@ -19,16 +19,19 @@ Meteor.methods(
             if (filtro2.fecha2) {
                 where = `(Fecha Between '${moment(filtro2.fecha1).format('YYYY-MM-DD')}' And '${moment(filtro2.fecha2).format('YYYY-MM-DD')}')`;
             }
-            else
+            else { 
                 where = `(Fecha = '${moment(filtro2.fecha1).format('YYYY-MM-DD')}')`;
+            }
         }
 
         if (filtro2.ingreso1) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
-
+            }
+                
             if (filtro2.ingreso2) {
                 where += `(Ingreso Between '${moment(filtro2.ingreso1).format('YYYY-MM-DD')}' And '${moment(filtro2.ingreso2).format('YYYY-MM-DD')}')`;
             }
@@ -37,10 +40,12 @@ Meteor.methods(
         }
 
         if (filtro2.ultAct1) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             if (filtro2.ultAct2) {
                 where += `(UltAct Between '${moment(filtro2.ultAct1).format('YYYY-MM-DD')}' And '${moment(filtro2.ultAct2).format('YYYY-MM-DD')}')`;
@@ -50,10 +55,12 @@ Meteor.methods(
         }
 
         if (filtro2.numero1) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             if (filtro2.numero2) {
                 where += `(Numero Between ${filtro2.numero1.toString()} And ${filtro2.numero2.toString()})`;
@@ -63,10 +70,12 @@ Meteor.methods(
         }
 
         if (filtro2.lote) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             if (filtro2.lote.indexOf('*') > -1) {
                 filtro2.lote = filtro2.lote.replace(new RegExp("\\*", 'g'), "%");
@@ -76,47 +85,73 @@ Meteor.methods(
             };
         }
 
-        if (where)
-            where += " And ";
-        else
-            where = "(1 = 1) And ";
+        if (filtro2.centroCosto) {
+            if (where) { 
+                where += " And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
+            if (filtro2.centroCosto.indexOf('*') > -1) {
+                filtro2.centroCosto = filtro2.centroCosto.replace(new RegExp("\\*", 'g'), "%");
+                where += ` (cc.Descripcion Like '${filtro2.centroCosto}')`;
+            } else {
+                where += ` (cc.Descripcion = '${filtro2.centroCosto}')`;
+            };
+        }
+
+        if (where) { 
+            where += " And ";
+        } 
+        else { 
+            where = "(1 = 1) And ";
+        }
+            
         where += `(Cia = ${ciaContab.toString()})`;
 
         if (filtro2.soloAsientosNumeroNegativo) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(a.Numero < 0)`;
         }
 
         if (filtro2.soloAsientosTipoCierreAnual) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(a.AsientoTipoCierreAnualFlag = 1)`;
         }
 
 
         if (filtro2.sinAsientosTipoCierreAnual) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(a.AsientoTipoCierreAnualFlag Is Null Or a.AsientoTipoCierreAnualFlag = 0)`;
         }
 
         if (filtro2.cuentasContables.length > 0) {
 
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             let cuentasContablesLista = "";
 
@@ -132,10 +167,12 @@ Meteor.methods(
         }
 
         if (filtro2.soloConCentrosCostoAsignado) {
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
-                where = "(1 = 1) And ";
+            }
+            else { 
+                where += "(1 = 1) And ";
+            }
 
             where += `(d.CentroCosto Is Not Null)`;
         }
@@ -143,10 +180,12 @@ Meteor.methods(
         
         if (_.isArray(filtro2.tiposAsiento) && filtro2.tiposAsiento.length > 0) {
 
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             let tiposAsientoLista = "";
 
@@ -163,10 +202,12 @@ Meteor.methods(
 
         if (_.isArray(filtro2.monedas) && filtro2.monedas.length > 0) {
 
-            if (where)
+           if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             let monedasLista = "";
 
@@ -183,10 +224,12 @@ Meteor.methods(
 
         if (_.isArray(filtro2.provieneDe) && filtro2.provieneDe.length > 0) {
 
-            if (where)
+            if (where) { 
                 where += " And ";
-            else
+            }
+            else { 
                 where += "(1 = 1) And ";
+            }
 
             let provieneDeLista = "";
 
@@ -217,15 +260,23 @@ Meteor.methods(
             where = "1 = 1";            // esto nunca va a ocurrir aquí ...
         }
 
+        let centrosCosto_sqlJoin = ''; 
+
+        if (filtro2.centroCosto) { 
+            centrosCosto_sqlJoin = ` Left Outer Join CentrosCosto cc On d.CentroCosto = cc.CentroCosto`
+        }
+
         // ---------------------------------------------------------------------------------------------------
         // leemos los movimientos bancarios para el período seleccionado. Además, leemos la chequera y la
         // cuenta bancaria (associations en model - include en query)
+        // accedemos a CentrosCosto solo si el usuario indicó en el filtro ... 
         let query = `Select a.NumeroAutomatico as numeroAutomatico, a.Numero as numero, a.Fecha as fecha, a.Tipo as tipo,
                     a.Descripcion as descripcion, a.Moneda as moneda, a.MonedaOriginal as monedaOriginal,
                     a.ProvieneDe as provieneDe, a.Ingreso as ingreso, a.UltAct as ultAct, a.Cia as cia,
                     a.asientoTipoCierreAnualFlag, a.FactorDeCambio as factorDeCambio,
                     COUNT(d.NumeroAutomatico) As cantidadPartidas, SUM(d.debe) As totalDebe, SUM(d.Haber) As totalHaber
-                    From Asientos a Left Outer Join dAsientos d On a.NumeroAutomatico = d.NumeroAutomatico
+                    From Asientos a Left Outer Join dAsientos d On a.NumeroAutomatico = d.NumeroAutomatico 
+                    ${centrosCosto_sqlJoin}
                     Where ${where} And ${whereMontosConMasDeDosDecimales}
                     Group by a.NumeroAutomatico, a.Numero, a.Fecha, a.Tipo, a.Descripcion,
                     a.Moneda, a.MonedaOriginal, a.ProvieneDe, a.Ingreso, a.UltAct, a.Cia,
@@ -233,7 +284,7 @@ Meteor.methods(
 
         if (filtro2.soloAsientosDescuadrados) {
             query += ` Having SUM(d.debe) <> SUM(d.Haber)`;
-        };
+        }
 
         response = null;
         response = Async.runSync(function(done) {
@@ -243,16 +294,16 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
+            
         // eliminamos los asientos que el usuario pueda haber registrado antes ...
         Temp_Consulta_AsientosContables.remove({ user: this.userId });
 
-
         if (response.result.length == 0) {
             return "Cero registros han sido leídos desde sql server.";
-        };
+        }
 
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
@@ -281,9 +332,10 @@ Meteor.methods(
             asientoContable.ultAct = moment(asientoContable.ultAct).add(TimeOffset, 'hours').toDate();
 
             Temp_Consulta_AsientosContables.insert(asientoContable, function (error, result) {
-                if (error)
+                if (error) { 
                     throw new Meteor.Error("validationErrors", error.invalidKeys.toString());
-            });
+                }
+            })
 
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
@@ -301,14 +353,14 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'contab', process: 'leerAsientosDesdeSqlServer' },
                                         { current: 1, max: 1, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
         return "Ok, los asientos contables han sido leídos desde sql server.";
     }
-});
+})
 
 function customizer(value) {
     return true;
