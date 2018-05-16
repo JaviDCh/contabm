@@ -1,4 +1,8 @@
 
+
+
+import { mostrarHelp } from "../imports/clientGlobalMethods/mostrarHelp_method"; 
+
 // Este controller (angular) se carga con el route /Administracion ...
 angular.module("contabm").controller("Administracion_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', '$location',
@@ -21,9 +25,10 @@ function ($rootScope, $scope, $state, $stateParams, $location) {
 
     $scope.mostrarHelp = () => {
         // cada vez que el usuario cambia a un state, grabamos su nombre en $rootScope (en client/lib/mainController.js) ...
-        if ($rootScope.currentStateName)
-            ClientGlobal_Methods.mostrarHelp($rootScope.currentStateName);
-    };
+        if ($rootScope.currentStateName) { 
+            mostrarHelp($rootScope.currentStateName);
+        }
+    }
 
     // $location lee el url de la página que se muestra; nótese que $location lee 'true' y no true, por eso
     // usamos true con comillas

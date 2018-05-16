@@ -1,5 +1,10 @@
 
+
+
 // Este controller (angular) se carga con la página primera del programa
+
+import { mostrarHelp } from "../imports/clientGlobalMethods/mostrarHelp_method";
+
 angular.module("contabm.nomina").controller("Nomina_Main_Controller",
 ['$rootScope', '$scope', '$state', '$stateParams', function ($rootScope, $scope, $state, $stateParams) {
 
@@ -20,9 +25,10 @@ angular.module("contabm.nomina").controller("Nomina_Main_Controller",
 
     $scope.mostrarHelp = () => {
         // cada vez que el usuario cambia a un state, grabamos su nombre en $rootScope (en client/lib/mainController.js) ...
-        if ($rootScope.currentStateName)
-            ClientGlobal_Methods.mostrarHelp($rootScope.currentStateName);
-    };
+        if ($rootScope.currentStateName) { 
+            mostrarHelp($rootScope.currentStateName);
+        }
+    }
 
     $scope.userHasRole = (rol) => {
         // debugger;

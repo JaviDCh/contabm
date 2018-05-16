@@ -70,6 +70,12 @@ export function mostrarHelp(currentStateName) {
           window.open('https://smrsoftware.wordpress.com/2017/08/06/contab-saldos-contables-consulta/', '_blank');
           break;
         }
+        case 'bancos.facturas.filter':
+        case 'bancos.facturas.lista':
+        case 'bancos.facturas.factura': {
+          window.open('https://smrsoftware.wordpress.com/2018/05/15/facturas/', '_blank');
+          break;
+        }
         default:
     }
 }
