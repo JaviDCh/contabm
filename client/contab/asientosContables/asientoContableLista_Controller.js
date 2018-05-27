@@ -1,5 +1,8 @@
 
 
+
+import lodash from 'lodash'; 
+
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
@@ -40,8 +43,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
     let companiaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
     let companiaContab = {};
 
-    if (companiaContabSeleccionada)
+    if (companiaContabSeleccionada) { 
         companiaContab = Companias.findOne(companiaContabSeleccionada.companiaID);
+    }
     // ------------------------------------------------------------------------------------------------
 
     $scope.regresarALista = function () {
@@ -62,7 +66,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.imprimir = function() {
 
-        if (!_.isArray($scope.asientosContables) || _.isEmpty($scope.asientosContables)) {
+        if (!lodash.isArray($scope.asientosContables) || lodash.isEmpty($scope.asientosContables)) {
             DialogModal($modal, "<em>Asientos Contables</em>",
                         "Aparentemente, no se han seleccionado registros; no hay nada que imprimir.",
                         false).then();
@@ -95,11 +99,11 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               function (cancel) {
                   return true;
               });
-      };
+      }
 
     $scope.exportarAsientosContables_csv = () => {
 
-        if (!_.isArray($scope.asientosContables) || _.isEmpty($scope.asientosContables)) {
+        if (!lodash.isArray($scope.asientosContables) || lodash.isEmpty($scope.asientosContables)) {
             DialogModal($modal, "<em>Asientos Contables - Exportar formato csv</em>",
                         "Aparentemente, no se han seleccionado registros; no hay nada que exportar.",
                         false).then();
@@ -123,7 +127,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                   return true;
               });
 
-    };
+    }
 
 
     let asientosContables_ui_grid_api = null;
@@ -173,7 +177,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             return row._id;
         }
     }
-
 
     $scope.asientosContables_ui_grid.columnDefs = [
         {
@@ -517,7 +520,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
         $scope.showProgress = false;
         $scope.$apply();
-    });
+    })
 
     $scope.exportarAsientosContables = () => {
         var modalInstance = $modal.open({

@@ -56,11 +56,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
         tiposAsientoContable: () => {
             return TiposAsientoContable.find();
         },
-
         monedas: () => {
             return Monedas.find();
         },
-
         cuentasContables: () => {
             return CuentasContables2.find({ cia: companiaContab.numero, totDet: 'D' }, { sort: { cuenta: true }});
         },

@@ -66,15 +66,15 @@ Meteor.methods(
             asientoContable.user = Meteor.userId();
 
             AsientosContables.insert(asientoContable, function (error, result) {
-                if (error)
+                if (error) { 
                     throw new Meteor.Error("validationErrors", error.invalidKeys.toString());
-            });
-        };
-
+                }   
+            })
+        }
 
         return {
             pkAsientoContale: asientoContable.numeroAutomatico,
             asientoContableMongoID: asientoContable._id
         };
     }
-});
+})

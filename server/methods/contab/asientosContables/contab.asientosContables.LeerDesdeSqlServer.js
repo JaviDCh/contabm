@@ -326,7 +326,6 @@ Meteor.methods(
             // al leer de sql, debemos sumar 4:30, para compensar la conversión que intenta hacer sequelize
             // (desde utc a local);
             // ahora tenemos una variable 'global' que sirve de 'offset' ...
-
             asientoContable.fecha = moment(asientoContable.fecha).add(TimeOffset, 'hours').toDate();
             asientoContable.ingreso = moment(asientoContable.ingreso).add(TimeOffset, 'hours').toDate();
             asientoContable.ultAct = moment(asientoContable.ultAct).add(TimeOffset, 'hours').toDate();
