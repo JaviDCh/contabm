@@ -22,6 +22,19 @@ Meteor.methods(
 
         let usuario = Meteor.users.findOne(Meteor.userId());
 
+        // algunos valores son opcionales; sin embargo, si vienen en '' la validación va a fallar. Ponemos en Nulls 
+        if (reposicion.observaciones && reposicion.observaciones === '') { 
+            reposicion.observaciones = null; 
+        }
+
+        reposicion.cajaChica_reposicion_gastos.forEach((g) => { 
+            g.numeroDocumento = g.numeroDocumento === '' ? null : g.numeroDocumento; 
+            g.numeroControl = g.numeroControl === '' ? null : g.numeroControl; 
+            g.nombre = g.nombre === '' ? null : g.nombre; 
+            g.rif = g.rif === '' ? null : g.rif; 
+        })
+
+
         if (reposicion.docState == 1) {
             delete reposicion.docState;
 
@@ -30,7 +43,7 @@ Meteor.methods(
             }
                 
             reposicion.cajaChica_reposicion_gastos.forEach((x) => { delete x.docState; });
-            // let proveedor = lodash.cloneDeep(proveedor);
+
             // ------------------------------------------------------------------------------------------
             // sequelize siempre convierte las fechas a utc (es decir, las globaliza); nuestro offset
             // en ccs es -4.00; sequelize va a sumar 4.0 para llevar a utc; restamos 4.0 para eliminar

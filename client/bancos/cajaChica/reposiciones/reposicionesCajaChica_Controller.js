@@ -148,6 +148,10 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         showColumnFooter: false,
         showGridFooter: true,
         enableFiltering: true,
+
+        enableCellEdit: false,
+        enableCellEditOnFocus: true,
+
         enableRowSelection: true,
         enableRowHeaderSelection: false,
         multiSelect: false,
@@ -199,6 +203,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             '<span ng-show="row.entity[col.field] == 3" class="fa fa-trash" style="color: red; font: xx-small; padding-top: 8px; "></span>',
             enableColumnMenu: false,
             enableSorting: false,
+            pinnedLeft: true,
             width: 25
         },
         {
@@ -492,6 +497,10 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         showColumnFooter: true,
         showGridFooter: true,
         enableFiltering: true,
+
+        enableCellEdit: false,
+        enableCellEditOnFocus: true,
+
         enableRowSelection: true,
         enableRowHeaderSelection: false,
         multiSelect: false,
@@ -502,6 +511,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         onRegisterApi: function (gridApi) {
 
             gastos_ui_grid_api = gridApi;
+
             gridApi.selection.on.rowSelectionChanged($scope, function (row) {
                 itemSeleccionado_gastos = {};
                 if (row.isSelected) {
@@ -510,7 +520,19 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
                 else { 
                     return;
                 }
-            }), 
+            }); 
+
+            gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+                if (newValue != oldValue) {
+                    if (!rowEntity.docState) {
+                        rowEntity.docState = 2;
+
+                        if (!$scope.reposicion.docState) { 
+                            $scope.reposicion.docState = 2; 
+                        }
+                    }
+                }
+            });
 
             // -----------------------------------------------------------------------------------------------------
             // cuando el ui-grid está en un bootstrap tab y tiene más columnas de las que se pueden ver,
@@ -551,6 +573,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableColumnMenu: false,
             enableCellEdit: false,
             enableSorting: false,
+            pinnedLeft: true,
             width: 25
         },
         {
@@ -565,6 +588,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableSorting: true,
             enableFiltering: true,
             filterCellFiltered: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {
@@ -585,6 +609,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {       
@@ -598,6 +623,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'string'
         },
         {
@@ -618,6 +644,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'number'
         },
         {       
@@ -631,6 +658,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             enableColumnMenu: false,
             enableCellEdit: true,
             enableSorting: true,
+            pinnedLeft: true,
             type: 'string'
         },
         {       
@@ -1063,6 +1091,8 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             $scope.showProgress = false;
             return;
         }
+
+        $scope.gastos_ui_grid.data = [];
 
         Meteor.call('bancos.cajaChica.save', editedItem, (err, result) => {
 

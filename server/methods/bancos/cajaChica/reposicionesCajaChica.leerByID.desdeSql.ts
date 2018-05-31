@@ -145,6 +145,9 @@ Meteor.methods(
 function leerCatalogoEnSqlServer(query: string, pk: number) { 
     // para leer algún catálogo en sql server; ejemplo: rubro de caja chica, proveedor, caja chica, etc. 
     // nótese que, en estos casos, siempre hay una clave simple y de tipo numérica ... 
+
+    query = query.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
+
     let response: any = null;
     response = Async.runSync(function(done) {
         sequelize.query(query, { replacements: [ pk ], type: sequelize.QueryTypes.SELECT })

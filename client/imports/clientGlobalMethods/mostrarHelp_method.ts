@@ -35,6 +35,10 @@ export function mostrarHelp(currentStateName) {
           window.open('https://smrsoftware.wordpress.com/2016/08/18/cuentas-contables/', '_blank');
           break;
         }
+        case 'contab.reconversionMonetaria': {
+          window.open('https://smrsoftware.wordpress.com/2018/05/27/contab-reconversion-monetaria/', '_blank');
+          break;
+        }
         case 'bancos.ultimoMesCerrado': {
           window.open('https://smrsoftware.wordpress.com/2016/04/20/bancos-ultimo-mes-cerrado/', '_blank');
           break;

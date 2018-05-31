@@ -138,6 +138,8 @@ Meteor.methods(
                      Group By cc.Descripcion, r.Reposicion, r.Fecha, r.EstadoActual, r.Observaciones   
                     `;
 
+        query = query.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
+
         let response: any = null;
         response = Async.runSync(function(done) {
             sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
