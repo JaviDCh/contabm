@@ -31,8 +31,7 @@ if (Meteor.isServer) {
 // en algún momento tenemos que unificar y tener *un solo schema* y, tal vez, dejar de leer
 // proveedores como un catálogo, en copiar catálogos, pues siempre resulta demasiado costoso ...
 // ---------------------------------------------------------------------------------------------------
-
-Personas_SimpleSchema = new SimpleSchema({
+const Personas_SimpleSchema = new SimpleSchema({
     persona: { type: Number, label: 'Persona', optional: false, },
     compania: { type: Number, label: 'Compania', optional: false, },
     nombre: { type: String, label: 'Nombre', optional: false, min: 1, max: 50, },
@@ -59,7 +58,7 @@ Personas_SimpleSchema = new SimpleSchema({
 });
 
 
-Proveedores_SimpleSchema = new SimpleSchema({
+export const Proveedores_SimpleSchema = new SimpleSchema({
     proveedor: { type: Number, label: 'Proveedor', optional: false },
     nombre: { type: String, label: 'Nombre', optional: false, min: 1, max: 70, },
     abreviatura: { type: String, label: 'Abreviatura', optional: false, min: 1, max: 10, },

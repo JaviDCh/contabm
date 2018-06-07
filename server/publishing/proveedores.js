@@ -1,7 +1,7 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Proveedores } from '/imports/collections/bancos/proveedoresClientes'; 
 
 Meteor.publish("proveedores", function (proveedorID) {
 

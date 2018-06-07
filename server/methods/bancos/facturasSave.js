@@ -5,6 +5,8 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+import { dFormasDePago_sql } from '/server/imports/sqlModels/bancos/formasDePago'; 
+
 Meteor.methods(
 {
     facturasSave: function (factura, fechaEmisionOriginal, fechaRecepcionOriginal, ciaContabID) {

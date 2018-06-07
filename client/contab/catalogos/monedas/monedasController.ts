@@ -231,9 +231,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_Monedas_Control
                return;
            }
 
-           Meteor.call('contab.monedasSave',
-                       editedItems,
-                       (err, result) => {
+           Meteor.call('contab.monedasSave', editedItems, (err, result) => {
 
                if (err) {
                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);

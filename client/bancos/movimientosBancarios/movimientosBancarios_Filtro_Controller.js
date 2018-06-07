@@ -4,6 +4,9 @@ import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Filtros } from '/imports/collections/general/filtros'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { Bancos } from '/imports/collections/bancos/bancos';
+
+import { FlattenBancos } from '/imports/general/bancos/flattenBancos'; 
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_Filter_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
@@ -189,7 +192,7 @@ function ($scope, $stateParams, $state, $meteor, $modal) {
         // en nuestro programa, el collecion Bancos tiene un array de agencias y, dentro, un array
         // de cuentas bancarias; con la siguiente función, regresamos una lista 'plana' para acceder
         // en forma más fácil las cuentas bancarias
-        let cuentasBancariasList = FuncionesGlobalesBancos.flattenBancos(companiaContab);
+        let cuentasBancariasList = FlattenBancos(companiaContab);
         $scope.cuentasBancarias = [];
 
         cuentasBancariasList.forEach((cuenta) => {

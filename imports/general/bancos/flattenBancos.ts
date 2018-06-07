@@ -1,13 +1,15 @@
 
-import { Monedas } from '/imports/collections/monedas';
-import { Companias } from '/imports/collections/companias';
+import * as lodash from 'lodash';
+
+import { Monedas } from '../../collections/monedas';
+import { Companias } from '../../collections/companias';
+import { Bancos } from '../../collections/bancos/bancos';
 
 // ---------------------------------------------------------------------------------------------------
 // tal como existe en mongodb, Bancos contiene Agencias y, cada agencia, contiene Cuentas bancarias
 // la función que sigue intenta crear un array en el cual cada item es una cuenta bancaria con sus
 // datos más importantes: banco, moneda, etc.
-
-let flattenBancos = function (ciaContab) {
+export const FlattenBancos = function (ciaContab) {
 
     let cuentasBancarias = [];
 
@@ -15,13 +17,13 @@ let flattenBancos = function (ciaContab) {
     let bancos = Bancos.find().fetch();
     let companias = Companias.find().fetch();
 
-    _.each(Bancos.find().fetch(), (banco) => {
+    lodash.each(Bancos.find().fetch(), (banco: any) => {
 
-        if (banco.agencias && _.isArray(banco.agencias) && banco.agencias.length) {
-            _.each(banco.agencias, (agencia) => {
+        if (banco.agencias && lodash.isArray(banco.agencias) && banco.agencias.length) {
+            lodash.each(banco.agencias, (agencia: any) => {
 
-                if (agencia.cuentasBancarias && _.isArray(agencia.cuentasBancarias) && agencia.cuentasBancarias.length) {
-                    _.each(agencia.cuentasBancarias, (cuenta) => {
+                if (agencia.cuentasBancarias && lodash.isArray(agencia.cuentasBancarias) && agencia.cuentasBancarias.length) {
+                    lodash.each(agencia.cuentasBancarias, (cuenta: any) => {
                         // puede o no venir una ciaContab ...
                         if (ciaContab && cuenta.cia === ciaContab.numero) {
                             let cuentaBancaria = {
@@ -29,12 +31,12 @@ let flattenBancos = function (ciaContab) {
                                 cuentaBancaria: cuenta.cuentaBancaria,
                                 cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null,
                                 moneda: cuenta.moneda,
-                                simboloMoneda: _.find(monedas, (x) => { return x.moneda === cuenta.moneda; }).simbolo,
+                                simboloMoneda: lodash.find(monedas, (x: any) => { return x.moneda === cuenta.moneda; }).simbolo,
                                 banco: banco.banco,
-                                nombreBanco: _.find(bancos, (x) => { return x.banco === banco.banco; }).abreviatura,
+                                nombreBanco: lodash.find(bancos, (x: any) => { return x.banco === banco.banco; }).abreviatura,
                                 cia: cuenta.cia,
-                                nombreCia: _.find(companias, (x) => { return x.numero === cuenta.cia; }).abreviatura,
-                            };
+                                nombreCia: lodash.find(companias, (x: any) => { return x.numero === cuenta.cia; }).abreviatura,
+                            } as never;
                             cuentasBancarias.push(cuentaBancaria);
                         } else if (!ciaContab) {
                             let cuentaBancaria = {
@@ -42,12 +44,12 @@ let flattenBancos = function (ciaContab) {
                                 cuentaBancaria: cuenta.cuentaBancaria,
                                 cuentaContable: cuenta.cuentaContable ? cuenta.cuentaContable : null,
                                 moneda: cuenta.moneda,
-                                simboloMoneda: _.find(monedas, (x) => { return x.moneda === cuenta.moneda; }).simbolo,
+                                simboloMoneda: lodash.find(monedas, (x: any) => { return x.moneda === cuenta.moneda; }).simbolo,
                                 banco: banco.banco,
-                                nombreBanco: _.find(bancos, (x) => { return x.banco === banco.banco; }).abreviatura,
+                                nombreBanco: lodash.find(bancos, (x: any) => { return x.banco === banco.banco; }).abreviatura,
                                 cia: cuenta.cia,
-                                nombreCia: _.find(companias, (x) => { return x.numero === cuenta.cia; }).abreviatura,
-                            };
+                                nombreCia: lodash.find(companias, (x: any) => { return x.numero === cuenta.cia; }).abreviatura,
+                            } as never; 
                             cuentasBancarias.push(cuentaBancaria);
                         };
                     });
@@ -58,5 +60,3 @@ let flattenBancos = function (ciaContab) {
 
     return cuentasBancarias;
 };
-
-FuncionesGlobalesBancos.flattenBancos = flattenBancos;

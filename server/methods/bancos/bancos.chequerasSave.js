@@ -4,6 +4,8 @@ import moment from 'moment';
 import lodash from 'lodash'; 
 import { TimeOffset } from '/globals/globals'; 
 
+import { Chequeras } from '/imports/collections/bancos/chequeras'; 
+
 Meteor.methods(
 {
     'bancos.chequerasSave': function (items) {

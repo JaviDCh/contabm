@@ -2,6 +2,8 @@
 import { sequelize } from '../_globals/_loadThisFirst/_globals';
 import Sequelize from 'sequelize';
 
+import { CuentasBancarias_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+
 Saldos_sql = sequelize.define('saldos', {
     id: { type: Sequelize.INTEGER, field: 'ID', allowNull: false, primaryKey: true, autoIncrement: true, },
     cuentaBancariaID: { type: Sequelize.INTEGER, field: 'CuentaBancaria', allowNull: false, },

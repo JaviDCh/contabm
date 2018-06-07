@@ -6,10 +6,11 @@ import { Monedas } from '/imports/collections/monedas.js';
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Proveedores } from '/imports/collections/bancos/proveedoresClientes'; 
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { TiposProveedor, FormasDePago } from '/imports/collections/bancos/catalogos'; 
 
 angular.module("contabm").controller("Bancos_Facturas_Factura_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants', 'leerTablasImpuestosRetenciones', 'tablasImpuestosRetenciones',

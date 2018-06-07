@@ -1,4 +1,7 @@
 
+
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
+
 Meteor.methods(
 {
     'contab.gruposContablesSave': function (items) {

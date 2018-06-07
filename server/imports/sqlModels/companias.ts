@@ -1,8 +1,8 @@
 
-import { sequelize } from './_globals/_loadThisFirst/_globals';
-import Sequelize from 'sequelize';
+import { sequelize } from '../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import * as Sequelize from 'sequelize';
 
-Compania_sql = sequelize.define('compania', {
+export const Compania_sql = sequelize.define('compania', {
     numero: { type: Sequelize.INTEGER, field: 'Numero', primaryKey: true, autoIncrement: true, allowNull: false, },
     nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, },
     nombreCorto: { type: Sequelize.STRING, field: 'NombreCorto', allowNull: false, },

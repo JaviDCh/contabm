@@ -5,6 +5,7 @@ import { Monedas } from '/imports/collections/monedas';
 import { Companias } from '/imports/collections/companias';
 import { Empleados } from '/models/nomina/empleados'; 
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
 
 // ---------------------------------------------------------------------------------------
 // ui-grid: para formatear fields numéricos y dates
@@ -265,41 +266,6 @@ angular.module("contabm").filter('empleadoFilter', function () {
         return empleadoItem ? empleadoItem.alias : "Indefinido";
     };
 });
-
-
-//
-// angular.module("contabm").filter('banco_fromChequeraID', function () {
-//     return function (chequeraID) {
-//         debugger;
-//         if (!chequeraID)
-//             return "";
-//
-//         // primero leemos la chequera, para obtener la cuenta bancaria ...
-//         let chequera = Chequeras.findOne({ numeroChequera: chequeraID });
-//         if (!chequera)
-//             return "";
-//
-//         // ahora, leemos el banco, usando el número de cuenta en la chequera
-//         let banco = Bancos.findOne({ 'agencias.cuentasBancarias.cuentaInterna': chequera.numeroCuenta });
-//         if (!banco)
-//             return "";
-//
-//         // el banco tiene un arregla de agencias; cada agencia tiene un arregla de cuentas bancarias
-//         let cuentaBancaria = {};
-//         _.forEach(banco.agencias, (agencia) => {
-//
-//             cuentaBancaria = _.find(agencia.cuentasBancarias, (x) => { return x.cuentaInterna === chequera.numeroCuenta; });
-//
-//             if (cuentaBancaria)
-//                 return false;           // para salir del forEach ... (solo en lodash)
-//         });
-//
-//         if (!cuentaBancaria || _.isEmpty(cuentaBancaria))
-//             return "Indefinido";
-//
-//         return `${banco.abreviatura} ${cuentaBancaria.cuentaBancaria}`;
-//     };
-// });
 
 
 angular.module("contabm").filter('userNameOrEmailFilter', function () {

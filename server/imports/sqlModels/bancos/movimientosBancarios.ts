@@ -1,20 +1,52 @@
 
-import { sequelize } from '../_globals/_loadThisFirst/_globals';
-import Sequelize from 'sequelize';
 
-CuentasBancarias_sql = sequelize.define('cuentasBancarias_sql', {
-    id: { type: Sequelize.INTEGER, field: 'CuentaInterna', allowNull: false, autoIncrement: true, primaryKey: true },
-    cuentaBancaria: { type: Sequelize.STRING, field: 'CuentaBancaria', allowNull: false },
-    tipo: { type: Sequelize.STRING, field: 'Tipo', allowNull: false },
-    moneda: { type: Sequelize.INTEGER, field: 'Moneda', allowNull: false },
-    estado: { type: Sequelize.STRING, field: 'Estado', allowNull: false },
-    cuentaContable: { type: Sequelize.INTEGER, field: 'CuentaContable', allowNull: true },
-    cia: { type: Sequelize.INTEGER, field: 'Cia', allowNull: false },
+import { sequelize } from '../../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import * as Sequelize from 'sequelize';
+
+export const Bancos_sql = sequelize.define('bancos_sql', {
+    banco: { type: Sequelize.INTEGER, field: 'Banco', allowNull: false, autoIncrement: true, primaryKey: true, },
+    nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, },
+    nombreCorto: { type: Sequelize.STRING, field: 'NombreCorto', allowNull: false, },
+    abreviatura: { type: Sequelize.STRING, field: 'Abreviatura', allowNull: false, },
+    codigo: { type: Sequelize.STRING, field: 'Codigo', allowNull: true, },
+}, {
+        tableName: 'Bancos'
+});
+
+
+export const Agencias_sql = sequelize.define('agencias_sql', {
+    agencia: { type: Sequelize.INTEGER, field: 'Agencia', allowNull: false, autoIncrement: true, primaryKey: true, },
+    banco: { type: Sequelize.INTEGER, field: 'Banco', allowNull: false, },
+    nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, },
+    direccion: { type: Sequelize.STRING, field: 'Direccion', allowNull: true, },
+    telefono1: { type: Sequelize.STRING, field: 'Telefono1', allowNull: true, },
+    telefono2: { type: Sequelize.STRING, field: 'Telefono2', allowNull: true, },
+    fax: { type: Sequelize.STRING, field: 'Fax', allowNull: true, },
+    contacto1: { type: Sequelize.STRING, field: 'Contacto1', allowNull: true, },
+    contacto2: { type: Sequelize.STRING, field: 'Contacto2', allowNull: true, },
+}, {
+     tableName: 'Agencias'
+});
+
+
+export const CuentasBancarias_sql = sequelize.define('cuentasBancarias_sql', {
+    cuentaInterna: { type: Sequelize.INTEGER, field: 'CuentaInterna', allowNull: false, autoIncrement: true, primaryKey: true, },
+    agencia: { type: Sequelize.INTEGER, field: 'Agencia', allowNull: false, },
+    cuentaBancaria: { type: Sequelize.STRING, field: 'CuentaBancaria', allowNull: false, },
+    tipo: { type: Sequelize.STRING, field: 'Tipo', allowNull: false, },
+    moneda: { type: Sequelize.INTEGER, field: 'Moneda', allowNull: false, },
+    lineaCredito: { type: Sequelize.DECIMAL(12, 2), field: 'LineaCredito', allowNull: true, },
+    estado: { type: Sequelize.STRING, field: 'Estado', allowNull: false, },
+    cuentaContable: { type: Sequelize.INTEGER, field: 'CuentaContable', allowNull: true, },
+    cuentaContableGastosIDB: { type: Sequelize.INTEGER, field: 'CuentaContableGastosIDB', allowNull: true, },
+    numeroContrato: { type: Sequelize.STRING, field: 'NumeroContrato', allowNull: true, },
+    cia: { type: Sequelize.INTEGER, field: 'Cia', allowNull: false, },
 }, {
      tableName: 'CuentasBancarias'
 });
 
-Chequeras_sql = sequelize.define('chequeras_sql', {
+
+export const Chequeras_sql = sequelize.define('chequeras_sql', {
     id: { type: Sequelize.INTEGER, field: 'NumeroChequera', allowNull: false, autoIncrement: true, primaryKey: true },
     numeroCuenta: { type: Sequelize.INTEGER, field: 'NumeroCuenta', allowNull: false },
     activa: { type: Sequelize.BOOLEAN, field: 'Activa', allowNull: false },
@@ -35,7 +67,7 @@ Chequeras_sql = sequelize.define('chequeras_sql', {
 });
 
 
-MovimientosBancarios_sql = sequelize.define('movimientosBancarios_sql', {
+export const MovimientosBancarios_sql = sequelize.define('movimientosBancarios_sql', {
     transaccion: { type: Sequelize.INTEGER, field: 'Transaccion', allowNull: false },
     tipo: { type: Sequelize.STRING, field: 'Tipo', allowNull: false },
     fecha: { type: Sequelize.DATE, field: 'Fecha', allowNull: false },

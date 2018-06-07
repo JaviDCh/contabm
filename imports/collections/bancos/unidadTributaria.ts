@@ -4,8 +4,6 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-export const UnidadTributaria: any = new Mongo.Collection("unidadTributaria");
-
 let schema = new SimpleSchema({
     _id: { type: String, optional: false, },
     fecha: { type: Date, label: "Fecha", optional: false, },
@@ -14,5 +12,6 @@ let schema = new SimpleSchema({
     docState: { type: Number, optional: true, }
 });
 
+export const UnidadTributaria: any = new Mongo.Collection("unidadTributaria");
 UnidadTributaria.attachSchema(schema);
 

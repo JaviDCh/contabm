@@ -3,6 +3,8 @@
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import SimpleSchema from 'simpl-schema';
 
+import { Chequeras } from '/imports/collections/bancos/chequeras'; 
+
 let actualizarChequera = (chequeraID) => {
 
     new SimpleSchema({

@@ -1,5 +1,7 @@
 
 
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
+
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm.bancos.catalogos").controller("Catalogos_ParametrosGlobalBancos_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

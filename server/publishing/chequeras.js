@@ -1,6 +1,8 @@
 
+
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Companias } from '/imports/collections/companias';
+import { Chequeras } from '/imports/collections/bancos/chequeras'; 
 
 Meteor.publish("chequeras", function (filtro) {
 

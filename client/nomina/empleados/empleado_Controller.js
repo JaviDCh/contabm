@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Empleados } from '/models/nomina/empleados'; 
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 

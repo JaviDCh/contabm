@@ -1,8 +1,9 @@
 
 
-
 import moment from 'moment'; 
 import numeral from 'numeral'; 
+
+import { CuentasBancarias_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 
 Meteor.methods(
 {

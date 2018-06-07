@@ -6,6 +6,9 @@ import numeral from 'numeral';
 import { Monedas } from '/imports/collections/monedas';
 import { TimeOffset } from '/globals/globals'; 
 import { Companias } from '/imports/collections/companias';
+import { Bancos } from '/imports/collections/bancos/bancos';
+import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
+import { Chequeras } from '/imports/collections/bancos/chequeras'; 
 
 Meteor.methods(
 {

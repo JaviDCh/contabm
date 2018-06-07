@@ -4,8 +4,9 @@ import { Monedas } from '/imports/collections/monedas.js';
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2'; 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
+import { Proveedores } from '/imports/collections/bancos/proveedoresClientes'; 
 import { Filtros } from '/imports/collections/general/filtros'; 
+import { TiposProveedor } from '/imports/collections/bancos/catalogos'; 
 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
@@ -198,12 +199,12 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_Bancos_Definici
               width: 100,
               headerCellClass: 'ui-grid-leftCell',
               cellClass: 'ui-grid-leftCell',
-              cellFilter: 'mapDropdown:row.grid.appScope.monedas:"moneda":"descripcion"',
-
+              
               editableCellTemplate: 'ui-grid/dropdownEditor',
               editDropdownIdLabel: 'moneda',
               editDropdownValueLabel: 'descripcion',
               editDropdownOptionsArray: $scope.monedas,
+              cellFilter: 'mapDropdown:row.grid.appScope.monedas:"moneda":"descripcion"',
 
               enableColumnMenu: false,
               enableCellEdit: true,

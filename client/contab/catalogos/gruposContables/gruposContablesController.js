@@ -1,5 +1,7 @@
 
 
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
+
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables_Controller",
@@ -144,10 +146,6 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables
              $scope.gruposContables_ui_grid.data = $scope.gruposContables;
       };
 
-
-
-
-
       $scope.showProgress = true;
       let gruposContablesSubscriptioHandle = null;
 
@@ -157,12 +155,6 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_GruposContables
                       $scope.$apply();
                   },
         });
-
-
-
-
-
-
 
      $scope.save = function () {
         //   debugger;

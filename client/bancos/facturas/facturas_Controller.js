@@ -1,6 +1,9 @@
 
+
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
 
 angular.module("contabm").controller("Bancos_Facturas_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'leerTablasImpuestosRetenciones',

@@ -1,8 +1,7 @@
 
+
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
-
-ParametrosGlobalBancos = new Mongo.Collection("parametrosGlobalBancos");
 
 let schema = new SimpleSchema({
      _id: { type: String, optional: false },
@@ -14,4 +13,5 @@ let schema = new SimpleSchema({
      docState: { type: Number, optional: true },
 });
 
+export const ParametrosGlobalBancos: any = new Mongo.Collection("parametrosGlobalBancos");
 ParametrosGlobalBancos.attachSchema(schema);

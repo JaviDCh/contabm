@@ -1,6 +1,9 @@
 ﻿
+
+
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 Meteor.publish(null, function () {
     // nótese como la idea es regresar aquí todos los catálogos ...

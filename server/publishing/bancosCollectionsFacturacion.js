@@ -1,6 +1,8 @@
 
+
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
 
 Meteor.publish("bancosCollectionsFacturacion", function () {
 

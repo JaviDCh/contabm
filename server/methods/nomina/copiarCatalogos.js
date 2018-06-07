@@ -5,6 +5,8 @@ import { GruposEmpleados } from '/models/nomina/catalogos';
 import { GruposEmpleados_empleados } from '/models/nomina/catalogos'; 
 import { Empleados } from '/models/nomina/empleados'; 
 import { Departamentos_sql } from '/server/imports/sqlModels/nomina/catalogos/departamentos'; 
+import { Bancos_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+import { Compania_sql } from '/server/imports/sqlModels/companias'; 
 
 Meteor.methods(
 {

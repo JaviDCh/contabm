@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { Monedas } from '../../../imports/collections/monedas'; 
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 angular.module("contabm").controller("Bancos_ImpuestoITF_Filtro_Controller",
 ['$scope', '$meteor', '$modal', '$state', function ($scope, $meteor, $modal, $state) {

@@ -1,10 +1,15 @@
 ﻿
-import { Monedas } from '/imports/collections/monedas';
-import { Companias } from '/imports/collections/companias';
-import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { GruposEmpleados } from '/models/nomina/catalogos';
-import { Empleados } from '/models/nomina/empleados'; 
-import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
+import { Monedas } from '../../imports/collections/monedas';
+import { Companias } from '../../imports/collections/companias';
+import { CompaniaSeleccionada } from '../../imports/collections/companiaSeleccionada';
+import { GruposEmpleados } from '../../models/nomina/catalogos';
+import { Empleados } from '../../models/nomina/empleados'; 
+import { TiposAsientoContable } from '../../imports/collections/contab/tiposAsientoContable'; 
+import { Bancos } from '../../imports/collections/bancos/bancos';
+import { ParametrosBancos } from '../../imports/collections/bancos/parametrosBancos'; 
+import { ParametrosGlobalBancos } from '../../imports/collections/bancos/parametrosGlobalBancos'; 
+import { GruposContables } from '../../imports/collections/contab/gruposContables'; 
+import { MesesDelAnoFiscal } from '../../imports/collections/contab/mesesAnoFiscal'; 
 
 Meteor.publish(null, function () {
     // nótese como la idea es regresar aquí todos los catálogos ...
@@ -12,9 +17,8 @@ Meteor.publish(null, function () {
     // cada client en forma automática ...
 
     // determinamos la compañía seleccionada, pues algunos catálogos que se publiquen deben corresponder a ésta ...
-    // debugger;
-    let ciaSeleccionada = null;
-    let ciaContabSeleccionada = null;
+    let ciaSeleccionada = { companiaID: 0 as number };
+    let ciaContabSeleccionada = {}; 
 
     if (this.userId) {
         ciaSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId });
@@ -28,7 +32,7 @@ Meteor.publish(null, function () {
     // una opción específica ...
     return [
              Companias.find(),
-             Meteor.roles.find({}),
+             Meteor.roles.find(),
              TiposAsientoContable.find(),
              GruposContables.find(),
              Monedas.find(),

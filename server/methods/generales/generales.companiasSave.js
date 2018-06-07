@@ -1,6 +1,7 @@
 
 import lodash from 'lodash';
 import { Companias } from '/imports/collections/companias';
+import { Compania_sql } from '/server/imports/sqlModels/companias'; 
 
 Meteor.methods(
 {

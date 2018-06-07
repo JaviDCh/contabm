@@ -1,6 +1,9 @@
 
+
 import lodash from 'lodash';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+import { FlattenBancos } from '/imports/general/bancos/flattenBancos'; 
 
 angular.module("contabm").controller("Bancos_ConciliacionesBancarias_ConciliacionBancaria_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
@@ -136,7 +139,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
       $scope.exportarExcel = function() {
 
           // leemos la cuenta bancaria para obtener el banco, moneda y cuenta bancaria (nombre, simbolo, l...)
-          let cuentasBancariasList = FuncionesGlobalesBancos.flattenBancos(companiaContabSeleccionada);
+          let cuentasBancariasList = FlattenBancos(companiaContabSeleccionada);
           let cuentaBancariaItem = lodash.find(cuentasBancariasList, (x) => {
                                               return x.cuentaInterna === $scope.conciliacionBancaria.cuentaBancaria;
                                           });

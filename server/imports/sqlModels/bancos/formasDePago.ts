@@ -1,8 +1,8 @@
 
-import { sequelize } from '../_globals/_loadThisFirst/_globals';
-import Sequelize from 'sequelize';
+import { sequelize } from '../../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import * as Sequelize from 'sequelize';
 
-FormasDePago_sql = sequelize.define('formasDePago_sql', {
+export const FormasDePago_sql = sequelize.define('formasDePago_sql', {
     formaDePago: { type: Sequelize.INTEGER, field: 'FormaDePago', allowNull: false, autoIncrement: false, primaryKey: true,  },
     descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },
     numeroDeCuotas: { type: Sequelize.INTEGER, field: 'NumeroDeCuotas', allowNull: false, },
@@ -11,7 +11,7 @@ FormasDePago_sql = sequelize.define('formasDePago_sql', {
 });
 
 
-dFormasDePago_sql = sequelize.define('dFormasDePago_sql', {
+export const dFormasDePago_sql = sequelize.define('dFormasDePago_sql', {
     claveUnica: { type: Sequelize.INTEGER, field: 'ClaveUnica', allowNull: false, autoIncrement: false, primaryKey: true,  },
     formaDePago: { type: Sequelize.INTEGER, field: 'FormaDePago', allowNull: false, autoIncrement: false, primaryKey: true,  },
     numeroDeCuota: { type: Sequelize.INTEGER, field: 'NumeroDeCuota', allowNull: false, },

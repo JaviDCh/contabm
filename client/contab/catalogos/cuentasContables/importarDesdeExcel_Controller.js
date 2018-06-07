@@ -1,6 +1,9 @@
 
+
 import XLSX from "XLSX";
 import { DialogModal } from '/client/generales/angularGenericModal'; 
+
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
 
 angular.module("contabm.contab.catalogos").controller('ContabCatalogosCuentasContablesImportarDesdeExcel_Controller',
 ['$scope', '$modalInstance', '$modal', '$meteor', 'cuentasContables', 'cuentasContables_ui_grid', 'ciaSeleccionada',

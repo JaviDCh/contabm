@@ -2,8 +2,6 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-// -------------------------------------------------------------------------------------------------------
-// *** CodificacionesContables_codigos_cuentasContables ***
 let simpleSchema = new SimpleSchema({
     _id: { type: String, optional: false },
     id: { type: Number, optional: false },
@@ -15,5 +13,5 @@ let simpleSchema = new SimpleSchema({
     docState: { type: Number, optional: true },
 });
 
-MesesDelAnoFiscal = new Mongo.Collection("mesesDelAnoFiscal");
+export const MesesDelAnoFiscal: any = new Mongo.Collection("mesesDelAnoFiscal");
 MesesDelAnoFiscal.attachSchema(simpleSchema);

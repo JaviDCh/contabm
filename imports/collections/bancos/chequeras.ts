@@ -55,7 +55,7 @@ let chequeras_SimpleSchema = new SimpleSchema({
     docState: { type: Number, optional: true, },
 });
 
-Chequeras = new Mongo.Collection("chequeras");
+export const Chequeras: any = new Mongo.Collection("chequeras");
 Chequeras.attachSchema(chequeras_SimpleSchema);
 
 if (Meteor.isServer) {

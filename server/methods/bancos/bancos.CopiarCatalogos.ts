@@ -1,19 +1,31 @@
 
-import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
-import numeral from 'numeral';
+import { sequelize } from '../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import * as numeral from 'numeral';
+import * as lodash from 'lodash'; 
 import SimpleSchema from 'simpl-schema';
 
-import { Monedas } from '/imports/collections/monedas';
-import { Monedas_sql } from '/server/imports/sqlModels/monedas';
-import { Companias } from '/imports/collections/companias';
-import { Proveedores } from '/models/collections/bancos/proveedoresClientes'; 
-import { Proveedores_sql } from '/server/imports/sqlModels/bancos/proveedores'; 
+import { Monedas } from '../../../imports/collections/monedas';
+import { Monedas_sql } from '../../imports/sqlModels/monedas';
+import { Companias } from '../../../imports/collections/companias';
+import { Proveedores } from '../../../imports/collections/bancos/proveedoresClientes'; 
+import { Proveedores_sql } from '../../imports/sqlModels/bancos/proveedores'; 
+import { Bancos_sql, Agencias_sql, CuentasBancarias_sql } from '../../imports/sqlModels/bancos/movimientosBancarios'; 
+import { FormasDePago_sql } from '../../imports/sqlModels/bancos/formasDePago'; 
+import { Bancos } from '../../../imports/collections/bancos/bancos';
+import { Compania_sql } from '../../imports/sqlModels/companias'; 
+import { TiposProveedor_sql } from '../../imports/sqlModels/bancos/tiposProveedor'; 
+import { ParametrosBancos } from '../../../imports/collections/bancos/parametrosBancos'; 
+import { Chequeras } from '../../../imports/collections/bancos/chequeras'; 
+import { TiposProveedor, FormasDePago } from '../../../imports/collections/bancos/catalogos'; 
+import { ParametrosGlobalBancos } from '../../../imports/collections/bancos/parametrosGlobalBancos'; 
+
+import { FlattenBancos } from '../../../imports/general/bancos/flattenBancos'; 
 
 Meteor.methods(
 {
     'bancos.CopiarCatalogos': function () {
 
-        let response = null;
+        let response = {} as any; 
 
         // ---------------------------------------------------------------------------------------------------
         // Compañías (empresas usuarias) - copiamos a mongo desde contab
@@ -25,10 +37,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         let numberOfItems = response.result.count;
@@ -72,11 +84,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 Companias.update({ _id: itemExisteID._id }, { $set: compania });
-            else
+            }  
+            else { 
                 Companias.insert(compania);
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -93,17 +107,16 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
 
         // ---------------------------------------------------------------------------------------------------
         // Monedas - copiamos a mongo desde contab
         // ---------------------------------------------------------------------------------------------------
-        // debugger;
         response = Async.runSync(function(done) {
             Monedas_sql.findAndCountAll({ raw: true })
                 .then(function(result) { done(null, result); })
@@ -111,10 +124,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.count;
@@ -165,17 +178,19 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
         // ---------------------------------------------------------------------------------------------------
         // Parámetros Bancos - copiamos a mongo desde contab
         // ---------------------------------------------------------------------------------------------------
         let query = `Select RetencionSobreIvaFlag, RetencionSobreIvaPorc, FooterFacturaImpresa_L1,
-        FooterFacturaImpresa_L2, FooterFacturaImpresa_L3, Cia
-        From ParametrosBancos`;
+                     FooterFacturaImpresa_L2, FooterFacturaImpresa_L3, Cia
+                     From ParametrosBancos`;
+
+        query = query.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
 
         response = Async.runSync(function(done) {
             sequelize.query(query, { type: sequelize.QueryTypes.SELECT})
@@ -184,10 +199,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.length;
@@ -218,12 +233,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 ParametrosBancos.update({ _id: itemExisteID._id }, { $set: document });
-            else
+            } 
+            else { 
                 ParametrosBancos.insert(document);
-
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -240,10 +256,10 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
 
@@ -251,7 +267,9 @@ Meteor.methods(
         // Parámetros Global Bancos - copiamos a mongo desde contab
         // ---------------------------------------------------------------------------------------------------
         query = `Select ClaveUnica, AgregarAsientosContables, TipoAsientoDefault, IvaPorc
-        From ParametrosGlobalBancos`;
+                 From ParametrosGlobalBancos`;
+
+        query = query.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
 
         response = Async.runSync(function(done) {
             sequelize.query(query, { type: sequelize.QueryTypes.SELECT})
@@ -260,9 +278,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.length;
@@ -290,11 +309,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 ParametrosGlobalBancos.update({ _id: itemExisteID._id }, { $set: document });
-            else
+            }
+            else { 
                 ParametrosGlobalBancos.insert(document);
-
+            }
+                
 
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
@@ -312,28 +333,26 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
         // ---------------------------------------------------------------------------------------------------
         // Bancos - copiamos a mongo desde sql
         // ---------------------------------------------------------------------------------------------------
-        query = `Select * From Bancos`;
-
         response = Async.runSync(function(done) {
-            sequelize.query(query, { type: sequelize.QueryTypes.SELECT})
+            Bancos_sql.findAndCountAll({ raw: true })
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.length;
@@ -346,80 +365,82 @@ Meteor.methods(
                             { current: currentProcess, max: numberOfProcess, progress: '0 %' });
         // -------------------------------------------------------------------------------------------------------------
 
-        response.result.forEach((item) => {
+        response.result.rows.forEach((item) => {
             // para cada catálogos, hacemos un 'upsert'; primero leemos a ver si existe; de ser así, usamos el _id del doc que existe ...
 
-            let itemExisteID = Bancos.findOne({ banco: item.Banco }, { fields: { _id: true }});
+            let itemExisteID = Bancos.findOne({ banco: item.banco }, { fields: { _id: true }});
 
             let document = {
                 _id: itemExisteID ? itemExisteID._id : new Mongo.ObjectID()._str,
 
-                banco: item.Banco,
-                nombre: item.Nombre,
-                nombreCorto: item.NombreCorto,
-                abreviatura: item.Abreviatura,
-                codigo: item.Codigo,
+                banco: item.banco,
+                nombre: item.nombre,
+                nombreCorto: item.nombreCorto,
+                abreviatura: item.abreviatura,
+                codigo: item.codigo,
                 agencias: []
             };
 
             // leemos las agencias, cuentas bancarias y agencias, y las agregamos a mongo ...
-            query = `Select * From Agencias Where Banco = ?`;
-
             let response_Agencias = Async.runSync(function(done) {
-                sequelize.query(query, { replacements: [ item.Banco ], type: sequelize.QueryTypes.SELECT})
+                Agencias_sql.findAndCountAll({ where: { banco: item.banco }, raw: true })
                     .then(function(result) { done(null, result); })
                     .catch(function (err) { done(err, null); })
                     .done();
             });
 
-            if (response_Agencias.error)
+            if (response_Agencias.error) { 
                 throw new Meteor.Error(response_Agencias.error && response_Agencias.error.message ? response_Agencias.error.message : response_Agencias.error.toString());
+            }
 
-            response_Agencias.result.forEach((agencia) => {
+            response_Agencias.result.rows.forEach((agencia) => {
 
                 let agenciaMongo = {
                     _id: new Mongo.ObjectID()._str,
-                    agencia: agencia.Agencia,
-                    nombre: agencia.Nombre,
-                    direccion: agencia.Direccion,
-                    telefono1: agencia.Telefono1,
-                    telefono2: agencia.Telefono2,
-                    fax: agencia.Fax,
-                    contacto1: agencia.Contacto1,
-                    contacto2: agencia.Contacto2,
+                    agencia: agencia.agencia,
+                    banco: agencia.banco, 
+                    nombre: agencia.nombre,
+                    direccion: agencia.direccion,
+                    telefono1: agencia.telefono1,
+                    telefono2: agencia.telefono2,
+                    fax: agencia.fax,
+                    contacto1: agencia.contacto1,
+                    contacto2: agencia.contacto2,
                     cuentasBancarias: [],
-                };
-
-                query = `Select * From CuentasBancarias Where Agencia = ?`;
+                } as never;
 
                 let response_CuentasBancarias = Async.runSync(function(done) {
-                    sequelize.query(query, { replacements: [ agencia.Agencia ], type: sequelize.QueryTypes.SELECT})
+                    CuentasBancarias_sql.findAndCountAll({ where: { agencia: agencia.agencia }, raw: true })
                         .then(function(result) { done(null, result); })
                         .catch(function (err) { done(err, null); })
                         .done();
                 });
 
-                if (response_CuentasBancarias.error)
+                if (response_CuentasBancarias.error) { 
                     throw new Meteor.Error(response_CuentasBancarias.error && response_CuentasBancarias.error.message ? response_CuentasBancarias.error.message : response_CuentasBancarias.error.toString());
+                }
 
-                response_CuentasBancarias.result.forEach((cuentaBancaria) => {
+                response_CuentasBancarias.result.rows.forEach((cuentaBancaria) => {
 
                     let cuentaBancariaMongo = {
                         _id: new Mongo.ObjectID()._str,
-                        cuentaInterna: cuentaBancaria.CuentaInterna,
-                        cuentaBancaria: cuentaBancaria.CuentaBancaria,
-                        tipo: cuentaBancaria.Tipo,
-                        moneda: cuentaBancaria.Moneda,
-                        lineaCredito: cuentaBancaria.LineaCredito,
-                        estado: cuentaBancaria.Estado,
-                        cuentaContable: cuentaBancaria.CuentaContable,
-                        cuentaContableGastosIDB: cuentaBancaria.CuentaContableGastosIDB,
-                        numeroContrato: cuentaBancaria.NumeroContrato,
-                        cia: cuentaBancaria.Cia,
+                        cuentaInterna: cuentaBancaria.cuentaInterna,
+                        agencia: cuentaBancaria.agencia, 
+                        cuentaBancaria: cuentaBancaria.cuentaBancaria,
+                        tipo: cuentaBancaria.tipo,
+                        moneda: cuentaBancaria.moneda,
+                        lineaCredito: cuentaBancaria.lineaCredito,
+                        estado: cuentaBancaria.estado,
+                        cuentaContable: cuentaBancaria.cuentaContable,
+                        cuentaContableGastosIDB: cuentaBancaria.cuentaContableGastosIDB,
+                        numeroContrato: cuentaBancaria.numeroContrato,
+                        cia: cuentaBancaria.cia,
                         chequeras: [],
                     };
 
-                    agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo);
+                    // solo para eliminar (TS): property 'cuentasBancarias' does not exist on type never (sorry) ... 
+                    // en:  agenciaMongo.cuentasBancarias.push(cuentaBancariaMongo);
+                    agenciaMongo['cuentasBancarias'].push(cuentaBancariaMongo);
                 });
 
                 document.agencias.push(agenciaMongo);
@@ -431,9 +452,10 @@ Meteor.methods(
                 Bancos.update({ _id: itemExisteID._id }, { $unset: { agencias: true } });
                 Bancos.update({ _id: itemExisteID._id }, { $set: document });
             }
-            else
+            else { 
                 Bancos.insert(document);
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -450,10 +472,10 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
         // ---------------------------------------------------------------------------------------------------
         // Chequeras - copiamos a mongo desde sql (en una table separada)
@@ -467,9 +489,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.length;
@@ -484,13 +507,13 @@ Meteor.methods(
 
         // esta función regresa una lista 'plana' con los bancos y sus cuentas
         // (la información en bancos es una lista de bancos con arreglos de agencias y luego cuentas)
-        let cuentasBancariasList = FuncionesGlobalesBancos.flattenBancos(null);
+        let cuentasBancariasList = FlattenBancos(null);
 
         response.result.forEach((item) => {
             // para cada catálogos, hacemos un 'upsert'; primero leemos a ver si existe; de ser así, usamos el _id del doc que existe ...
 
             let itemExisteID = Chequeras.findOne({ numeroChequera: item.NumeroChequera }, { fields: { _id: true }});
-            let cuentaBancaria = _.find(cuentasBancariasList, (x) => { return x.cuentaInterna === item.NumeroCuenta; });
+            let cuentaBancaria = lodash.find(cuentasBancariasList, (x: any) => { return x.cuentaInterna === item.NumeroCuenta; });
 
             let document = {
                 _id: itemExisteID ? itemExisteID._id : new Mongo.ObjectID()._str,
@@ -526,7 +549,7 @@ Meteor.methods(
             // aparentemente, collection2 no envía correctamente el mensaje de error al cliente (desde el servidor);
             // por ese motivo, y aunque ésto agrega un overhead enorme, validamos *antes* de actualizar mongo ...
             let isValid = false;
-            let errores = [];
+            let errores = [] as any;
 
             isValid = Chequeras.simpleSchema().namedContext().validate(document);
 
@@ -537,7 +560,7 @@ Meteor.methods(
                                  error de tipo '${error.type}' (chequera #: ${document.numeroChequera.toString()}).`);
 
                 });
-            };
+            }
 
             if (errores && errores.length) {
                 let errorMessages = "Se han encontrado errores al intentar guardar las modificaciones efectuadas en " +
@@ -576,9 +599,9 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
-        });
+                }
+            }
+        })
 
 
         // ---------------------------------------------------------------------------------------------------
@@ -591,10 +614,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.count;
@@ -609,7 +632,7 @@ Meteor.methods(
 
         response.result.rows.forEach((item) => {
             // para cada catálogos, hacemos un 'upsert'; primero leemos a ver si existe; de ser así, usamos el _id del doc que existe ...
-            let itemExisteID = Proveedores.findOne({ proveedor: item.proveedor }, { fields: { _id: true }});
+            let itemExisteID: any = Proveedores.findOne({ proveedor: item.proveedor }, { fields: { _id: 1 }});
 
             let document = {
                 _id: itemExisteID ? itemExisteID._id : new Mongo.ObjectID()._str,
@@ -628,11 +651,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 Proveedores.update({ _id: itemExisteID._id }, { $set: document });
-            else
+            }   
+            else { 
                 Proveedores.insert(document);
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -649,10 +674,10 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
         // ---------------------------------------------------------------------------------------------------
@@ -693,11 +718,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 TiposProveedor.update({ _id: itemExisteID._id }, { $set: document });
-            else
+            } 
+            else { 
                 TiposProveedor.insert(document);
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -714,10 +741,10 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
         // ---------------------------------------------------------------------------------------------------
@@ -730,9 +757,10 @@ Meteor.methods(
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+        }
+            
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...
         numberOfItems = response.result.count;
@@ -758,11 +786,13 @@ Meteor.methods(
             };
 
             // aquí intentamos usar un upsert, pero sin éxito; recurrimos a un insert o update, de acuerdo a si el doc fue encontrado arriba
-            if (itemExisteID && itemExisteID._id)
+            if (itemExisteID && itemExisteID._id) { 
                 FormasDePago.update({ _id: itemExisteID._id }, { $set: document });
-            else
+            }
+            else { 
                 FormasDePago.insert(document);
-
+            }
+                
             // -------------------------------------------------------------------------------------------------------
             // vamos a reportar progreso al cliente; solo 20 veces ...
             cantidadRecs++;
@@ -779,12 +809,12 @@ Meteor.methods(
                                         { myuserId: this.userId, app: 'bancos', process: 'copiarCatalogos' },
                                         { current: currentProcess, max: numberOfProcess, progress: numeral(cantidadRecs / numberOfItems).format("0 %") });
                     reportar = 0;
-                };
-            };
+                }
+            }
             // -------------------------------------------------------------------------------------------------------
-        });
+        })
 
 
         return "Ok, los catálogos han sido cargados desde <em>Contab</em> en forma satisfactoria.";
     }
-});
+})

@@ -3,6 +3,8 @@ import numeral from 'numeral';
 import moment from 'moment';
 import SimpleSchema from 'simpl-schema';
 
+import { FlattenBancos } from '/imports/general/bancos/flattenBancos'; 
+
 Meteor.methods(
 {
     conciliacionBancariaPrepararLista: function (filtro, ciaContab) {
@@ -66,7 +68,7 @@ Meteor.methods(
         // en nuestro programa, el collecion Bancos tiene un array de agencias y, dentro, un array
         // de cuentas bancarias; con la siguiente función, regresamos una lista 'plana' para acceder
         // en forma más fácil las cuentas bancarias
-        let cuentasBancariasList = FuncionesGlobalesBancos.flattenBancos(ciaContab);
+        let cuentasBancariasList = FlattenBancos(ciaContab);
 
         // -------------------------------------------------------------------------------------------------------------
         // para reportar progreso solo 20 veces; si hay menos de 20 registros, reportamos siempre ...

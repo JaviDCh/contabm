@@ -5,6 +5,7 @@ import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada'
 import { Companias } from '/imports/collections/companias';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
 
 angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContables_Controller",
 ['$scope', '$meteor', '$modal', function ($scope, $meteor, $modal) {

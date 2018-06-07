@@ -1,7 +1,9 @@
 
 
+import lodash from 'lodash';   
 
-import lodash from 'lodash';           
+import { Bancos } from '/imports/collections/bancos/bancos';
+import { Bancos_sql } from '../../../imports/sqlModels/bancos/movimientosBancarios'; 
 
 Meteor.methods(
 {

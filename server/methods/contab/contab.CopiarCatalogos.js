@@ -4,6 +4,9 @@ import { Monedas } from '/imports/collections/monedas';
 import { Monedas_sql } from '/server/imports/sqlModels/monedas';
 import { Companias } from '/imports/collections/companias';
 import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
+import { Compania_sql } from '/server/imports/sqlModels/companias'; 
+import { GruposContables } from '/imports/collections/contab/gruposContables'; 
+import { MesesDelAnoFiscal } from '/imports/collections/contab/mesesAnoFiscal'; 
 
 Meteor.methods(
 {

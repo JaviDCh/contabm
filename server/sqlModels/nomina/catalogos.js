@@ -2,16 +2,6 @@
 import { sequelize } from '../_globals/_loadThisFirst/_globals';
 import Sequelize from 'sequelize';
 
-Bancos_sql = sequelize.define('bancos', {
-    banco: { type: Sequelize.INTEGER, field: 'Banco', allowNull: false, primaryKey: true, autoIncrement: true, },
-    nombre: { type: Sequelize.STRING, field: 'Nombre', allowNull: false, },
-    nombreCorto: { type: Sequelize.STRING, field: 'NombreCorto', allowNull: false, },
-    abreviatura: { type: Sequelize.STRING, field: 'Abreviatura', allowNull: true,  },
-    codigo: { type: Sequelize.STRING, field: 'Codigo', allowNull: true,  },
-}, {
-     tableName: 'Bancos'
-});
-
 Cargos_sql = sequelize.define('cargos', {
     cargo: { type: Sequelize.INTEGER, field: 'Cargo', allowNull: false, primaryKey: true, autoIncrement: true, },
     descripcion: { type: Sequelize.STRING, field: 'Descripcion', allowNull: false, },

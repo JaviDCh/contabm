@@ -1,10 +1,9 @@
 
 
-
-
 import lodash from 'lodash'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 // Este controller (angular) se carga con la página primera del programa
 angular.module("contabm").controller("Catalogos_Nomina_bancos_Controller", ['$scope', '$meteor', function ($scope, $meteor) {

@@ -2,6 +2,7 @@
 import lodash from 'lodash';
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { MesesDelAnoFiscal } from '/imports/collections/contab/mesesAnoFiscal'; 
 
 angular.module("contabm").controller("Contab_Consultas_Saldos_Lista_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',

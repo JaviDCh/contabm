@@ -10,7 +10,7 @@ let formasDePago_SimpleSchema = new SimpleSchema({
     numeroDeCuotas: { type: Number, label: "Cant de cuotas", optional: false },
 });
 
-FormasDePago = new Mongo.Collection("formasDePago");
+export const FormasDePago: any = new Mongo.Collection("formasDePago");
 FormasDePago.attachSchema(formasDePago_SimpleSchema);
 
 
@@ -21,7 +21,7 @@ let tiposProveedor_SimpleSchema = new SimpleSchema({
     descripcion: { type: String, label: "Descripcion", optional: false },
 });
 
-TiposProveedor = new Mongo.Collection("tiposProveedor");
+export const TiposProveedor: any = new Mongo.Collection("tiposProveedor");
 TiposProveedor.attachSchema(tiposProveedor_SimpleSchema);
 
 if (Meteor.isServer) {

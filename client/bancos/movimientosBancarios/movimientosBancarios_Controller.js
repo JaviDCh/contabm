@@ -2,6 +2,7 @@
 
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
+import { Chequeras } from '/imports/collections/bancos/chequeras'; 
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_Controller",
 ['$scope', '$stateParams', '$state', '$meteor', '$modal',
