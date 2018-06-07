@@ -184,6 +184,21 @@ export default angular.module("categoriasRetencion", [ angularMeteor ])
             type: 'number'
         },
         {
+            name: 'aplicaSustraendo',
+            field: 'aplicaSustraendo',
+            displayName: 'Sustraendo?',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-centerCell',
+            cellClass: 'ui-grid-centerCell',
+            cellFilter: 'boolFilter',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            enableFiltering: false, 
+            type: 'boolean'
+        },
+        {
             name: 'delButton',
             displayName: '',
             cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',

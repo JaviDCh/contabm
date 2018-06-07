@@ -3,6 +3,8 @@ import moment from 'moment';
 import lodash from 'lodash';
 import { TimeOffset } from '/globals/globals'; 
 
+import { AsientosContables } from '/imports/collections/contab/asientosContables'; 
+
 Meteor.methods(
 {
     asientosContablesSave: function (asientoContable, fechaOriginalAsientoContable) {

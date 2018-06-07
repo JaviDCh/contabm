@@ -14,8 +14,6 @@ let partidas_SimpleSchema = new SimpleSchema({
     docState: { type: Number, optional: true },
 });
 
-AsientosContables = new Mongo.Collection("asientosContables");
-
 let schema = new SimpleSchema({
     _id: { type: String, optional: false, },
     numeroAutomatico: { type: Number, label: "Número automático", optional: false, },
@@ -49,4 +47,5 @@ let schema = new SimpleSchema({
     docState: { type: Number, optional: true, },
 });
 
+export const AsientosContables: any = new Mongo.Collection("asientosContables");
 AsientosContables.attachSchema(schema);

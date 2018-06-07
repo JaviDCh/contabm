@@ -57,11 +57,12 @@ function ($scope, $modalInstance, $modal, companiaContabSeleccionada, factura) {
                         </p>
                         <p>
                             Con el registro de la unidad tributaria, viene su <em>monto</em> y el <em>factor</em>. <br /> 
-                            Con el registro de la categoría de retención, viene el <em>porcentaje de retención</em> y el <em>código</em>. 
+                            Con el registro de la categoría de retención, viene el <em>porcentaje de retención</em>, <em>código</em> 
+                            y si aplica (o no) el <em>sustrendo</em>. 
                         </p>
                         <p>
                             Para calcular el monto <em>a partir de</em> (o monto mínimo), se usa esta fórmula: (1.000 x U.T. / 12). <br /> 
-                            Para calcular el <em>sustraendo</em>, se usa esta fórmula: (U.T. x %Ret x factor). 
+                            Para calcular el <em>sustraendo</em>, solo si aplica, se usa esta fórmula: (U.T. x %Ret x factor). 
                         </p>
                         <p>
                             Aunque el programa intenta determinar el cálculo de la retención, el usuario <b>siempre</b> puede cambiar los montos 
@@ -117,9 +118,17 @@ function ($scope, $modalInstance, $modal, companiaContabSeleccionada, factura) {
         $scope.categoriaRetencion = result.categoriaRetencion; 
 
         // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
-        $scope.aPartirDe = 1000 * result.unidadTributaria.monto / 12;          
-        $scope.sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
-                            result.unidadTributaria.factor;      
+        $scope.aPartirDe = 1000 * result.unidadTributaria.monto / 12;      
+        
+        $scope.sustraendo = 0; 
+        $scope.sustraendoAplica = false; 
+
+        if (result.categoriaRetencion && result.categoriaRetencion.aplicaSustraendo) { 
+            $scope.sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
+                            result.unidadTributaria.factor;  
+                            
+            $scope.sustraendoAplica = true; 
+        }
 
         // determinamos el monto 'base' para el cálculo del la retención del Islr 
         $scope.baseRetIslr = 0; 

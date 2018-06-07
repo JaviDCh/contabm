@@ -1039,13 +1039,16 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                             return;
                         }
 
-
-
                         // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
-                        let aPartirDe = 1000 * result.unidadTributaria.monto / 12;          
-                        let sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
+                        let aPartirDe = 1000 * result.unidadTributaria.monto / 12;      
+                        
+                        // el sustraendo puede o no aplicarse. Se determina en la tabla de categorías de retención 
+                        let sustraendo = 0; 
+                        if (result.categoriaRetencion && result.categoriaRetencion.aplicaSustraendo) { 
+                            sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
                                          result.unidadTributaria.factor;      
-
+                        }
+                        
                         // determinamos el monto 'base' para el cálculo del la retención del Islr 
                         let baseRetIslr = 0; 
                         baseRetIslr += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0; 

@@ -65,7 +65,8 @@ Meteor.methods(
 
             // ahora leemos el registro para la categoría de retención ... 
             // TODO: falta usar el tipo de persona y la categoría en el query ... 
-            let query = `Select Top 1 CodigoIslr as codigoIslr, PorcentajeRetencion as porcentajeRetencion 
+            let query = `Select Top 1 CodigoIslr as codigoIslr, PorcentajeRetencion as porcentajeRetencion, 
+                         AplicaSustraendo as aplicaSustraendo   
                          From CategoriasRetencion 
                          Where Categoria = ? And TipoPersona = ? And FechaAplicacion <= ? 
                          Order By FechaAplicacion Desc
@@ -113,7 +114,8 @@ Meteor.methods(
             let categoriaRetencion = response.result[0];
 
             if (!unidadTributaria.monto || !unidadTributaria.factor || !categoriaRetencion.porcentajeRetencion || !categoriaRetencion.codigoIslr) { 
-                let message = `Error: aunque pudimos leer registros para <em>unidad tributaria</em> y <em>categoría de retención</em>, pareciera que 
+                let message = `Error: aunque pudimos leer registros para <em>unidad tributaria</em> y <em>categoría de retención</em>, 
+                               pareciera que 
                                estos registros no se han registrado en forma completa, para poder calcular la retención de Islr 
                                con sus valores.<br /><br />
                                Por favor revise estos registros en los catálogo: <em>bancos/catálogos/categorías de retención</em> y 

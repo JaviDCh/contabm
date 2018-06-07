@@ -1,5 +1,6 @@
 
 import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
+import { AsientosContables } from '/imports/collections/contab/asientosContables'; 
 
 Meteor.methods(
 {

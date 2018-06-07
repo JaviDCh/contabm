@@ -9,6 +9,7 @@ import { Companias } from '/imports/collections/companias';
 import { Bancos } from '/imports/collections/bancos/bancos';
 import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
 import { Chequeras } from '/imports/collections/bancos/chequeras'; 
+import { AsientosContables } from '/imports/collections/contab/asientosContables'; 
 
 Meteor.methods(
 {

@@ -10,6 +10,7 @@ let simpleSchema = new SimpleSchema({
     fechaAplicacion: { type: Date, label: "Fecha de aplicación", optional: true, },
     codigoIslr: { type: String, label: "Código de retención Islr", optional: true, min: 1, max: 6, },
     porcentajeRetencion: { type: Number, label: "Porcentaje de retención", optional: true, },
+    aplicaSustraendo: { type: Boolean, label: "Aplica sustraendo?", optional: true, },
 
     docState: { type: Number, optional: true },
 });

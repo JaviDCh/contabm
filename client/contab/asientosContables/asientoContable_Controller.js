@@ -9,6 +9,7 @@ import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada'
 import { TiposAsientoContable } from '/imports/collections/contab/tiposAsientoContable'; 
 import { CuentasContables2 } from '/imports/collections/contab/cuentasContables2';  
 import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
+import { AsientosContables } from '/imports/collections/contab/asientosContables'; 
 
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 

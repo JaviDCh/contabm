@@ -1,8 +1,9 @@
 
 
-import { Companias } from '/imports/collections/companias';
-import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
-import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
+import { Companias } from '../../imports/collections/companias';
+import { CompaniaSeleccionada } from '../../imports/collections/companiaSeleccionada';
+import { ParametrosBancos } from '../../imports/collections/bancos/parametrosBancos'; 
+import { ParametrosGlobalBancos } from '../../imports/collections/bancos/parametrosGlobalBancos'; 
 
 Meteor.publish("bancosCollectionsFacturacion", function () {
 
@@ -11,7 +12,6 @@ Meteor.publish("bancosCollectionsFacturacion", function () {
     // a facturas desde el menú principal, en cambio, todos los catálogos están allí ...
     // Por esa razón, tuvimos que agregar este publishing para que se usará desde facturas, aunque en la mayoría
     // de los casos (casos normales) no sea necesario usarla ...
-
     let ciaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: this.userId }, { fields: { companiaID: 1, }});
 
     if (!ciaContabSeleccionada) {

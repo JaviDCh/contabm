@@ -12,10 +12,9 @@ Meteor.methods(
 
         let query = `Select Ciudad as ciudad, AplicaIvaFlag as aplicaIvaFlag,
                      ContribuyenteEspecialFlag as contribuyenteEspecialFlag,
-                     BaseRetencionISLR as baseRetencionISLR,
-                     CodigoConceptoRetencion as codigoConceptoRetencion, PorcentajeDeRetencion as porcentajeDeRetencion,
-                     RetencionIslrSustraendo as retencionIslrSustraendo, SujetoARetencionFlag as sujetoARetencionFlag,
-                     NuestraRetencionSobreIvaPorc as nuestraRetencionSobreIvaPorc
+                     SujetoARetencionFlag as sujetoARetencionFlag,
+                     NuestraRetencionSobreIvaPorc as nuestraRetencionSobreIvaPorc, 
+                     RetencionSobreIvaPorc as retencionSobreIvaPorc 
                      From Proveedores Where Proveedor = ?`;
 
         let response = null;

@@ -129,8 +129,11 @@
     <div class="col-sm-3 col-centered">
         <div class="form-group">
             <label>Sustraendo</label><br />
-            <span>
+            <span ng-if="sustraendoAplica">
                 {{ sustraendo | currency : "" : 2 }} (U.T. x %Ret x factor)  
+            </span>
+            <span ng-if="!sustraendoAplica">
+                {{ sustraendo | currency : "" : 2 }} (no aplica)  
             </span>
         </div>
     </div>
