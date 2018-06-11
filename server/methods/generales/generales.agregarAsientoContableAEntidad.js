@@ -15,6 +15,8 @@ import { CajaChica_Reposiciones_sql,
          CajaChica_Reposiciones_Gastos_sql, 
          CajaChica_RubrosCuentasContables } from '../../imports/sqlModels/bancos/cajasChicas';
 
+import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+
 import { Monedas_sql } from '../../imports/sqlModels/monedas'; 
 
 Meteor.methods({

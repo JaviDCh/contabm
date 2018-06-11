@@ -4,6 +4,8 @@ import moment from 'moment';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+
 Meteor.methods({
    'bancos.pagos.agregarMovimientoBancario': function (pagoID) {
 

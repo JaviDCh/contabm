@@ -7,6 +7,7 @@ import { Companias } from '/imports/collections/companias';
 import { CuentasBancarias_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 import { Bancos } from '/imports/collections/bancos/bancos';
 import { Chequeras } from '/imports/collections/bancos/chequeras'; 
+import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 
 Meteor.methods(
 {

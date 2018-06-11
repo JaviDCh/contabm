@@ -4,6 +4,8 @@ import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+
 Meteor.methods(
 {
     'movimientoBancario.leerByID.desdeSql': function (pk) {
