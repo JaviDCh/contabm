@@ -4,6 +4,7 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import SimpleSchema from 'simpl-schema';
 
 import { Chequeras } from '/imports/collections/bancos/chequeras'; 
+import { Chequeras_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 
 let actualizarChequera = (chequeraID) => {
 

@@ -3,6 +3,7 @@
 import { Companias } from '/imports/collections/companias';
 import { CompaniaSeleccionada } from '/imports/collections/companiaSeleccionada';
 import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
 
 Meteor.publish('parametrosBancos', function () {
 

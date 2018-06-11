@@ -5,7 +5,7 @@ import { CompaniaSeleccionada } from '../../imports/collections/companiaSeleccio
 import { GruposEmpleados } from '../../models/nomina/catalogos';
 import { Empleados } from '../../models/nomina/empleados'; 
 import { TiposAsientoContable } from '../../imports/collections/contab/tiposAsientoContable'; 
-import { Bancos } from '../../imports/collections/bancos/bancos';
+import { Bancos } from 'imports/collections/bancos/bancos';
 import { ParametrosBancos } from '../../imports/collections/bancos/parametrosBancos'; 
 import { ParametrosGlobalBancos } from '../../imports/collections/bancos/parametrosGlobalBancos'; 
 import { GruposContables } from '../../imports/collections/contab/gruposContables'; 

@@ -13,6 +13,7 @@ import { Proveedores_sql } from '/server/imports/sqlModels/bancos/proveedores';
 import { CuentasBancarias_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 import { Bancos } from '/imports/collections/bancos/bancos';
+import { Chequeras_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...

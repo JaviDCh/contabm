@@ -16,8 +16,11 @@ import { CajaChica_Reposiciones_sql,
          CajaChica_RubrosCuentasContables } from '../../imports/sqlModels/bancos/cajasChicas';
 
 import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
 
 import { Monedas_sql } from '../../imports/sqlModels/monedas'; 
+import { Chequeras_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 Meteor.methods({
    'generales.agregarAsientoContableAEntidad': function (provieneDe, provieneDe_ID, ciaContabSeleccionada_ID) {

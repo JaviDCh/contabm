@@ -1,4 +1,7 @@
 
+
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
+
 Meteor.methods(
 {
     parametrosGlobalBancosSave: function (parametrosGlobalBancos) {

@@ -10,6 +10,7 @@ import { Bancos } from '/imports/collections/bancos/bancos';
 import { ParametrosBancos } from '/imports/collections/bancos/parametrosBancos'; 
 import { Chequeras } from '/imports/collections/bancos/chequeras'; 
 import { AsientosContables } from '/imports/collections/contab/asientosContables'; 
+import { ParametrosGlobalBancos } from '/imports/collections/bancos/parametrosGlobalBancos'; 
 
 Meteor.methods(
 {

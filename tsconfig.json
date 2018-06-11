@@ -9,7 +9,8 @@
     "jsx": "react",
     "allowJs": true,
     "noImplicitAny": false,
-    "strictNullChecks": true
+    "strictNullChecks": true, 
+    "baseUrl": "."
   },
   "include": [
     "client/**/*",

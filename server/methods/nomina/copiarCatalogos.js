@@ -7,6 +7,7 @@ import { Empleados } from '/models/nomina/empleados';
 import { Departamentos_sql } from '/server/imports/sqlModels/nomina/catalogos/departamentos'; 
 import { Bancos_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 import { Compania_sql } from '/server/imports/sqlModels/companias'; 
+import { Bancos } from '/imports/collections/bancos/bancos';
 
 Meteor.methods(
 {
