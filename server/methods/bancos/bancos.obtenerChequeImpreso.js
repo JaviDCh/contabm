@@ -161,7 +161,7 @@ Meteor.methods(
         let proveedorRif = ""; 
         let proveedorNit = ""; 
 
-        // ahora leemos el asiento contable asociado al movimiento bancario
+        // ahora leemos la compañía (prov/clte) asociada al movimiento bancario
         response = null;
         response = Async.runSync(function(done) {
             Proveedores_sql.findAll({
@@ -218,13 +218,28 @@ Meteor.methods(
         let doc = new Docxtemplater();
         doc.loadZip(zip);
 
-        // var writtenNumber = require('written-number');
-        // writtenNumber(1234, { lang: 'es' }); // => 'mil doscientos treinta y cuatro'
+        let montoBase = movimientoBancario.montoBase ? Math.abs(movimientoBancario.montoBase) : 0; 
+        let comision = movimientoBancario.comision ? Math.abs(movimientoBancario.comision) : 0; 
+        let impuestos = movimientoBancario.impuestos ? Math.abs(movimientoBancario.impuestos) : 0; 
+        let monto = movimientoBancario.monto ? Math.abs(movimientoBancario.monto) : 0; 
 
-        //set the templateVariables
         doc.setData({
-            montoEnLetras: montoEscrito(movimientoBancario.monto), 
-            monto: numeral(Math.abs(movimientoBancario.monto)).format("0,0.00"),
+
+            // nótese como permitimos agregar a la plantilla todos los montos (com, imp, ...); además, también 
+            // agregamos montoEscrito para cada uno de ellos 
+
+            montoBase: numeral(montoBase).format("0,0.00"),
+            montoBase_enLetras: montoEscrito(montoBase), 
+
+            comision: numeral(comision).format("0,0.00"),
+            comision_enLetras: montoEscrito(comision), 
+
+            impuestos: numeral(impuestos).format("0,0.00"),
+            impuestos_enLetras: montoEscrito(impuestos), 
+
+            monto: numeral(monto).format("0,0.00"),
+            monto_enLetras: montoEscrito(monto), 
+
             beneficiario: movimientoBancario.beneficiario,
             fechaEscrita: moment(movimientoBancario.fecha).format("DD [de] MMMM"),
             año: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0,0"),
