@@ -80,6 +80,13 @@ export function mostrarHelp(currentStateName) {
           window.open('https://smrsoftware.wordpress.com/2018/05/15/facturas/', '_blank');
           break;
         }
+        case 'bancos.movimientosBancarios':
+        case 'bancos.movimientosBancarios.filter':
+        case 'bancos.movimientosBancarios.lista':
+        case 'bancos.movimientosBancarios.movimientoBancario': {
+          window.open('https://smrsoftware.wordpress.com/2014/04/08/bancosregistro-de-movimientos/', '_blank');
+          break;
+        }
         default:
     }
 }

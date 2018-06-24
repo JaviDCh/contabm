@@ -561,7 +561,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
     if (entidadOriginal.comision) {
 
-        // cuentas de proveedores (CxP) ...
+        // cuenta contable para la comisión del movimiento bancario 
         leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(
             15,
             entidadOriginal.provClte,
@@ -591,7 +591,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
     if (entidadOriginal.impuestos) {
 
-        // cuentas de proveedores (CxP) ...
+        // cuenta contable para el impuesto en el movimiento bancario 
         leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(
             16,
             entidadOriginal.provClte,
@@ -1113,7 +1113,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
 
 
 // -------------------------------------------------------------------------------------------------------------------------------
-// esta función intenta leer los registros de impuestos/retenciones (en facturas_impuestos) asociados al pago al cual se aosica
+// esta función intenta leer los registros de impuestos/retenciones (en facturas_impuestos) asociados al pago al cual se asoció
 // el movimiento bancario. Algunos de estos impuestos/retenciones pueden estar marcados para ser contabilizados al pagar. En realidad,
 // al registrar el movimiento bancario que corresponde al pago (el pago se contabiliza al registrar su movimiento bancario)
 function leerImpuestosRetenciones_contabilizarAlPagar(pagoID) {
