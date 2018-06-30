@@ -26,6 +26,43 @@ angular.module("contabm").controller("Contab_AsientosContables_Controller", ['$s
 
         $scope.alerts.length = 0;
         $scope.alerts.push({ type: 'warning', msg: message }); 
+    } else { 
+        // determinamos la cantidad de registros en la tabla de cuentas contables. La idea es comparar contra la cantidad que 
+        // existe en CuentasContables2. De ser diferentes, informamos que se debe refrescar este 'cache' ... 
+        Meteor.call('getCollectionCount', 'CuentasContables', (err, result) => {
+
+            if (err) {
+              let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+                return;
+            };
+
+            // el método regresa la cantidad de items en el collection 
+            let recordCount = result;
+
+            if (recordCount != CuentasContables2.find().count()) { 
+                let message = `Aparentemente, la cantidad de cuentas contables en la <em>tabla de cuentas contables</em> es 
+                               <b>diferente</b> a la <em>copia</em> que existe para la misma en el navegador. <br />
+                               Esto puede indicar que esta copia no es igual a la tabla y, por lo tanto, deba ser refrescada. <br /><br />
+                               Para corregir esta situación, Ud. debe ejecutar la opción:  
+                               <em>contab / generales / persistir cuentas contables</em>. <br />
+                               Luego puede regresar a esta función para editar o consultar los asientos contables.`; 
+        
+                $scope.alerts.length = 0;
+                $scope.alerts.push({ type: 'warning', msg: message }); 
+            }
+
+            $scope.showProgress = false;
+            $scope.$apply();
+        })
     }
     
     let companiaSeleccionada = { };

@@ -43,11 +43,16 @@ Meteor.methods({
             case 'Temp_Consulta_Bancos_CuentasContables_Definicion':
                 return Temp_Consulta_Bancos_CuentasContables_Definicion.find({ user: this.userId }).count();
                 break;
-                case 'Temp_Consulta_Bancos_CajaChica':
+            case 'Temp_Consulta_Bancos_CajaChica':
                 return Temp_Consulta_Bancos_CajaChica.find({ user: this.userId }).count();
                 break;
             case 'Temp_Consulta_Contab_ActivosFijos':
                 return Temp_Consulta_Contab_ActivosFijos.find({ user: this.userId }).count();
+                break;
+            case 'CuentasContables':
+                // para cuentas contables, regresamos el count de todas y no las del usuario; esta no es una tabla 
+                // 'temporal' donde guardemos records para alguna consulta ... 
+                return CuentasContables.find().count();
                 break;
             default:
                 return -9999;

@@ -1264,7 +1264,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
         };
 
 
-        // creamos un array con las partidas del asiento, para grabarlas a sql al final
+        // creamos un array con las partidas del asiento, para grabarlas a sql al final; la idea de crear 
+        // las partidas en un array, es poder ordenarlo antes de grabar a sql; de esa forma, podemos grabar 
+        // los montos positivos primero y luego los negativos, siempre desde el mayor al menor. 
         // --------------------------------------------------------------------------------------
         // partida para registrar la compra o venta (gasto o ingresos por venta)
         let partida = {};
@@ -1633,7 +1635,7 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
 
         if (retencionIva && !retencionIva.contabilizarAlPagar_flag && retencionIva.monto) {
             // hay un monto Iva y no se va a contabilizar al pagar
-            montoAsiento -= impuestoIva.monto;
+            montoAsiento -= retencionIva.monto;
         }
 
         if (retencionIslr && !retencionIslr.contabilizarAlPagar_flag && retencionIslr.monto) {

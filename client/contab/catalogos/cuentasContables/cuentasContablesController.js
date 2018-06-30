@@ -285,166 +285,167 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContable
       ];
 
 
-      $scope.deleteItem = function (item) {
-          if (item.docState && item.docState === 1)
-              // si el item es nuevo, simplemente lo eliminamos del array
-              lodash.remove($scope.cuentasContables, (x) => { return x._id === item._id; });
-          else
-              item.docState = 3;
-      };
+    $scope.deleteItem = function (item) {
+        if (item.docState && item.docState === 1) { 
+            // si el item es nuevo, simplemente lo eliminamos del array
+            lodash.remove($scope.cuentasContables, (x) => { return x._id === item._id; });
+        }
+        else if (item.docState && item.docState === 3) {
+            // permitimos hacer un 'undelete' de un item que antes se había eliminado en la lista (antes de grabar) ...
+            delete item.docState;
+        }
+        else {
+            item.docState = 3;
+        }
+    }
 
-      $scope.nuevo = function () {
-          let item = {
-              _id: new Mongo.ObjectID()._str,
-              id: 0,
-              actSusp: "A",
-              cia: companiaSeleccionadaDoc.numero,
-              docState: 1
-          };
+    $scope.nuevo = function () {
+        let item = {
+            _id: new Mongo.ObjectID()._str,
+            id: 0,
+            actSusp: "A",
+            cia: companiaSeleccionadaDoc.numero,
+            docState: 1
+        };
 
-          $scope.cuentasContables.push(item);
+        $scope.cuentasContables.push(item);
 
-          $scope.cuentasContables_ui_grid.data = [];
-          if (lodash.isArray($scope.cuentasContables))
-             $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
-      };
+        $scope.cuentasContables_ui_grid.data = [];
+        if (lodash.isArray($scope.cuentasContables))
+            $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
+    }
 
-      $scope.save = function () {
-           $scope.showProgress = true;
+    $scope.save = function () {
+        $scope.showProgress = true;
 
-           // eliminamos los items eliminados; del $scope y del collection
-           let editedItems = lodash.filter($scope.cuentasContables, function (item) { return item.docState; });
+        // eliminamos los items eliminados; del $scope y del collection
+        let editedItems = lodash.filter($scope.cuentasContables, function (item) { return item.docState; });
 
-           // determinamos la cuenta y sus niveles, en base a la cuenta 'editada' que el usuario indica
-           determinarNivelesCuentaContable(editedItems);
+        // determinamos la cuenta y sus niveles, en base a la cuenta 'editada' que el usuario indica
+        determinarNivelesCuentaContable(editedItems);
 
-           // nótese como validamos cada item antes de intentar guardar (en el servidor)
-           let isValid = false;
-           let errores = [];
+        // nótese como validamos cada item antes de intentar guardar (en el servidor)
+        let isValid = false;
+        let errores = [];
 
-           editedItems.forEach((item) => {
-               if (item.docState != 3) {
-                   isValid = CuentasContables.simpleSchema().namedContext().validate(item);
+        editedItems.forEach((item) => {
+            if (item.docState != 3) {
+                isValid = CuentasContables.simpleSchema().namedContext().validate(item);
 
-                   if (!isValid) {
-                       CuentasContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
-                           errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + CuentasContables.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
-                       });
-                   }
-               }
-           });
+                if (!isValid) {
+                    CuentasContables.simpleSchema().namedContext().validationErrors().forEach(function (error) {
+                        errores.push("El valor '" + error.value + "' no es adecuado para el campo <b><em>" + CuentasContables.simpleSchema().label(error.name) + "</b></em>; error de tipo '" + error.type + ".");
+                    });
+                }
+            }
+        });
 
-           if (errores && errores.length) {
-               $scope.alerts.length = 0;
-               $scope.alerts.push({
-                   type: 'danger',
-                   msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
-                       errores.reduce(function (previous, current) {
+        if (errores && errores.length) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
+                    errores.reduce(function (previous, current) {
 
-                           if (previous == "")
-                               // first value
-                               return current;
-                           else
-                               return previous + "<br />" + current;
-                       }, "")
-               });
+                        if (previous == "")
+                            // first value
+                            return current;
+                        else
+                            return previous + "<br />" + current;
+                    }, "")
+            });
 
-               $scope.showProgress = false;
-               return;
-           };
+            $scope.showProgress = false;
+            return;
+        }
 
-
-           // eliminamos la conexión entre angular y meteor
-           // $scope.asegurados.stop();
-           // $scope.asegurados.length = 0;
-
-           $meteor.call('contab.cuentasContablesSave', editedItems).then(
-             function (data) {
-
-                 $scope.alerts.length = 0;
-                 $scope.alerts.push({
-                     type: 'info',
-                     msg: data
-                 });
-
-                 // por alguna razón, que aún no entendemos del todo, si no hacemos el subscribe nuevamente,
-                 // se queda el '*' para registros nuevos en el ui-grid ...
-                 $scope.cuentasContables = [];
-                 $scope.cuentasContables_ui_grid.data = [];
-
-                 // NOTA: el publishing de este collection es 'automático'; muchos 'catálogos' se publican
-                 // de forma automática para que estén siempre en el cliente ...
-
-                 cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
-                     onReady: function () {
-
-                         $scope.helpers({
-                             cuentasContables: () => {
-                               return CuentasContables.find(
-                                   { cia: numeroCiaContabSeleccionada }, { sort: { cuenta: 1 } });
-                             }
-                         });
-
-                         $scope.cuentasContables_ui_grid.data = [];
-                         $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
-
-                         $scope.showProgress = false;
-                         $scope.$apply();
-                     },
-                   });
-             },
-             function (err) {
-                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
-
-                 $scope.alerts.length = 0;
-                 $scope.alerts.push({
-                     type: 'danger',
-                     msg: errorMessage
-                 });
-
-                 $scope.showProgress = false;
-             });
-         };
-
-
-      $scope.showProgress = true;
-      let cuentasContablesSubscriptioHandle = null;
-
-      // la suscripción a cuentas contables trae solo las que corresponden a la cia contab seleccionada
-      cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
-            onError: function( error ) {
-                // if the sub terminates with an error
-                $scope.alerts.length = 0;
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: "Error: se ha producido un error al intentar leer las cuentas contables para la <em>compañía Contab seleccionada</em>.<br />" +
-                         "Por favor revise."
-                });
-                $scope.showProgress = false;
-            },
-            onReady: function() {
-
-                $scope.helpers({
-                    cuentasContables: () => {
-                      return CuentasContables.find(
-                          { cia: numeroCiaContabSeleccionada }, { sort: { cuenta: 1 } });
-                    }
-                });
-
-                $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
-
-                let count = $scope.cuentasContables && lodash.isArray($scope.cuentasContables) ? $scope.cuentasContables.length : 0
+        $meteor.call('contab.cuentasContablesSave', editedItems).then(
+            function (data) {
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
                     type: 'info',
-                    msg: `<b>${numeral(count).format('0,0')}</b> cuentas contables leídas para la <em>compañía Contab</em> seleccionada ...`
+                    msg: data
+                });
+
+                // por alguna razón, que aún no entendemos del todo, si no hacemos el subscribe nuevamente,
+                // se queda el '*' para registros nuevos en el ui-grid ...
+                $scope.cuentasContables = [];
+                $scope.cuentasContables_ui_grid.data = [];
+
+                // NOTA: el publishing de este collection es 'automático'; muchos 'catálogos' se publican
+                // de forma automática para que estén siempre en el cliente ...
+
+                cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
+                    onReady: function () {
+
+                        $scope.helpers({
+                            cuentasContables: () => {
+                            return CuentasContables.find(
+                                { cia: numeroCiaContabSeleccionada }, { sort: { cuenta: 1 } });
+                            }
+                        });
+
+                        $scope.cuentasContables_ui_grid.data = [];
+                        $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
+
+                        $scope.showProgress = false;
+                        $scope.$apply();
+                    },
+                });
+            },
+            function (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
                 });
 
                 $scope.showProgress = false;
-                $scope.$apply();
-            }
-      });
+        })
+    }
+
+
+    $scope.showProgress = true;
+    let cuentasContablesSubscriptioHandle = null;
+
+    // la suscripción a cuentas contables trae solo las que corresponden a la cia contab seleccionada
+    cuentasContablesSubscriptioHandle = Meteor.subscribe("cuentasContables", {
+        onError: function( error ) {
+            // if the sub terminates with an error
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: "Error: se ha producido un error al intentar leer las cuentas contables para la <em>compañía Contab seleccionada</em>.<br />" +
+                        "Por favor revise."
+            });
+            $scope.showProgress = false;
+        },
+        onReady: function() {
+
+            $scope.helpers({
+                cuentasContables: () => {
+                    return CuentasContables.find(
+                        { cia: numeroCiaContabSeleccionada }, { sort: { cuenta: 1 } });
+                }
+            });
+
+            $scope.cuentasContables_ui_grid.data = $scope.cuentasContables;
+
+            let count = $scope.cuentasContables && lodash.isArray($scope.cuentasContables) ? $scope.cuentasContables.length : 0
+
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'info',
+                msg: `<b>${numeral(count).format('0,0')}</b> cuentas contables leídas para la <em>compañía Contab</em> seleccionada ...`
+            });
+
+            $scope.showProgress = false;
+            $scope.$apply();
+        }
+    })
 
       $scope.mostrarDetallesCuentaContable = () => {
 
@@ -486,7 +487,7 @@ angular.module("contabm.contab.catalogos").controller("Catalogos_CuentasContable
           };
       });
 }
-]);
+])
 
 function determinarNivelesCuentaContable(cuentasContables) {
 
