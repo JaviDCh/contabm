@@ -199,12 +199,16 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             fechaOriginalAsientoContable = $scope.asientoContable && $scope.asientoContable.fecha ? $scope.asientoContable.fecha : null;
 
             $scope.partidas_ui_grid.data = [];
-            if (lodash.isArray($scope.asientoContable.partidas)) { 
+            if ($scope.asientoContable && Array.isArray($scope.asientoContable.partidas)) { 
                 $scope.partidas_ui_grid.data = $scope.asientoContable.partidas;
             }
-                
-            let result = revisarSumasIguales($scope.asientoContable.partidas);
 
+            let result = {}; 
+
+            if ($scope.asientoContable && Array.isArray($scope.asientoContable.partidas)) { 
+                result = revisarSumasIguales($scope.asientoContable.partidas);
+            }
+               
             $scope.alerts.length = 0; 
             if (result.error) {
                 // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, 

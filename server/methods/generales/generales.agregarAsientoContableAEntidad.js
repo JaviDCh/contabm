@@ -1314,7 +1314,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                               entidadOriginal.concepto.substring(0, 75) :
                               entidadOriginal.concepto;
 
-        partida.referencia = entidadOriginal.numeroFactura.toString();
+        partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                             entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                             entidadOriginal.numeroFactura.toString();
 
         montoAsiento = (entidadOriginal.montoFacturaSinIva ? entidadOriginal.montoFacturaSinIva : 0) +
                        (entidadOriginal.montoFacturaConIva ? entidadOriginal.montoFacturaConIva : 0);
@@ -1389,7 +1391,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                                   entidadOriginal.concepto.substring(0, 75) :
                                   entidadOriginal.concepto;
 
-            partida.referencia = entidadOriginal.numeroFactura.toString();
+            partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                                 entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                                 entidadOriginal.numeroFactura.toString();
 
             montoAsiento = impuestoIva.monto;
 
@@ -1467,7 +1471,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                                   entidadOriginal.concepto.substring(0, 75) :
                                   entidadOriginal.concepto;
 
-            partida.referencia = entidadOriginal.numeroFactura.toString();
+            partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                                 entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                                 entidadOriginal.numeroFactura.toString();
 
             montoAsiento = retencionIslr.monto;
 
@@ -1545,7 +1551,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                                   entidadOriginal.concepto.substring(0, 75) :
                                   entidadOriginal.concepto;
 
-            partida.referencia = entidadOriginal.numeroFactura.toString();
+            partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                                 entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                                 entidadOriginal.numeroFactura.toString();
 
             montoAsiento = retencionIva.monto;
 
@@ -1613,7 +1621,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                               entidadOriginal.concepto.substring(0, 75) :
                               entidadOriginal.concepto;
 
-        partida.referencia = entidadOriginal.numeroFactura.toString();
+        partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                             entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                             entidadOriginal.numeroFactura.toString();
 
         // calculamos el total a pagar a la compañía
         montoAsiento =
@@ -1709,7 +1719,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
                                   entidadOriginal.concepto.substring(0, 75) :
                                   entidadOriginal.concepto;
 
-            partida.referencia = entidadOriginal.numeroFactura.toString();
+            partida.referencia = entidadOriginal.numeroFactura.toString().length > 20 ?
+                                 entidadOriginal.numeroFactura.toString().substring(0, 20) :
+                                 entidadOriginal.numeroFactura.toString();
 
             montoAsiento = entidadOriginal.anticipo;
 
