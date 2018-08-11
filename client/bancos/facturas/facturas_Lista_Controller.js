@@ -13,7 +13,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.origen = $stateParams.origen;
     let limit = parseInt($stateParams.limit);
@@ -26,21 +26,21 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             id: "0",
             limit: limit
         });
-    };
+    }
 
     $scope.regresar = function () {
         $state.go('bancos.facturas.filter', { origen: $scope.origen });
-    };
+    }
 
 
     $scope.exportarAMicrosoftWord = () => {
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/bancos/facturas/exportarAMicrosoftWordModal.html',
             controller: 'FacturasExportarAMicrosoftWordModalController',
             size: 'lg',
             resolve: {
                 tiposArchivo: () => {
-                    return ['BANCOS-FACTURAS'];
+                    return ['BANCOS-FACTURAS', 'BANCOS-RET-IMP-IVA', 'BANCOS-RET-IMP-ISLR'];  
                 },
                 aplicacion: () => {
                     return 'bancos';
@@ -49,7 +49,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     return $scope.companiaSeleccionada;
                 },
                 factura: () => {
-                    return $scope.factura;
+                    return $scope.facturas[0];                          // pasamos la 1ra. factura en la lista 
                 },
                 user: () => {
                     return Meteor.user().emails[0].address;              // nómina, bancos, contab, ...
@@ -67,7 +67,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     filtro += ')';
 
                     return filtro;
-                }
+                },
             },
         }).result.then(
               function (resolve) {
@@ -76,7 +76,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               function (cancel) {
                   return true;
               });
-    };
+    }
 
 
     let list_ui_grid_api = null;
@@ -538,8 +538,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
             $scope.showProgress = false;
             $scope.$apply();
-        });
-    };
+        })
+    }
 
 
     // al abrir la página, mostramos los primeros 50 items
@@ -562,12 +562,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
             $scope.showProgress = false;
             $scope.$apply();
             return;
-        };
+        }
 
         // el método regresa la cantidad de items en el collection (siempre para el usuario)
         recordCount = result;
         $scope.leerRegistrosDesdeServer(limit);
-    });
+    })
 
 
     $scope.leerMasRegistros = () => {

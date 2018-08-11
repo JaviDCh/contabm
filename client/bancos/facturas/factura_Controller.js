@@ -75,57 +75,66 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
         // cuando el usuario indica la compañía (prov o cliente), leemos sus datos en sql ...
         if (value === 'compania' && $scope.factura.proveedor) {
-            $meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor).then(
-                function (data) {
 
-                    if (data.error) {
-                        $scope.alerts.length = 0;
-                        $scope.alerts.push({
-                            type: 'danger',
-                            msg: data.message
-                        })
-                        $scope.showProgress = false;
-                    } else {
-                        // leemos desde sql una buena cantidad de datos que permiten emitir la factura para el
-                        // proveedor o cliente; ejemplo: AplicaIvaFlag, ContribuyenteEspecialFlag,
-                        // BaseRetencionISLR, etc
-                        $scope.proveedor = JSON.parse(data);;
+            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
 
-                        // leemos el proveedor en mongo para inicializar algunos 'defaults'
-                        let proveedorCliente = Proveedores.findOne({ proveedor: $scope.factura.proveedor });
-                        if (proveedorCliente) {
-                            $scope.factura.moneda = proveedorCliente.monedaDefault;
-                            $scope.factura.condicionesDePago = proveedorCliente.formaDePagoDefault;
-                            $scope.factura.tipo = proveedorCliente.tipo;
-                            $scope.factura.cxCCxPFlag = proveedorCliente.proveedorClienteFlag;
-                            $scope.factura.concepto = proveedorCliente.concepto;
-
-                            if ($scope.proveedor.aplicaIvaFlag) {
-                                $scope.factura.montoFacturaConIva = proveedorCliente.montoCheque;
-                            } else {
-                                $scope.factura.montoFacturaSinIva = proveedorCliente.montoCheque;
-                            }
-                        }
-
-                        $scope.alerts.length = 0;
-                        $scope.showProgress = false;
-                    }
-                },
-                function (err) {
-
-                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                if (err) {
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
                     $scope.alerts.length = 0;
                     $scope.alerts.push({
                         type: 'danger',
                         msg: errorMessage
                     });
+
                     $scope.showProgress = false;
-                })
+                    $scope.$apply();
+
+                    return;
+                }
+
+                if (result.error) {
+
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: result.message
+                    })
+                    $scope.showProgress = false;
+                    $scope.$apply();
+
+                } else {
+                    // leemos desde sql una buena cantidad de datos que permiten emitir la factura para el
+                    // proveedor o cliente; ejemplo: AplicaIvaFlag, ContribuyenteEspecialFlag,
+                    // BaseRetencionISLR, etc
+                    $scope.proveedor = JSON.parse(result);;
+
+                    // leemos el proveedor en mongo para inicializar algunos 'defaults'
+                    let proveedorCliente = Proveedores.findOne({ proveedor: $scope.factura.proveedor });
+                    if (proveedorCliente) {
+                        $scope.factura.moneda = proveedorCliente.monedaDefault;
+                        $scope.factura.condicionesDePago = proveedorCliente.formaDePagoDefault;
+                        $scope.factura.tipo = proveedorCliente.tipo;
+                        $scope.factura.cxCCxPFlag = proveedorCliente.proveedorClienteFlag;
+                        $scope.factura.concepto = proveedorCliente.concepto;
+
+                        if ($scope.proveedor.aplicaIvaFlag) {
+                            $scope.factura.montoFacturaConIva = proveedorCliente.montoCheque;
+                        } else {
+                            $scope.factura.montoFacturaSinIva = proveedorCliente.montoCheque;
+                        }
+                    }
+
+                    $scope.alerts.length = 0;
+
+                    $scope.showProgress = false;
+                    $scope.$apply();
+                }
+            })
         }
 
         if ($scope.factura.docState) { 
-        return;
+            return;
         }
             
         $scope.factura.docState = 2;
@@ -152,9 +161,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 });
 
             return;
-        }
-        else
+        } else { 
             $state.go('bancos.facturas.lista', { origen: $scope.origen, limit: $scope.limit });
+        }
     }
 
     $scope.eliminar = function () {
@@ -200,9 +209,9 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 });
 
             return;
-        }
-        else
+        } else { 
             $scope.refresh();
+        }   
     }
 
     $scope.refresh = () => {
@@ -210,7 +219,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
     }
 
     $scope.exportarAMicrosoftWord = () => {
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/bancos/facturas/exportarAMicrosoftWordModal.html',
             controller: 'FacturasExportarAMicrosoftWordModalController',
             size: 'lg',
@@ -245,6 +254,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
 
     $scope.mostrarCuotas = () => {
+
         if (!$scope.factura || !_.isArray($scope.factura.cuotasFactura) || !$scope.factura.cuotasFactura.length) {
             DialogModal($modal, "<em>Bancos - Facturas - Cuotas</em>",
                                 `Factura sin cuotas. No hay cuotas que mostrar.<br />
@@ -257,7 +267,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             return;
         }
 
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/bancos/facturas/mostrarCuotasFactura.html',
             controller: 'MostrarCuotasFactura_Modal_Controller',
             size: 'lg',
@@ -280,7 +290,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
 
     $scope.mostrarPagosAsociados = () => {
-        var modalInstance = $modal.open({
+
+        $modal.open({
             templateUrl: 'client/bancos/facturas/mostrarPagosAsociadosModal.html',
             controller: 'MostrarPagosAsociadosModal_Controller',
             size: 'lg',
@@ -308,7 +319,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
     $scope.asientoContable = function() {
 
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/generales/asientosContablesAsociados/asientosContablesAsociadosModal.html',
             controller: 'AsientosContablesAsociados_Controller',
             size: 'lg',
@@ -374,28 +385,28 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
     $scope.anularRevertirAnulacion = () => {
 
         if ($scope.factura.docState) {
-        DialogModal($modal, "<em>Bancos - Facturas</em>",
-                            "Aparentemente, <em>se han efectuado cambios</em> en el registro. <br />" +
-                            "Ud. debe guardar los cambios antes de intentar continuar con esta función.",
-                            false).then();
-        return;
+            DialogModal($modal, "<em>Bancos - Facturas</em>",
+                                "Aparentemente, <em>se han efectuado cambios</em> en el registro. <br />" +
+                                "Ud. debe guardar los cambios antes de intentar continuar con esta función.",
+                                false).then();
+            return;
         }
 
         if ($scope.factura.estado != 1 && $scope.factura.estado != 4) {
         // ésto nunca debería ocurrir, pues la opción solo se muestra en el tool bar si el estado de la factura es 1 o 4 ...
-        DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
-                            `
-                                El estado de la factura no es <em><b>pendiente<b /><em /> o <em><b>anulado<b /><em />. <br /><br />
-                                Esta opción solo puede ser ejecutada para facturas cuyo estado es pendiente o anulado.
-                                Por favor revise.
-                            `,
-                                false).then();
+            DialogModal($modal, "<em>Bancos - Facturas - Anulación de facturas</em>",
+                                `
+                                    El estado de la factura no es <em><b>pendiente<b /><em /> o <em><b>anulado<b /><em />. <br /><br />
+                                    Esta opción solo puede ser ejecutada para facturas cuyo estado es pendiente o anulado.
+                                    Por favor revise.
+                                `,
+                                    false).then();
             return;
         }
 
 
         if ($scope.factura.estado === 1) {
-        // factura pendiente; permitimos anular
+            // factura pendiente; permitimos anular
             // permitimos al usuario indicar que no quiere modificar el asiento
             var modalInstance = $modal.open({
                 templateUrl: 'client/bancos/facturas/facturasAnular_Modal.html',
@@ -423,14 +434,14 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                                 <em><b>pendiente</b></em>. <br /><br />
                                 Desea continuar y revertir la anulación de esta factura?
                             `,
-                                true).then(
-                                (resolve) => {
-                                    anularRevertirAnulacion2();
-                                },
-                                (err) => {
-                                    return;
-                                }
-                                );
+                    true).then(
+                        (resolve) => {
+                            anularRevertirAnulacion2();
+                        },
+                        (err) => {
+                            return;
+                        }
+                    );
         }
     }
 
@@ -441,53 +452,53 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
         if ($scope.factura.estado === 4) {
         // si la factura está anulada, es muy fácil revertirla; ponemos su estado en pendiente e indicamos que se debe grabar ...
-        $scope.factura.estado = 1;
+            $scope.factura.estado = 1;
 
-        if ($scope.factura.cuotasFactura) {
-            $scope.factura.cuotasFactura.forEach((x) => { return x.estadoCuota = 1; });
-        }
+            if ($scope.factura.cuotasFactura) {
+                $scope.factura.cuotasFactura.forEach((x) => { return x.estadoCuota = 1; });
+            }
 
 
-        DialogModal($modal, "<em>Bancos - Facturas - Reversión de anulación</em>",
-                            `
-                                Ok, el estado de la factura es, nuevamente, <em><b>pendiente</b></em>.<br /><br />
-                                Ud. debe hacer un <em>click</em> en <em><b>Grabar</b></em> para guardar estos cambios.
-                            `,
-                                false).then();
+            DialogModal($modal, "<em>Bancos - Facturas - Reversión de anulación</em>",
+                                `
+                                    Ok, el estado de la factura es, nuevamente, <em><b>pendiente</b></em>.<br /><br />
+                                    Ud. debe hacer un <em>click</em> en <em><b>Grabar</b></em> para guardar estos cambios.
+                                `,
+                                    false).then();
 
-        // el usuario debe grabar los cambios ...
-        $scope.factura.docState = 2;
-        $scope.showProgress = false;
+            // el usuario debe grabar los cambios ...
+            $scope.factura.docState = 2;
+            $scope.showProgress = false;
 
         } else {
 
-        Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, noModificarAsientoContableAsociado, (err, result) => {
+            Meteor.call('bancos.facturas.anular', $scope.factura.claveUnica, noModificarAsientoContableAsociado, (err, result) => {
 
-            if (err) {
-                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                if (err) {
+                    let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
+                    });
+
+                    $scope.showProgress = false;
+                    $scope.$apply();
+
+                    return;
+                }
 
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
-                    type: 'danger',
-                    msg: errorMessage
+                    type: 'info',
+                    msg: result.message,
                 });
 
-                $scope.showProgress = false;
-                $scope.$apply();
-
-                return;
-            }
-
-            $scope.alerts.length = 0;
-            $scope.alerts.push({
-                type: 'info',
-                msg: result.message,
-            });
-
-            // para leer la factura nuevamente desde sql server y mostrar en la página
-            $scope.id = $scope.factura.claveUnica;                        // para que inicializarItem() agregue un nuevo registro
-            inicializarItem();
-        })
+                // para leer la factura nuevamente desde sql server y mostrar en la página
+                $scope.id = $scope.factura.claveUnica;                        // para que inicializarItem() agregue un nuevo registro
+                inicializarItem();
+            })
         }
     }
 
@@ -763,7 +774,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
         if (!_.isArray($scope.factura.impuestosRetenciones)) {
             $scope.factura.impuestosRetenciones = [];
-        };
+        }
 
         $scope.factura.impuestosRetenciones.push(item);
 
@@ -864,7 +875,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 });
 
                 return;
-            };
+            }
 
             // con esta función, determinamos el tipo de alícuota que corresonde al porcentaje de
             // impuesto usado ...
@@ -886,12 +897,12 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 });
 
                 return;
-            };
+            }
 
             // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación del impuesto Iva
             if (!_.isArray($scope.factura.impuestosRetenciones)) {
                 $scope.factura.impuestosRetenciones = [];
-            };
+            }
 
             let impuestoRetencionItem = {
                     _id: new Mongo.ObjectID()._str,
@@ -908,7 +919,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             if (!$scope.factura.docState) {
                 $scope.factura.docState = 2;
             }
-        };
+        }
 
         // -------------------------------------------------------------------------------
         // 2) agregamos un registro a Facturas_Impuestos para la retención Iva
@@ -933,7 +944,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     });
 
                     return;
-                };
+                }
 
                 // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Iva
                 if (!_.isArray($scope.factura.impuestosRetenciones)) {
@@ -947,14 +958,14 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                         impRetID: definicionItem.ID,
                         montoBase: lodash.round($scope.factura.montoFacturaConIva * ivaPorc / 100, 4),
                         porcentaje: retencionIvaPorc,
-                };
+                }
 
                 $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
 
                 if (!$scope.factura.docState) {
                     $scope.factura.docState = 2;
                 }
-        };
+        }
 
 
         // -------------------------------------------------------------------------------
@@ -1096,15 +1107,13 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
     $scope.calcularFactura = () => {
         let factura = $scope.factura;
 
-            if (!factura) { 
+        if (!factura) { 
             return;
-            }
-                
-            let proveedor = $scope.proveedor;
-
-            // -------------------------------------------------------------------------------
-            // intentamos calcular los impuestos y retenciones que existan en la lista ...
-            factura.impuestosRetenciones.forEach((impuesto) => {
+        }
+            
+        // -------------------------------------------------------------------------------
+        // intentamos calcular los impuestos y retenciones que existan en la lista ...
+        factura.impuestosRetenciones.forEach((impuesto) => {
             let definicionImpRet = null;
 
             // lo primero que hacemos es leer la definición del imp o ret en el catálogo
@@ -1122,7 +1131,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     }  
                 }  
             }
-                
+                    
             // por un error de diseño en el análisis que hicimos hace bastante tiempo, aplicamos el sustraendo *luego* del 
             // porcentaje de retención. Debe ser antes ... Nótese que esto aplica, generalmente, a la retención del Islr 
             // y no la del Iva (para la cual no aplica un sustraendo) ... 
@@ -1136,48 +1145,47 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             if (impuesto.sustraendo) { 
                 impuesto.monto -= impuesto.sustraendo;
             }
-            })
+        })
 
-            // arriba calculamos el monto de impuestos y retenciones (en el grid); ahora, calculamos los
-            // montos generales de la factura ...
-            calcularFactura2(factura);
+        // arriba calculamos el monto de impuestos y retenciones (en el grid); ahora, calculamos los
+        // montos generales de la factura ...
+        calcularFactura2(factura);
 
-            if (!factura.docState) {
-                factura.docState = 2;
-            }
+        if (!factura.docState) {
+            factura.docState = 2;
+        }
     }
 
-function calcularFactura2(factura) {
-    // a diferencia de calcular, donde solo calculamos impuestos y retenciones que están en el grid,
-    // aquí calculamos la factura como tal. Esta función debería ser ejecutada luego de
-    // calcularFactura, para completar el calculo de la factura cuando ya están calculados
-    // los montos en el grid
+    function calcularFactura2(factura) {
+        // a diferencia de calcular, donde solo calculamos impuestos y retenciones que están en el grid,
+        // aquí calculamos la factura como tal. Esta función debería ser ejecutada luego de
+        // calcularFactura, para completar el calculo de la factura cuando ya están calculados
+        // los montos en el grid
 
-    factura.iva = null;
-    factura.otrosImpuestos = null;
-    factura.totalAPagar = 0;
-    factura.retencionSobreIva = null;
-    factura.impuestoRetenido = null;
-    factura.impuestoRetenidoISLRAntesSustraendo = null;
-    factura.otrasRetenciones = null;
-    factura.saldo = 0;
+        factura.iva = null;
+        factura.otrosImpuestos = null;
+        factura.totalAPagar = 0;
+        factura.retencionSobreIva = null;
+        factura.impuestoRetenido = null;
+        factura.impuestoRetenidoISLRAntesSustraendo = null;
+        factura.otrasRetenciones = null;
+        factura.saldo = 0;
 
-    if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva) { 
-        return;
-    }
+        if (!factura.montoFacturaConIva && !factura.montoFacturaSinIva) { 
+            return;
+        }
+                
+        factura.montoFactura = 0;
+        factura.totalFactura = 0;
+
+        if (factura.montoFacturaSinIva) { 
+            factura.montoFactura = factura.montoFacturaSinIva;
+        }
+
+        if (factura.montoFacturaConIva) { 
+            factura.montoFactura += factura.montoFacturaConIva;
+        }
             
-    factura.montoFactura = 0;
-    factura.totalFactura = 0;
-
-    if (factura.montoFacturaSinIva) { 
-        factura.montoFactura = factura.montoFacturaSinIva;
-    }
-
-    if (factura.montoFacturaConIva) { 
-        factura.montoFactura += factura.montoFacturaConIva;
-    }
-            
-
         factura.totalFactura = factura.montoFactura;
 
         // calculamos y agregamos el iva
@@ -1206,11 +1214,11 @@ function calcularFactura2(factura) {
 
 
         if (factura.otrosImpuestos) { 
-        factura.totalFactura += factura.otrosImpuestos;
+            factura.totalFactura += factura.otrosImpuestos;
         }
 
         if (factura.iva) { 
-        factura.totalFactura += factura.iva;
+            factura.totalFactura += factura.iva;
         }
             
         factura.impuestosRetenciones.forEach((impuesto) => {
@@ -1219,7 +1227,7 @@ function calcularFactura2(factura) {
 
             if (definicionImpRet.Predefinido && definicionImpRet.Predefinido === 2) {
                 if (!factura.retencionSobreIva) { 
-                factura.retencionSobreIva = 0;
+                    factura.retencionSobreIva = 0;
                 }
                     
                 factura.retencionSobreIva += impuesto.monto ? impuesto.monto : 0;
@@ -1228,7 +1236,7 @@ function calcularFactura2(factura) {
             // retención Islr
             if (definicionImpRet.Predefinido && definicionImpRet.Predefinido === 3) {
                 if (!factura.impuestoRetenido) { 
-                factura.impuestoRetenido = 0;
+                    factura.impuestoRetenido = 0;
                 }
                     
                 factura.impuestoRetenido += impuesto.monto ? impuesto.monto : 0;
@@ -1237,7 +1245,7 @@ function calcularFactura2(factura) {
             // 'otras' retenciones
             if (!definicionImpRet.Predefinido && definicionImpRet.ImpuestoRetencion == 2) {
                 if (!factura.otrasRetenciones) { 
-                factura.otrasRetenciones = 0;
+                    factura.otrasRetenciones = 0;
                 }
                     
                 factura.otrasRetenciones += impuesto.monto ? impuesto.monto : 0;
@@ -1249,15 +1257,15 @@ function calcularFactura2(factura) {
         factura.totalAPagar = factura.totalFactura;
 
         if (factura.impuestoRetenido) { 
-        factura.totalAPagar -= factura.impuestoRetenido;
+            factura.totalAPagar -= factura.impuestoRetenido;
         }
             
         if (factura.retencionSobreIva) { 
-        factura.totalAPagar -= factura.retencionSobreIva;
+            factura.totalAPagar -= factura.retencionSobreIva;
         }
             
         if (factura.otrasRetenciones) { 
-        factura.totalAPagar -= factura.otrasRetenciones;
+            factura.totalAPagar -= factura.otrasRetenciones;
         }
             
         factura.totalAPagar = lodash.round(factura.totalAPagar, 4);
@@ -1302,26 +1310,28 @@ function calcularFactura2(factura) {
             if (impuesto.montoAntesSustraendo) {
                 impuesto.montoAntesSustraendo = lodash.round(impuesto.montoAntesSustraendo, 2);
 
-                if (impuesto.sustraendo != null)
+                if (impuesto.sustraendo != null) { 
                     impuesto.sustraendo = lodash.round(impuesto.sustraendo, 2);
-
+                }
+                    
                 impuesto.monto = impuesto.montoAntesSustraendo;
 
-                if (impuesto.sustraendo)
+                if (impuesto.sustraendo) { 
                     impuesto.monto -= impuesto.sustraendo;
+                }
             }
         })
 
         // nótese que calcularFactura2 no calcula los montos en el grid (impuestos/retenciones);
         // solo los valores generales de la factura. La idea es recalcular la factura, una vez
         // redondeados los montos en el grid (imp/ret) ...
-            calcularFactura2(factura);
+        calcularFactura2(factura);
     }
 
 
     $scope.demostrarRetIslr = function() { 
 
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/bancos/facturas/demostrarRetIslr.html',
             controller: 'DemostrarRetencionIslr_Modal_Controller',
             size: 'lg',
@@ -1343,542 +1353,567 @@ function calcularFactura2(factura) {
 
     }
 
-      // -------------------------------------------------------------------------
-      // Grabar las modificaciones hechas al registro
-      // -------------------------------------------------------------------------
-      $scope.grabar = function () {
+    // -------------------------------------------------------------------------
+    // Grabar las modificaciones hechas al registro
+    // -------------------------------------------------------------------------
+    $scope.grabar = function () {
 
-          if (!$scope.factura.docState) {
-              DialogModal($modal, "<em>Facturas</em>",
-                                  `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
-                                   No hay nada que grabar.`,
-                                 false).then();
-              return;
-          };
+        if (!$scope.factura.docState) {
+            DialogModal($modal, "<em>Facturas</em>",
+                                `Aparentemente, <em>no se han efectuado cambios</em> en el registro.
+                                No hay nada que grabar.`,
+                                false).then();
+            return;
+        }
 
-          // calculamos la factura; si la misma no cuadra, informamos al usuario, pero permitirmos continuar ...
-          let factura = $scope.factura;
+        // calculamos la factura; si la misma no cuadra, informamos al usuario, pero permitirmos continuar ...
+        let factura = $scope.factura;
 
-          let totalFactura = 0;
+        let totalFactura = 0;
 
-          if (factura.montoFacturaSinIva)
+        if (factura.montoFacturaSinIva) { 
             totalFactura = factura.montoFacturaSinIva;
-
-          if (factura.montoFacturaConIva)
+        }
+        
+        if (factura.montoFacturaConIva) { 
             totalFactura += factura.montoFacturaConIva;
-
-          if (factura.iva)
+        }
+        
+        if (factura.iva) { 
             totalFactura += factura.iva;
-
-          if (factura.otrosImpuestos)
+        }
+        
+        if (factura.otrosImpuestos) { 
             totalFactura += factura.otrosImpuestos;
-
-          if (factura.impuestoRetenido)
+        }
+        
+        if (factura.impuestoRetenido) { 
             totalFactura -= factura.impuestoRetenido;
-
-          if (factura.retencionSobreIva)
+        }
+        
+        if (factura.retencionSobreIva) { 
             totalFactura -= factura.retencionSobreIva;
-
-          if (factura.otrasRetenciones)
+        }
+        
+        if (factura.otrasRetenciones) { 
             totalFactura -= factura.otrasRetenciones;
+        }
+        
+        let diferencia = factura.totalAPagar - totalFactura;
 
-          let diferencia = factura.totalAPagar - totalFactura;
+        if (diferencia) {
+            DialogModal($modal, "<em>Bancos - Facturas</em>",
+                                `Hemos encontrado una diferencia que resulta al calcular la factura usando los
+                                montos que ahora existen.<br />
+                                El monto de la diferencia es de: <b>${numeral(diferencia).format('0,0.000000')}</b>.
+                                <br /><br />
+                                Desea continuar y registrar la factura bajo estas condiciones?
+                                `,
+                                true).then(
+                function (resolve) {
+                    grabar2();
+                },
+                function (err) {
+                    return;
+                });
+            return;
+        } else { 
+            grabar2();
+        }     
+    }
 
-          if (diferencia) {
-              DialogModal($modal, "<em>Bancos - Facturas</em>",
-                                  `Hemos encontrado una diferencia que resulta al calcular la factura usando los
-                                   montos que ahora existen.<br />
-                                   El monto de la diferencia es de: <b>${numeral(diferencia).format('0,0.000000')}</b>.
-                                   <br /><br />
-                                   Desea continuar y registrar la factura bajo estas condiciones?
-                                  `,
-                                  true).then(
-                  function (resolve) {
-                      grabar2();
-                  },
-                  function (err) {
-                      return;
-                  });
-              return;
-          } else
-              grabar2();
-      };
 
+    function grabar2() {
 
-      function grabar2() {
-          $scope.showProgress = true;
+        $scope.showProgress = true;
 
-          // obtenemos un clone de los datos a guardar ...
-          let editedItem = _.cloneDeep($scope.factura);
+        // obtenemos un clone de los datos a guardar ...
+        let editedItem = _.cloneDeep($scope.factura);
 
-          if (editedItem.docState != 3) {
-              if (!editedItem.numeroFactura) {
-                  editedItem.numeroFactura = '0';
-              }
-          }
+        if (editedItem.docState != 3) {
+            if (!editedItem.numeroFactura) {
+                editedItem.numeroFactura = '0';
+            }
+        }
 
-          // nótese como validamos cada item antes de intentar guardar en el servidor
-          let isValid = false;
-          let errores = [];
+        // nótese como validamos cada item antes de intentar guardar en el servidor
+        let isValid = false;
+        let errores = [];
 
-          if (editedItem.docState != 3) {
-              isValid = Facturas.simpleSchema().namedContext().validate(editedItem);
+        if (editedItem.docState != 3) {
+            isValid = Facturas.simpleSchema().namedContext().validate(editedItem);
 
-              if (!isValid) {
-                  Facturas.simpleSchema().namedContext().validationErrors().forEach(function (error) {
-                      errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Facturas.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
-                  });
-              };
-          };
+            if (!isValid) {
+                Facturas.simpleSchema().namedContext().validationErrors().forEach(function (error) {
+                    errores.push("El valor '" + error.value + "' no es adecuado para el campo '" + Facturas.simpleSchema().label(error.name) + "'; error de tipo '" + error.type + "'.");
+                })
+            }
+        }
 
-          if (errores && errores.length) {
+        if (errores && errores.length) {
 
-              $scope.alerts.length = 0;
-              $scope.alerts.push({
-                  type: 'danger',
-                  msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
-                      errores.reduce(function (previous, current) {
+            $scope.alerts.length = 0;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
+                    errores.reduce(function (previous, current) {
 
-                          if (previous == "")
-                              // first value
-                              return current;
-                          else
-                              return previous + "<br />" + current;
-                      }, "")
-              });
+                        if (previous == "") { 
+                            // first value
+                            return current;
+                        }  
+                        else { 
+                            return previous + "<br />" + current;
+                        }  
+                    }, "")
+            });
 
-              $scope.showProgress = false;
-              return;
-          };
+            $scope.showProgress = false;
+            return;
+        }
 
-          $meteor.call('facturasSave', editedItem,
-                                       $scope.fechaEmisionOriginal,
-                                       $scope.fechaRecepcionOriginal,
-                                       $scope.companiaSeleccionada.numero).then(
-              function (data) {
+        Meteor.call('facturasSave', editedItem, $scope.fechaEmisionOriginal, $scope.fechaRecepcionOriginal, 
+                                    $scope.companiaSeleccionada.numero, (err, result) => {
 
-                  if (data.error) {
-                      // el método que intenta grabar los cambis puede regresar un error cuando,
-                      // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: data.message
-                      });
-                      $scope.showProgress = false;
-                  } else {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'info',
-                          msg: data.message
-                      });
-
-                      // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
-                      $scope.id = data.id;
-
-                      // nótese que siempre, al registrar cambios, leemos la factura desde sql server; la idea es
-                      // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
-                      // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
-                      // encontrar nada ...
-                      inicializarItem($scope.id);
-                  };
-              },
-              function (err) {
-
+            if (err) {
                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
-                  $scope.showProgress = false;
-              });
-      };
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-      $scope.factura = {};
+                $scope.showProgress = false;
+                $scope.$apply();
 
-      function inicializarItem() {
-        //   debugger;
-          $scope.showProgress = true;
+                return;
+            }
 
-          if ($scope.id == "0") {
+            if (result.error) {
+                // el método que intenta grabar los cambis puede regresar un error cuando,
+                // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: result.message
+                });
 
-              let usuario =  Meteor.user();
+                $scope.showProgress = false;
+                $scope.$apply();
+            } else {
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'info',
+                    msg: result.message
+                });
 
-              $scope.factura = {};
-              $scope.factura = {
-                 claveUnica: 0,
-                 fechaEmision: new Date(),
-                 fechaRecepcion: new Date(),
+                // el meteor method regresa siempre el _id del item; cuando el usuario elimina, regresa "-999"
+                $scope.id = result.id;
 
-                 cuotasFactura: [],
-                 impuestosRetenciones: [],
+                // nótese que siempre, al registrar cambios, leemos la factura desde sql server; la idea es
+                // mostrar los datos tal como fueron grabados y refrescarlos para el usuario. Cuando el
+                // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
+                // encontrar nada ...
+                inicializarItem($scope.id);
+            }
+        })
+    }
 
-                 ingreso: new Date(),
-                 ultAct: new Date(),
-                 usuario: usuario ? usuario.emails[0].address : null,
-                 cia: $scope.companiaSeleccionada.numero,
+    $scope.factura = {};
 
-                 docState: 1,
-            };
+    function inicializarItem() {
+
+        $scope.showProgress = true;
+
+        if ($scope.id == "0") {
+
+            let usuario =  Meteor.user();
+
+            $scope.factura = {};
+            $scope.factura = {
+                claveUnica: 0,
+                fechaEmision: new Date(),
+                fechaRecepcion: new Date(),
+
+                cuotasFactura: [],
+                impuestosRetenciones: [],
+
+                ingreso: new Date(),
+                ultAct: new Date(),
+                usuario: usuario ? usuario.emails[0].address : null,
+                cia: $scope.companiaSeleccionada.numero,
+
+                docState: 1,
+            }
 
             $scope.impuestosRetenciones_ui_grid.data = $scope.factura.impuestosRetenciones;
 
             $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
             $scope.showProgress = false;
-          }
-          else {
-              $scope.showProgress = true;
+        } else {
+            $scope.showProgress = true;
 
-               // mantenemos las fechas de la factura, pues puede ser necesario validar los valores originales
-              factura_leerByID_desdeSql($scope.id);
-          };
-      };
+            // mantenemos las fechas de la factura, pues puede ser necesario validar los valores originales
+            factura_leerByID_desdeSql($scope.id);
+        }
+    }
 
-      inicializarItem();
+    inicializarItem();
 
-      function factura_leerByID_desdeSql(pk) {
+    function factura_leerByID_desdeSql(pk) {
 
-          // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
-          let facturaID = parseInt($scope.id);
-          Meteor.call('factura.leerByID.desdeSql', facturaID, (err, result) => {
+        // ejecutamos un método para leer el asiento contable en sql server y grabarlo a mongo (para el current user)
+        let facturaID = parseInt($scope.id);
+        Meteor.call('factura.leerByID.desdeSql', facturaID, (err, result) => {
 
-              if (err) {
+            if (err) {
                 let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                  $scope.alerts.length = 0;
-                  $scope.alerts.push({
-                      type: 'danger',
-                      msg: errorMessage
-                  });
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
 
-                  $scope.showProgress = false;
-                  $scope.$apply();
+                $scope.showProgress = false;
+                $scope.$apply();
 
-                  return;
-              }
+                return;
+            }
 
-              $scope.factura = {};
-              $scope.factura = JSON.parse(result);
+            $scope.factura = {};
+            $scope.factura = JSON.parse(result);
 
-              if ($scope.factura == null) {
-                  // el usuario eliminó el registro y, por eso, no pudo se leído desde sql
-                  $scope.factura = {};
-                  $scope.impuestosRetenciones_ui_grid.data = [];
+            if ($scope.factura == null) {
+                // el usuario eliminó el registro y, por eso, no pudo se leído desde sql
+                $scope.factura = {};
+                $scope.impuestosRetenciones_ui_grid.data = [];
 
-                  $scope.showProgress = false;
-                  $scope.$apply();
+                $scope.showProgress = false;
+                $scope.$apply();
 
-                  return;
-              };
+                return;
+            }
 
-              // las fechas vienen serializadas como strings; convertimos nuevamente a dates
-              $scope.factura.fechaEmision = $scope.factura.fechaEmision ? moment($scope.factura.fechaEmision).toDate() : null;
-              $scope.factura.fechaRecepcion = $scope.factura.fechaRecepcion ? moment($scope.factura.fechaRecepcion).toDate() : null;
-              $scope.factura.fRecepcionRetencionISLR = $scope.factura.fRecepcionRetencionISLR ? moment($scope.factura.fRecepcionRetencionISLR).toDate() : null;
-              $scope.factura.fRecepcionRetencionIVA = $scope.factura.fRecepcionRetencionIVA ? moment($scope.factura.fRecepcionRetencionIVA).toDate() : null;
-              $scope.factura.ingreso = $scope.factura.ingreso ? moment($scope.factura.ingreso).toDate() : null;
-              $scope.factura.ultAct = $scope.factura.ultAct ? moment($scope.factura.ultAct).toDate() : null;
+            // las fechas vienen serializadas como strings; convertimos nuevamente a dates
+            $scope.factura.fechaEmision = $scope.factura.fechaEmision ? moment($scope.factura.fechaEmision).toDate() : null;
+            $scope.factura.fechaRecepcion = $scope.factura.fechaRecepcion ? moment($scope.factura.fechaRecepcion).toDate() : null;
+            $scope.factura.fRecepcionRetencionISLR = $scope.factura.fRecepcionRetencionISLR ? moment($scope.factura.fRecepcionRetencionISLR).toDate() : null;
+            $scope.factura.fRecepcionRetencionIVA = $scope.factura.fRecepcionRetencionIVA ? moment($scope.factura.fRecepcionRetencionIVA).toDate() : null;
+            $scope.factura.ingreso = $scope.factura.ingreso ? moment($scope.factura.ingreso).toDate() : null;
+            $scope.factura.ultAct = $scope.factura.ultAct ? moment($scope.factura.ultAct).toDate() : null;
 
-              // las fechas serializadas vienen siempre como strings; convertimos a Date ...
-              $scope.factura.impuestosRetenciones.forEach((x) => {
-                  x.fechaRecepcionPlanilla = x.fechaRecepcionPlanilla ? moment(x.fechaRecepcionPlanilla).toDate() : null;
-              });
+            // las fechas serializadas vienen siempre como strings; convertimos a Date ...
+            $scope.factura.impuestosRetenciones.forEach((x) => {
+                x.fechaRecepcionPlanilla = x.fechaRecepcionPlanilla ? moment(x.fechaRecepcionPlanilla).toDate() : null;
+            });
 
-              $scope.factura.cuotasFactura.forEach((x) => {
-                  x.fechaVencimiento = x.fechaVencimiento ? moment(x.fechaVencimiento).toDate() : null;
-              });
+            $scope.factura.cuotasFactura.forEach((x) => {
+                x.fechaVencimiento = x.fechaVencimiento ? moment(x.fechaVencimiento).toDate() : null;
+            })
 
-              // nótese que este es un valor virtual, que no existe en sql ...
-              $scope.factura.montoFactura = 0;
-              $scope.factura.montoFactura += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0;
-              $scope.factura.montoFactura += $scope.factura.montoFacturaConIva ? $scope.factura.montoFacturaConIva : 0;
+            // nótese que este es un valor virtual, que no existe en sql ...
+            $scope.factura.montoFactura = 0;
+            $scope.factura.montoFactura += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0;
+            $scope.factura.montoFactura += $scope.factura.montoFacturaConIva ? $scope.factura.montoFacturaConIva : 0;
 
-              $scope.impuestosRetenciones_ui_grid.data = $scope.factura.impuestosRetenciones;
+            $scope.impuestosRetenciones_ui_grid.data = $scope.factura.impuestosRetenciones;
 
-              // mantenemos las fechas de la factura para poder validar luego los valores originales de las mismas
-              $scope.fechaEmisionOriginal = $scope.factura.fechaEmision;
-              $scope.fechaRecepcionOriginal = $scope.factura.fechaRecepcion;
+            // mantenemos las fechas de la factura para poder validar luego los valores originales de las mismas
+            $scope.fechaEmisionOriginal = $scope.factura.fechaEmision;
+            $scope.fechaRecepcionOriginal = $scope.factura.fechaRecepcion;
 
-              // finalmente, leemos lo datos importantes del proveedor para tenerlos para cuando sea
-              // necesario (al calcular, determinar impuestos y retenciones, etc.)
-              Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
+            // finalmente, leemos lo datos importantes del proveedor para tenerlos para cuando sea
+            // necesario (al calcular, determinar impuestos y retenciones, etc.)
+            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
 
-                  if (err) {
+                if (err) {
                     let errorMessage = mensajeErrorDesdeMethod_preparar(err);
 
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: errorMessage
-                      });
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: errorMessage
+                    });
 
-                      $scope.showProgress = false;
-                      $scope.$apply();
+                    $scope.showProgress = false;
+                    $scope.$apply();
 
-                      return;
-                  }
+                    return;
+                }
 
-                  if (result.error) {
-                      $scope.alerts.length = 0;
-                      $scope.alerts.push({
-                          type: 'danger',
-                          msg: result.message
-                      });
-                      $scope.showProgress = false;
+                if (result.error) {
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: result.message
+                    });
 
-                      $scope.$apply();
-                  } else {
-                      $scope.proveedor = JSON.parse(result);;
-                      $scope.showProgress = false;
+                    $scope.showProgress = false;
+                    $scope.$apply();
+                } else {
+                    $scope.proveedor = JSON.parse(result);;
 
-                      $scope.$apply();
-                  }
-              })
-          })
-      }
-
-
-      // ------------------------------------------------------------------------------------
-      // para determinar el tipo de alícuota que corresponde a la tasa de impuesto Iva
-      // que usa el usuario; por ejemplo: para 12% el tipo de alícuota es 'G' (general)
-      // ------------------------------------------------------------------------------------
-      function determinarTipoAlicuotaImpuestosIva(tiposAlicuotaIvaList, fechaEmisionFactura, ivaPorc) {
-          // ---------------------------------------------------------------------------------------
-          // leemos un registro en TiposAlicuotaIva que sea justo anterior a la fecha de la factura
-          let tipoAlicuotaIva = lodash(tiposAlicuotaIvaList).
-                                 orderBy([ 'Fecha' ], [ 'desc' ]).
-                                 find((x) => { return x.Fecha <= fechaEmisionFactura; });
-                              //    .value();
-
-          let tipoAlicuotaImpuestosIva = null;
-          if (tipoAlicuotaIva) {
-              if (tipoAlicuotaIva.Reducida && ivaPorc == tipoAlicuotaIva.Reducida)
-                  tipoAlicuotaImpuestosIva = "R";
-              else if (tipoAlicuotaIva.General && ivaPorc == tipoAlicuotaIva.General)
-                  tipoAlicuotaImpuestosIva = "G";
-              else if (tipoAlicuotaIva.Adicional && ivaPorc == tipoAlicuotaIva.Adicional)
-                  tipoAlicuotaImpuestosIva = "A";
-          };
-
-          if (!tipoAlicuotaImpuestosIva) {
-              let message = `Error: hemos obtenido un error al intentar determinar el tipo
-                      (reducida, general, adicional) de alícuota para el porcentaje de
-                      impuesto Iva indicado.<br />
-                      Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
-                      e intentar corregir esta situación.`;
-
-              return {
-                  error: true,
-                  message: message
-              };
-          };
-
-          return {
-              error: false,
-              tipoAlicuotaImpuestosIva: tipoAlicuotaImpuestosIva,
-          };
-      };
+                    $scope.showProgress = false;
+                    $scope.$apply();
+                }
+            })
+        })
+    }
 
 
-      function inicializarImpRetConImpuestosRetencionesDefinicion(impRetItem,
-                                                                  proveedor,
-                                                                  factura,
-                                                                  impuestosRetencionesDefinicion,
-                                                                  parametrosBancos,
-                                                                  parametrosGlobalBancos,
-                                                                  tiposAlicuotaIva) {
+    // ------------------------------------------------------------------------------------
+    // para determinar el tipo de alícuota que corresponde a la tasa de impuesto Iva
+    // que usa el usuario; por ejemplo: para 12% el tipo de alícuota es 'G' (general)
+    // ------------------------------------------------------------------------------------
+    function determinarTipoAlicuotaImpuestosIva(tiposAlicuotaIvaList, fechaEmisionFactura, ivaPorc) {
+        // ---------------------------------------------------------------------------------------
+        // leemos un registro en TiposAlicuotaIva que sea justo anterior a la fecha de la factura
+        let tipoAlicuotaIva = lodash(tiposAlicuotaIvaList).
+                                orderBy([ 'Fecha' ], [ 'desc' ]).
+                                find((x) => { return x.Fecha <= fechaEmisionFactura; });
+                            //    .value();
 
-          // esta función hace, básicamente, lo mismo que se hace en Determinar, solo que:
-          // Deteminar: agrega e inicializa items para: impIva, retIva, retIslr
-          // esta función: inicializa el item recibido
-          // para inicializar el item, igual que en Determinar, usamos la definición que se ha
-          // registrado en el catálogo: ImpuestosRetencionesDefinicion ...
+        let tipoAlicuotaImpuestosIva = null;
+        if (tipoAlicuotaIva) {
+            if (tipoAlicuotaIva.Reducida && ivaPorc == tipoAlicuotaIva.Reducida) { 
+                tipoAlicuotaImpuestosIva = "R";
+            } 
+            else if (tipoAlicuotaIva.General && ivaPorc == tipoAlicuotaIva.General) { 
+                tipoAlicuotaImpuestosIva = "G";
+            } 
+            else if (tipoAlicuotaIva.Adicional && ivaPorc == tipoAlicuotaIva.Adicional) { 
+                tipoAlicuotaImpuestosIva = "A";
+            }   
+        }
 
-          // lo primero que hacemos es leer la definición del item, en base a su tipo
-          let definicionItem = _.find(impuestosRetencionesDefinicion, (x) => {
-              return x.ID === impRetItem.impRetID;
-          });
+        if (!tipoAlicuotaImpuestosIva) {
+            let message = `Error: hemos obtenido un error al intentar determinar el tipo
+                    (reducida, general, adicional) de alícuota para el porcentaje de
+                    impuesto Iva indicado.<br />
+                    Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
+                    e intentar corregir esta situación.`;
 
-          if (!definicionItem)
-              // esto no debe ocurrir nunca, pues si el usuario agregó este item y cambio su tipo es
-              // porque existe en el catálogo!
-              return {
-                  error: false,
-              };
+            return {
+                error: true,
+                message: message
+            };
+        }
 
-          // si el item no es 'predefinido', solo intentamos inicializar su monto base y porcentaje
-          // (solo si es predefinido, sabemos si es impIva, retIva o retIslr)
-          if (!definicionItem.Predefinido) {
-              if (!impRetItem.montoBase) {
-                  if (definicionItem.Base) {
-                      if ((definicionItem.Base == 1 || definicionItem.Base == 3) && factura.montoFacturaSinIva)
-                          impRetItem.montoBase = factura.montoFacturaSinIva;
+        return {
+            error: false,
+            tipoAlicuotaImpuestosIva: tipoAlicuotaImpuestosIva,
+        };
+    }
 
-                      if ((definicionItem.Base == 2 || definicionItem.Base == 3) && factura.montoFacturaConIva)
-                          impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
-                  };
-              };
+    function inicializarImpRetConImpuestosRetencionesDefinicion(impRetItem,
+                                                                proveedor,
+                                                                factura,
+                                                                impuestosRetencionesDefinicion,
+                                                                parametrosBancos,
+                                                                parametrosGlobalBancos,
+                                                                tiposAlicuotaIva) {
 
-              if (!impRetItem.porcentaje && definicionItem.Porcentaje) {
-                  impRetItem.porcentaje = definicionItem.Porcentaje;
-              };
+        // esta función hace, básicamente, lo mismo que se hace en Determinar, solo que:
+        // Deteminar: agrega e inicializa items para: impIva, retIva, retIslr
+        // esta función: inicializa el item recibido
+        // para inicializar el item, igual que en Determinar, usamos la definición que se ha
+        // registrado en el catálogo: ImpuestosRetencionesDefinicion ...
 
-              return {
-                  error: false,
-              };
-          };
+        // lo primero que hacemos es leer la definición del item, en base a su tipo
+        let definicionItem = _.find(impuestosRetencionesDefinicion, (x) => {
+            return x.ID === impRetItem.impRetID;
+        });
 
-          // el registro, imp/ret, que el usuario acaba de indicar es 'predefinida', lo que quiere decir que
-          // corresponde a un impIva/retIva/retIslr. Intentamos inicializar sus valores por defecto como
-          // se hace en 'Determinar' ...
+        if (!definicionItem)
+            // esto no debe ocurrir nunca, pues si el usuario agregó este item y cambio su tipo es
+            // porque existe en el catálogo!
+            return {
+                error: false,
+            }
 
-          let contribuyenteEspecialFlag = false;
+        // si el item no es 'predefinido', solo intentamos inicializar su monto base y porcentaje
+        // (solo si es predefinido, sabemos si es impIva, retIva o retIslr)
+        if (!definicionItem.Predefinido) {
+            if (!impRetItem.montoBase) {
+                if (definicionItem.Base) {
+                    if ((definicionItem.Base == 1 || definicionItem.Base == 3) && factura.montoFacturaSinIva) { 
+                        impRetItem.montoBase = factura.montoFacturaSinIva;
+                    }
+                        
+                    if ((definicionItem.Base == 2 || definicionItem.Base == 3) && factura.montoFacturaConIva) { 
+                        impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
+                    }
+                }
+            }
 
-          if (proveedor.contribuyenteEspecialFlag)
-              contribuyenteEspecialFlag = proveedor.contribuyenteEspecialFlag;
+            if (!impRetItem.porcentaje && definicionItem.Porcentaje) {
+                impRetItem.porcentaje = definicionItem.Porcentaje;
+            }
 
-          // inicialmente, obtenemos todos los valores que necesitamos para determinar impuestos y retenciones
-          let sujetoARetencionFlag = false;
-          let ivaPorc = null;
-          let retencionIvaPorc = null;
-          let retencionIslrPorc = null;
-          let impuestoRetenidoIslrSustraendo = null;
-          let codigoConceptoRetencionIslr = "";
+            return {
+                error: false,
+            };
+        }
 
-          if (proveedor.aplicaIvaFlag && parametrosGlobalBancos.ivaPorc)
-              ivaPorc = parametrosGlobalBancos.ivaPorc;
+        // el registro, imp/ret, que el usuario acaba de indicar es 'predefinida', lo que quiere decir que
+        // corresponde a un impIva/retIva/retIslr. Intentamos inicializar sus valores por defecto como
+        // se hace en 'Determinar' ...
 
+        let contribuyenteEspecialFlag = false;
 
-          // determinamos el porcentaje de retención Iva para la compañía ...
-          switch (factura.cxCCxPFlag) {
-              case 1: {
-                      // cuentas por pagar (factura de un proveedor)
-                      // -------------------------------------------------------------------------------------------
-                      // el usuario indica en ParametrosBancos si la compañía Contab retiene impuestos sobre iva a
-                      // sus proveedores (contribuyente especial)
+        if (proveedor.contribuyenteEspecialFlag) { 
+            contribuyenteEspecialFlag = proveedor.contribuyenteEspecialFlag;
+        }
+            
+        // inicialmente, obtenemos todos los valores que necesitamos para determinar impuestos y retenciones
+        let sujetoARetencionFlag = false;
+        let ivaPorc = null;
+        let retencionIvaPorc = null;
+        let retencionIslrPorc = null;
+        let impuestoRetenidoIslrSustraendo = null;
+        let codigoConceptoRetencionIslr = "";
 
-                      // nótese como, SOLO si la cia contab retiene, el porcentaje del proveedor PRIVA sobre el
-                      // de la compañía
-                      if (parametrosBancos.retencionSobreIvaFlag) {
-                          if (proveedor.nuestraRetencionSobreIvaPorc) {
-                              retencionIvaPorc = proveedor.nuestraRetencionSobreIvaPorc;
-                          } else {
-                              retencionIvaPorc = parametrosBancos.retencionSobreIvaPorc;
-                          };
-                      };
-                      break;
-                  }
-              case 2: {
-                      // cuentas por cobrar (factura a un cliente)
-                      if (proveedor.contribuyenteEspecialFlag) {
-                          if (proveedor.retencionSobreIvaPorc)
-                              retencionIvaPorc = proveedor.retencionSobreIvaPorc;
-                          else
-                              retencionIvaPorc = parametrosBancos.retencionSobreIvaPorc;
-                      };
-                      break;
-                  };
-          };
+        if (proveedor.aplicaIvaFlag && parametrosGlobalBancos.ivaPorc) { 
+            ivaPorc = parametrosGlobalBancos.ivaPorc;
+        }
+        
+        // determinamos el porcentaje de retención Iva para la compañía ...
+        switch (factura.cxCCxPFlag) {
+            case 1: {
+                    // cuentas por pagar (factura de un proveedor)
+                    // -------------------------------------------------------------------------------------------
+                    // el usuario indica en ParametrosBancos si la compañía Contab retiene impuestos sobre iva a
+                    // sus proveedores (contribuyente especial)
 
-
-          if (proveedor.sujetoARetencionFlag && proveedor.porcentajeDeRetencion) {
-              sujetoARetencionFlag = true;
-              retencionIslrPorc = proveedor.porcentajeDeRetencion;
-
-              if (proveedor.retencionIslrSustraendo)
-                  impuestoRetenidoIslrSustraendo = proveedor.retencionIslrSustraendo;
-
-              if (proveedor.codigoConceptoRetencion)
-                  codigoConceptoRetencionIslr = proveedor.codigoConceptoRetencion;
-          };
-
-          // -------------------------------------------------------------------------------
-          // 1) agregamos un registro a Facturas_Impuestos para el impuesto Iva
-          if (definicionItem.Predefinido === 1 && ivaPorc) {
-              // la compañía indica que se debe aplicar un impuesto Iva; Nota: debemos buscar una definición
-              // en la tabla ImpuestosRetenciones_Definicion, para el valor predefinido 1 ...
-              // nótese que esta tabla la leimos en el parent state y está en $scope.$parent ...
-
-
-              // con esta función, determinamos el tipo de alícuota que corresonde al porcentaje de
-              // impuesto usado ...
-              let tipoAlicuotaImpuestosIva = determinarTipoAlicuotaImpuestosIva(tiposAlicuotaIva,
-                                                                                factura.fechaEmision,
-                                                                                ivaPorc);
-
-              if (tipoAlicuotaImpuestosIva.error) {
-                  let message = `Error: hemos obtenido un error al intentar determinar el tipo
-                          (reducida, general, adicional) de alícuota para el porcentaje de
-                          impuesto Iva indicado.<br />
-                          Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
-                          e intentar corregir esta situación.`;
-
-                  return {
-                      error: true,
-                      message: message,
-                  };
-              };
-
-              impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : factura.montoFacturaConIva;
-              impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : ivaPorc;
-              impRetItem.tipoAlicuota = tipoAlicuotaImpuestosIva.tipoAlicuotaImpuestosIva;
-
-              return {
-                  error: false,
-              };
-          };
-
-          // -------------------------------------------------------------------------------
-          // 2) agregamos un registro a Facturas_Impuestos para la retención Iva
-          if (definicionItem.Predefinido === 2 && ivaPorc && retencionIvaPorc) {
-              // el usuario intenta registrar un monto de retención Iva; inicializamos su monto base y %
-              let montoBase = factura.montoFacturaConIva ? lodash.round(factura.montoFacturaConIva * ivaPorc / 100, 4) : 0;
-
-              impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : montoBase;
-              impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : retencionIvaPorc;
-
-              return {
-                  error: false,
-              };
-          };
+                    // nótese como, SOLO si la cia contab retiene, el porcentaje del proveedor PRIVA sobre el
+                    // de la compañía
+                    if (parametrosBancos.retencionSobreIvaFlag) {
+                        if (proveedor.nuestraRetencionSobreIvaPorc) {
+                            retencionIvaPorc = proveedor.nuestraRetencionSobreIvaPorc;
+                        } else {
+                            retencionIvaPorc = parametrosBancos.retencionSobreIvaPorc;
+                        };
+                    };
+                    break;
+                }
+            case 2: {
+                    // cuentas por cobrar (factura a un cliente)
+                    if (proveedor.contribuyenteEspecialFlag) {
+                        if (proveedor.retencionSobreIvaPorc)
+                            retencionIvaPorc = proveedor.retencionSobreIvaPorc;
+                        else
+                            retencionIvaPorc = parametrosBancos.retencionSobreIvaPorc;
+                    };
+                    break;
+                }
+        }
 
 
-          // -------------------------------------------------------------------------------
-          // 3) agregamos un registro a Facturas_Impuestos para la retención Islr
-          if (definicionItem.Predefinido === 3 && (factura.montoFacturaSinIva || factura.montoFacturaConIva)) {
-              if (sujetoARetencionFlag && retencionIslrPorc) {
-                  let montoBase = null;
-                  if (proveedor.baseRetencionISLR) {
-                      if ((proveedor.baseRetencionISLR == 1 || proveedor.baseRetencionISLR == 3) &&
-                          factura.montoFacturaSinIva)
-                          montoBase = factura.montoFacturaSinIva;
+        if (proveedor.sujetoARetencionFlag && proveedor.porcentajeDeRetencion) {
+            sujetoARetencionFlag = true;
+            retencionIslrPorc = proveedor.porcentajeDeRetencion;
 
-                      if ((proveedor.baseRetencionISLR == 2 || proveedor.baseRetencionISLR == 3) &&
-                          factura.montoFacturaConIva)
-                          montoBase = montoBase ? montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
-                  } else {
-                      if (definicionItem.Base) {
-                          if ((definicionItem.Base == 1 || definicionItem.Base == 3) && factura.montoFacturaSinIva)
-                              montoBase = factura.montoFacturaSinIva;
+            if (proveedor.retencionIslrSustraendo) { 
+                impuestoRetenidoIslrSustraendo = proveedor.retencionIslrSustraendo;
+            }
+                
+            if (proveedor.codigoConceptoRetencion) { 
+                codigoConceptoRetencionIslr = proveedor.codigoConceptoRetencion;
+            }
+        }
 
-                          if ((definicionItem.Base == 2 || definicionItem.Base == 3) && factura.montoFacturaConIva)
-                              montoBase = montoBase ? montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
-                      };
-                  };
+        // -------------------------------------------------------------------------------
+        // 1) agregamos un registro a Facturas_Impuestos para el impuesto Iva
+        if (definicionItem.Predefinido === 1 && ivaPorc) {
+            // la compañía indica que se debe aplicar un impuesto Iva; Nota: debemos buscar una definición
+            // en la tabla ImpuestosRetenciones_Definicion, para el valor predefinido 1 ...
+            // nótese que esta tabla la leimos en el parent state y está en $scope.$parent ...
 
-                  impRetItem.codigo = impRetItem.codigo ? impRetItem.codigo : codigoConceptoRetencionIslr;
-                  impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : montoBase;
-                  impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : retencionIslrPorc;
-                  impRetItem.sustraendo = impRetItem.sustraend ? impRetItem.sustraend : impuestoRetenidoIslrSustraendo;
-              };
 
-              return {
-                  error: false,
-              };
-          };
-      };
+            // con esta función, determinamos el tipo de alícuota que corresonde al porcentaje de
+            // impuesto usado ...
+            let tipoAlicuotaImpuestosIva = determinarTipoAlicuotaImpuestosIva(tiposAlicuotaIva,
+                                                                            factura.fechaEmision,
+                                                                            ivaPorc);
+
+            if (tipoAlicuotaImpuestosIva.error) {
+                let message = `Error: hemos obtenido un error al intentar determinar el tipo
+                        (reducida, general, adicional) de alícuota para el porcentaje de
+                        impuesto Iva indicado.<br />
+                        Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
+                        e intentar corregir esta situación.`;
+
+                return {
+                    error: true,
+                    message: message,
+                };
+            }
+
+            impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : factura.montoFacturaConIva;
+            impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : ivaPorc;
+            impRetItem.tipoAlicuota = tipoAlicuotaImpuestosIva.tipoAlicuotaImpuestosIva;
+
+            return {
+                error: false,
+            };
+        }
+
+        // -------------------------------------------------------------------------------
+        // 2) agregamos un registro a Facturas_Impuestos para la retención Iva
+        if (definicionItem.Predefinido === 2 && ivaPorc && retencionIvaPorc) {
+            // el usuario intenta registrar un monto de retención Iva; inicializamos su monto base y %
+            let montoBase = factura.montoFacturaConIva ? lodash.round(factura.montoFacturaConIva * ivaPorc / 100, 4) : 0;
+
+            impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : montoBase;
+            impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : retencionIvaPorc;
+
+            return {
+                error: false,
+            };
+        }
+
+
+        // -------------------------------------------------------------------------------
+        // 3) agregamos un registro a Facturas_Impuestos para la retención Islr
+        if (definicionItem.Predefinido === 3 && (factura.montoFacturaSinIva || factura.montoFacturaConIva)) {
+            if (sujetoARetencionFlag && retencionIslrPorc) {
+                let montoBase = null;
+                if (proveedor.baseRetencionISLR) {
+                    if ((proveedor.baseRetencionISLR == 1 || proveedor.baseRetencionISLR == 3) &&
+                        factura.montoFacturaSinIva) { 
+                            montoBase = factura.montoFacturaSinIva;
+                        }
+
+                    if ((proveedor.baseRetencionISLR == 2 || proveedor.baseRetencionISLR == 3) &&
+                        factura.montoFacturaConIva) { 
+                            montoBase = montoBase ? montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
+                        }
+                } else {
+                    if (definicionItem.Base) {
+                        if ((definicionItem.Base == 1 || definicionItem.Base == 3) && factura.montoFacturaSinIva) { 
+                            montoBase = factura.montoFacturaSinIva;
+                        }
+
+                        if ((definicionItem.Base == 2 || definicionItem.Base == 3) && factura.montoFacturaConIva) { 
+                            montoBase = montoBase ? montoBase + factura.montoFacturaConIva : factura.montoFacturaConIva;
+                        }
+                            
+                    }
+                }
+
+                impRetItem.codigo = impRetItem.codigo ? impRetItem.codigo : codigoConceptoRetencionIslr;
+                impRetItem.montoBase = impRetItem.montoBase ? impRetItem.montoBase : montoBase;
+                impRetItem.porcentaje = impRetItem.porcentaje ? impRetItem.porcentaje : retencionIslrPorc;
+                impRetItem.sustraendo = impRetItem.sustraend ? impRetItem.sustraend : impuestoRetenidoIslrSustraendo;
+            }
+
+            return {
+                error: false,
+            };
+        }
+    }
 
   }
 ])

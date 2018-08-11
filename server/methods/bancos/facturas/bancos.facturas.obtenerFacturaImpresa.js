@@ -19,19 +19,19 @@ Meteor.methods(
     'bancos.facturas.obtenerFacturaImpresa': function (fileID,
                                                        tipoArchivo,
                                                        userID,
-                                                       facturasID,
+                                                       listaFacturasID,
                                                        nombreArchivo) {
 
         new SimpleSchema({
             fileID: { type: String, optional: false, },
             tipoArchivo: { type: String, optional: false, },
             userID: { type: String, optional: false, },
-            facturasID: { type: String, optional: false, },
+            listaFacturasID: { type: String, optional: false, },
             nombreArchivo: { type: String, optional: false, },
         }).validate({ fileID,
                       tipoArchivo,
                       userID,
-                      facturasID,
+                      listaFacturasID,
                       nombreArchivo,
                   });
 
@@ -39,10 +39,11 @@ Meteor.methods(
         let response = null;
 
         // el template debe ser siempre un documento word ...
-        if (!nombreArchivo || !nombreArchivo.endsWith('.docx'))
+        if (!nombreArchivo || !nombreArchivo.endsWith('.docx')) { 
             throw new Meteor.Error('archivo-debe-ser-word-doc', 'El archivo debe ser un documento Word (.docx).');
-
-        // leemos las facturas que se asociaron al numeroComprobante; nota: raramente será más de una ...
+        }
+            
+        // leemos las facturas que el usuario ha consultado 
         query = `Select f.NumeroFactura as numeroFactura, f.FechaEmision as fechaEmision,
                  p.Nombre as nombreCompania, p.Rif as rifCompania, p.Direccion as domicilioCompania,
                  p.Telefono1 as telefonoCompania, p.Fax as faxCompania,
@@ -52,7 +53,7 @@ Meteor.methods(
                  f.Cia as cia
                  From Facturas f Inner Join Proveedores p On f.Proveedor = p.Proveedor
                  Inner Join FormasDePago fp On f.CondicionesDePago = fp.FormaDePago
-                 Where f.ClaveUnica In ${facturasID}
+                 Where f.ClaveUnica In ${listaFacturasID}
                 `;
 
         response = null;

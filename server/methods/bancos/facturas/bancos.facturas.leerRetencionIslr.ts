@@ -1,12 +1,10 @@
 
 
-import * as lodash from 'lodash'; 
 import SimpleSchema from 'simpl-schema';
-import { sequelize } from '../../../server/sqlModels/_globals/_loadThisFirst/_globals';
+import { sequelize } from 'server/sqlModels/_globals/_loadThisFirst/_globals';
 
-import { UnidadTributaria } from '../../../imports/collections/bancos/unidadTributaria';
-import { CategoriasRetencion_sql } from '../../imports/sqlModels/bancos/categoriasRetencion'; 
-import { Proveedores_sql } from '../../imports/sqlModels/bancos/proveedores'; 
+import { UnidadTributaria } from 'imports/collections/bancos/unidadTributaria';
+import { Proveedores_sql } from '../../../imports/sqlModels/bancos/proveedores'; 
 
 Meteor.methods(
     {

@@ -22,8 +22,7 @@ Meteor.methods(
                                                                 tipoArchivo,
                                                                 ciaSeleccionada,
                                                                 userID,
-                                                                proveedorID,
-                                                                numeroComprobante,
+                                                                listaFacturasID,
                                                                 periodoRetencion,
                                                                 nombreArchivo) {
 
@@ -32,51 +31,56 @@ Meteor.methods(
             tipoArchivo: { type: String, optional: false, },
             ciaSeleccionada: { type: Object, blackbox: true, optional: false, },
             userID: { type: String, optional: false, },
-            proveedorID: { type: SimpleSchema.Integer, optional: false, },
-            numeroComprobante: { type: String, optional: false, },
+            listaFacturasID: { type: String, blackbox: true, optional: false, },
             periodoRetencion: { type: String, optional: false, },
             nombreArchivo: { type: String, optional: false, },
         }).validate({ fileID,
                       tipoArchivo,
                       ciaSeleccionada,
                       userID,
-                      proveedorID,
-                      numeroComprobante,
+                      listaFacturasID,
                       periodoRetencion,
                       nombreArchivo,
                   });
 
         // el template debe ser siempre un documento word ...
-        if (!nombreArchivo || !nombreArchivo.endsWith('.docx'))
+        if (!nombreArchivo || !nombreArchivo.endsWith('.docx')) { 
             throw new Meteor.Error('archivo-debe-ser-word-doc', 'El archivo debe ser un documento Word (.docx).');
-
-        let proveedor = Proveedores.findOne({ proveedor: proveedorID });
+        }
+            
         let companiaContab = Companias.findOne(ciaSeleccionada._id);
 
-        // TODO: leemos las facturas que se asociaron al numeroComprobante; nota: raramente será más de una ...
-        let response = null;
+        // leemos las facturas que el usuario ha consultado 
+        query = `Select f.ClaveUnica as claveUnica, f.NumeroFactura as numeroFactura, f.FechaEmision as fechaEmision, 
+                 f.FechaRecepcion as fechaRecepcion, f.NcNdFlag as ncNdFlag, 
+                 f.NumeroComprobante as numeroComprobante, f.NumeroOperacion as numeroOperacion, 
+                 f.NumeroControl as numeroControl, f.NumeroFacturaAfectada as numeroFacturaAfectada, 
+                 f.Proveedor as proveedor, 
+                 f.MontoFacturaSinIva as montoNoImponible, f.MontoFacturaConIva as montoImponible,
+                 f.IvaPorc as ivaPorc, f.Iva as iva,
+                 f.Cia as cia
+                 From Facturas f 
+                 Where f.ClaveUnica In ${listaFacturasID} 
+                 Order By f.NumeroComprobante, f.NumeroOperacion 
+                `;
+
+        response = null;
         response = Async.runSync(function(done) {
-            Facturas_sql.findAll({ where:
-                    {
-                        proveedor: proveedor.proveedor,
-                        numeroComprobante: numeroComprobante,
-                        cia: ciaSeleccionada.numero
-                    },
-                    order: [['numeroOperacion', 'ASC']],
-                    raw: true,
-                })
+            sequelize.query(query, { replacements: [], type: sequelize.QueryTypes.SELECT })
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-        if (!response.result.length)
+        }
+            
+        if (!response.result.length) { 
             throw new Meteor.Error('db-registro-no-encontrado',
             'Error inesperado: no pudimos leer la factura en la base de datos.');
-
+        }
+            
         let facturas = response.result;
         let retencionesIva = [];
         // para guardar la fecha de recepción de una factura y usar para construir la fecha del documento
@@ -88,6 +92,9 @@ Meteor.methods(
         let baseImp2 = 0;
         let iva2 = 0;
         let retIva2 = 0;
+
+        // cada item en este array será una factura a ser impresa 
+        let facturasArray = []; 
 
         facturas.forEach((factura) => {
 
@@ -127,9 +134,10 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+            }
+                
             let impuestosRetenciones = response.result;
 
             let montoFacturaIncluyeIva = 0;
@@ -144,6 +152,8 @@ Meteor.methods(
             let alicuotaIva = 0;
             let montoIva = 0;
             let montoRetencionIva = 0;
+
+            retencionesIva = []; 
 
             impuestosRetenciones.forEach((impRet) => {
 
@@ -187,9 +197,34 @@ Meteor.methods(
                     baseImp2 += montoImponible;
                     iva2 += montoIva;
                     retIva2 += montoRetencionIva;
-                };
-            });
-        });
+                }
+            })
+
+            let proveedor = Proveedores.findOne({ proveedor: factura.proveedor }, { fields: { nombre: 1, rif: 1, }});
+
+            let fechaDoc = `${moment(fechaRecepcion).format('DD')} de ${moment(fechaRecepcion).format('MMMM')} de ${numeral(parseInt(moment(fechaRecepcion).format('YYYY'))).format('0,0')}`;
+
+            let item = { 
+                fechaDoc: fechaDoc,
+                companiaContabNombre: companiaContab.nombre,
+                companiaContabRif: companiaContab.rif,
+                companiaContabDireccion: companiaContab.direccion,
+                periodoFiscal: periodoRetencion,
+                comprobanteSeniat: factura.numeroComprobante,
+                proveedorNombre: proveedor.nombre,
+                proveedorRif: proveedor.rif,
+
+                items: retencionesIva,
+
+                totalIncIva2: numeral(totalIncIva2).format("0,0.00"),
+                comprasSinIva2: numeral(comprasSinIva2).format("0,0.00"),
+                baseImp2: numeral(baseImp2).format("0,0.00"),
+                iva2: numeral(iva2).format("0,0.00"),
+                retIva2: numeral(retIva2).format("0,0.00"),
+            }; 
+
+            facturasArray.push(item); 
+        })
 
 
         // ----------------------------------------------------------------------------------------------------
@@ -197,11 +232,11 @@ Meteor.methods(
         // leer el item en el collection, para obtener el nombre 'verdadero' del archivo en el disco
         let collectionFS_file = Files_CollectionFS_Templates.findOne(fileID);
 
-        if (!collectionFS_file)
+        if (!collectionFS_file) { 
             throw new Meteor.Error('collectionFS-no-encontrada',
-            'Error inesperado: no pudimos leer el item en collectionFS, que corresponda al archivo (plantilla) indicado.');
-
-
+                'Error inesperado: no pudimos leer el item en collectionFS, que corresponda al archivo (plantilla) indicado.');
+        }
+            
         // ----------------------------------------------------------------------------------------------------
         // obtenemos el directorio en el server donde están las plantillas (guardadas por el usuario mediante collectionFS)
         // nótese que usamos un 'setting' en setting.json (que apunta al path donde están las plantillas)
@@ -219,25 +254,8 @@ Meteor.methods(
         let doc = new Docxtemplater();
         doc.loadZip(zip);
 
-        let fechaDoc = `${moment(fechaRecepcion).format('DD')} de ${moment(fechaRecepcion).format('MMMM')} de ${numeral(parseInt(moment(fechaRecepcion).format('YYYY'))).format('0,0')}`;
-
-        //set the templateVariables
-        doc.setData({
-            fechaDoc: fechaDoc,
-            companiaContabNombre: companiaContab.nombre,
-            companiaContabRif: companiaContab.rif,
-            companiaContabDireccion: companiaContab.direccion,
-            periodoFiscal: periodoRetencion,
-            comprobanteSeniat: numeroComprobante,
-            proveedorNombre: proveedor.nombre,
-            proveedorRif: proveedor.rif,
-            items: retencionesIva,
-
-            totalIncIva2: numeral(totalIncIva2).format("0,0.00"),
-            comprasSinIva2: numeral(comprasSinIva2).format("0,0.00"),
-            baseImp2: numeral(baseImp2).format("0,0.00"),
-            iva2: numeral(iva2).format("0,0.00"),
-            retIva2: numeral(retIva2).format("0,0.00"),
+        doc.setData({ 
+            facturas: facturasArray, 
         });
 
         try {
@@ -271,4 +289,4 @@ Meteor.methods(
         // promise y no el promise object ...
         return grabarDatosACollectionFS_regresarUrl(buf, nombreArchivo2, tipoArchivo, 'bancos', companiaContab, Meteor.user(), 'docx');
     }
-});
+})
