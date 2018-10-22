@@ -20,7 +20,7 @@ Meteor.methods(
 
         if (!factura || !factura.docState) {
             throw new Meteor.Error("Aparentemente, no se han editado los datos en la forma. No hay nada que actualizar.");
-        };
+        }
 
         // una factura con pagos no puede ser alterada
         let pagosEnFactura = validarPagosEnFactura(factura.claveUnica);

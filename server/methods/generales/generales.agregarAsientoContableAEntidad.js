@@ -27,6 +27,10 @@ Meteor.methods({
 
        // agregamos el asiento que corresponde al registro de una entidad, por ejemplo: factura, pago, nómina,
        // movimiento bancario, etc.
+
+       // cuando el parámetro proviene2 es 'facturas_retencion_impuestos', este proceso genera el asiento contable para 
+       // una factura, pero, en particular, el que corresponde a las retenciones de impuesto ... 
+
         new SimpleSchema({
            provieneDe: { type: String, optional: false, },
            provieneDe_ID: { type: SimpleSchema.Integer, optional: false, },
@@ -132,6 +136,7 @@ Meteor.methods({
                 } else {
                     fechaAsiento = entidadOriginal.fechaEmision;        // cxc
                 }
+
                break;
             case 'Caja chica':
                fechaAsiento = entidadOriginal.fecha;
@@ -217,7 +222,6 @@ Meteor.methods({
            }
            case "Caja chica": { 
                 agregarAsientoContable = agregarAsientoContable_CajaChica_Reposicion(entidadOriginal,
-                    tipoAsientoDefault,
                     companiaContab,
                     fechaAsiento,
                     mesFiscal,
@@ -486,9 +490,10 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
     lodash.forEach(banco.agencias, (agencia) => {
         // la cuenta bancaria está en alguna de las agencias del banco ...
         cuentaBancaria = lodash.find(agencia.cuentasBancarias, (x) => { return x.cuentaInterna == chequera.numeroCuenta; });
-        if (cuentaBancaria)
+        if (cuentaBancaria) { 
             return false;           // logramos un 'break' en el (lodash) forEach ..
-    });
+        } 
+    })
 
     if (!cuentaBancaria || lodash.isEmpty(cuentaBancaria)) {
         return {
@@ -1055,8 +1060,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             partidasAsientoContable.push(partidaAsiento);
       })
 
-
-
       // agregamos la partida que corresponde a la compañía (proveedor o cliente - cxp o cxc)
       // agregamos esta partida (cxp o cxc) al final, pues antes debemos ajustar su monto con retenciones que deban ser contabilizadas
       // en el momento del pago (en vez del momento de la factura) ...
@@ -1080,10 +1083,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
             partidasAsientoContable.push(partidaAsiento);
       }
-
-
-
-
 
       // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
       // que las de mayor monto vayan primero
@@ -1794,25 +1793,9 @@ function agregarAsientoContable_Factura(entidadOriginal, tipoAsientoDefault, com
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // -----------------------------------------------------------------------------------
 // construimos y agregamos el asiento contable para el movimiento bancario
-function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsientoDefault, companiaContab,
+function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, companiaContab,
                                                        fechaAsiento, mesFiscal, factorCambio, numeroNegativoAsiento,
                                                        provieneDe_ID, currentUser) {
 
@@ -1858,12 +1841,12 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
     if (!response.result.length) {
         return {
             error: true,
-            message: `Error: no encontramos un registro para la compañía Contab en la tabla de <em>parámetros de caja chica</em>, 
-                        para poder obtener el tipo de asiento y la cuenta contable 'puente' para la contabilización de la reposición de la caja chica.`
+            message: `Error: no pudimos leer la reposición de caja chica indicada en la base de datos.<br /> 
+                      Por favor revise.`
         };
     }
 
-    let cajaChica = response.result[0];   // para obtener el tipo de asiento 'default' y la cuenta contable 'puente' 
+    let cajaChica = response.result[0];   
 
 
     // ----------------------------------------------------------------------------------------------------------------------------------
@@ -1883,8 +1866,8 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
     if (!response.result.length) {
         return {
             error: true,
-            message: `Error: no encontramos un registro para la compañía Contab en la tabla de <em>parámetros de caja chica</em>, 
-                        para poder obtener el tipo de asiento y la cuenta contable 'puente' para la contabilización de la reposición de la caja chica.`
+            message: `Error: no hemos podido leer una moneda marcada como <em>default</em> en la tabla  <em>Monedas</em>. <br /> 
+                      Nótese que debe existir una para poder generar el asiento en forma automática.`
         };
     }
 
@@ -1942,7 +1925,6 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
     asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'h').toDate();
     asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'h').toDate();
 
-
     // ----------------------------------------------------------------------------------------------------------------------------
     // construmos un array con las partidas que serán agregadas al asiento, una por gasto, además otra si hay un monto para el Iva 
     response = null;
@@ -1996,8 +1978,8 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
             return {
                 error: true,
                 message: `Error: no hemos podido leer una cuenta contable definida para el rubro indicado para el gasto <em>${gasto.descripcion}</em>. <br /> 
-                          Por favor note que debe existir una <em>cuenta contable asociada</em> a cada rubro indicado en la caja chica.<br /> 
-                          Por favor revise.`
+                          Por favor note que debe existir una <em>cuenta contable asociada</em> a cada rubro indicado en la reposición de caja chica.<br /> 
+                          Por favor revise esta situación en la tabla que corresponde y solo luego regrese y continúe con este proceso.`
             };
         }
 
@@ -2008,7 +1990,7 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
         if (gasto.montoNoImponible) { debe += gasto.montoNoImponible; }; 
         if (gasto.monto) { debe += gasto.monto; }; 
 
-        let referencia = ""; 
+        let referencia = null; 
         if (gasto.numeroDocumento) { 
             // nos aseguramos que el valor usado como referencia no pase de 20 chars 
             referencia = gasto.numeroDocumento.length > 20 ? gasto.numeroDocumento.substr(0, 20) : gasto.numeroDocumento; 
@@ -2049,7 +2031,7 @@ function agregarAsientoContable_CajaChica_Reposicion(entidadOriginal, tipoAsient
     partida = { 
         cuentaContableID: parametrosCajaChica.cuentaContablePuenteID, 
         descripcion: descripcionPartidaFinal, 
-        referencia: "", 
+        referencia: null, 
         debe: 0,  
         haber: totalMontoGastos 
     }

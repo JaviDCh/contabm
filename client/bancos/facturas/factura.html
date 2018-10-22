@@ -251,10 +251,10 @@
                                                  ng-model-options="{ updateOn: 'blur' }" />
                                       </div>
                                   </div>
-                                  <div class="col-sm-3 col-sm-offset-0">
+                                  <div class="col-sm-4">
                                       <div class="form-group">
                                           <label></label>
-                                          <input type="text"
+                                          <input type="number"
                                                  class="form-control input-sm"
                                                  ng-model="factura.numeroOperacion"
                                                  ng-change="setIsEdited()"
@@ -330,7 +330,10 @@
                                                 <li ng-if="origen == 'edicion'"><a href="#" class="navbar_custom_small_node_withBackground" ng-click="nuevoImpuestosRetenciones()">Nuevo <span class="fa fa-file-o"></span></a></li>
                                                 
                                                 <li ng-if="origen == 'edicion'" class="divider-vertical-small"></li>
-                                                <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="demostrarRetIslr()">Ret Islr <span class="fa fa-desktop"></span></a></li>
+                                                <li><a href="#" class="navbar_custom_small_node_withBackground" ng-click="demostrarRetIslr()" popover="Click para revisar cómo el programa determina la retención de Islr." popover-trigger="mouseenter">Ret Islr <span class="fa fa-desktop"></span></a></li>
+
+                                                <li ng-if="origen == 'edicion'" class="divider-vertical-small"></li>
+                                                <li ng-if="origen == 'edicion'"><a href="#" class="navbar_custom_small_node_withBackground" ng-click="grabarFechasRecepcionPlanillasRetencionImpuesto()" popover="Click para grabar (solo!) las fechas de recepción de planillas de retención de impuestos." popover-trigger="mouseenter">Grabar <span class="fa fa-save"></span></a></li>
                                             </ul>
                                         </div>
                                     </div>

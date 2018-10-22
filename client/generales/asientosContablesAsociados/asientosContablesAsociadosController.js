@@ -4,8 +4,8 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('AsientosContablesAsociados_Controller',
-['$scope', '$modalInstance', '$modal', '$meteor', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
-function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID, ciaSeleccionada, origen, docState) {
+['$scope', '$modalInstance', '$modal', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
+function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSeleccionada, origen, docState) {
 
     // abrimos un modal para mostrar los asientos contables asociados a alguna entidad; ejemplos de
     // entidades son: bancos, facturas, nomina, pagos, etc.
@@ -35,19 +35,6 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
     $scope.cancel = function () {
         $modalInstance.dismiss("Cancel");
     };
-
-    $scope.provieneDe = "";
-
-    switch (provieneDe) {
-        case "Bancos":
-            $scope.provieneDe = "Movimientos bancarios";
-            break;
-        case "Facturas":
-            $scope.provieneDe = "Facturas";
-            break;
-        default:
-            $scope.provieneDe = "Indefinido (??)";
-    }
 
     $scope.origen = origen;
     $scope.asientosContablesAsociadosList = [];
@@ -137,6 +124,9 @@ function ($scope, $modalInstance, $modal, $meteor, $state, provieneDe, entidadID
     };
 
     $scope.agregarAsientoContable = () => {
+
+        // además del origen normal, Factuas, Bancos, etc., la función puede recibir 'facturas_retencion_impuestos' para que se 
+        // genere el asiento de retenciones de impuestos para una factura ... 
 
         // el usuario modificó la entidad (mov bancario / factura / ...); indicamos que debe grabar ...
         if (docState) {

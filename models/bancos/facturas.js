@@ -90,7 +90,7 @@ let facturas_SimpleSchema = new SimpleSchema({
     ncNdFlag: { type: String, label: 'NcNdFlag', optional: true },
     numeroFacturaAfectada: { type: String, label: 'Número de la factura afectada', optional: true },
     numeroComprobante: { type: String, label: 'Número de comprobante', optional: true, custom: validarComprobanteSeniat, },
-    numeroOperacion: { type: Number, label: 'NumeroOperacion', optional: true },
+    numeroOperacion: { type: Number, label: 'Número de operación', optional: true },
     comprobanteSeniat_UsarUnoExistente_Flag: { type: Boolean, label: 'ComprobanteSeniat_UsarUnoExistente_Flag', optional: true },
     tipo: { type: Number, label: 'Tipo', optional: false },
     numeroPlanillaImportacion: { type: String, label: 'NumeroPlanillaImportacion', optional: true },

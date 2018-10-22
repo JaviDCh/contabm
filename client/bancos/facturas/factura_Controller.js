@@ -540,18 +540,20 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     // si el usuario agrega un nuevo item (impRet), determinamos su tipo y agregamos
                     // algunos valores 'por defecto' que pueden existir en impuestosRetencionesDefinicion
 
-                    if (colDef.field == 'impRetID') {
-                        // cuando el usuario cambia el tipo de item, casi siempre (o siempre?) será para
-                        // un registro nuevo; debemos inializar los valores del item en base al contenido
-                        // de la definición que existe en el catálogo impuestosRetencionesDefinicion
-                        let functionResult =
-                        inicializarImpRetConImpuestosRetencionesDefinicion(rowEntity,
-                                                                            $scope.proveedor,
-                                                                            $scope.factura,
-                                                                            $scope.impuestosRetencionesDefinicion,
-                                                                            $scope.parametrosBancos,
-                                                                            $scope.parametrosGlobalBancos,
-                                                                            $scope.tiposAlicuotaIva);
+                    switch (colDef.field) { 
+                        case 'impRetID': { 
+
+                            // cuando el usuario cambia el tipo de item, casi siempre (o siempre?) será para
+                            // un registro nuevo; debemos inializar los valores del item en base al contenido
+                            // de la definición que existe en el catálogo impuestosRetencionesDefinicion
+                            let functionResult =
+                            inicializarImpRetConImpuestosRetencionesDefinicion(rowEntity,
+                                                                                $scope.proveedor,
+                                                                                $scope.factura,
+                                                                                $scope.impuestosRetencionesDefinicion,
+                                                                                $scope.parametrosBancos,
+                                                                                $scope.parametrosGlobalBancos,
+                                                                                $scope.tiposAlicuotaIva);
 
                             if (functionResult.error) {
                                 $scope.alerts.length = 0;
@@ -559,17 +561,23 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                                     type: 'danger',
                                     msg: functionResult.message
                                 });
-                            };
-                    };
+                            }
+                            break; 
+                        }
 
-                    // esta vez no usamos un docState para el item en el array ...
-                    // if (!rowEntity.docState)
-                    //     rowEntity.docState = 2;
+                        case 'fechaRecepcionPlanilla': { 
+                            // dejamos de 'marcar' la factura como editada cuando el usuario cambia la fecha de recepción de 
+                            // la planilla de retención de impuestos. La idea es que el usuario puede cambiar, en un momento posterior, 
+                            // solo este valor, y actualizarlo mediante un link diferente a Grabar ... 
+                            return; 
+                        }
+                    }
 
-                    if (!$scope.factura.docState)
+                    if (!$scope.factura.docState) { 
                         $scope.factura.docState = 2;
-                };
-            });
+                    }
+                }
+            })          
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         // nótese que usamos 'id', y no '_id', pues estos registros vienen de sql con un id único
@@ -1516,6 +1524,68 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 // usuario elimina el registro, su id debe regresar en -999 e InicializarItem no debe
                 // encontrar nada ...
                 inicializarItem($scope.id);
+            }
+        })
+    }
+
+    $scope.grabarFechasRecepcionPlanillasRetencionImpuesto = function() { 
+
+        if (!$scope.factura || !$scope.factura.impuestosRetenciones || !Array.isArray($scope.factura.impuestosRetenciones) || 
+            !$scope.factura.impuestosRetenciones.length) { 
+
+            DialogModal($modal, "<em>Facturas</em>",
+                            `No hemos encontrado registros en la lista de impuestos/retenciones. No hay nada que grabar.`,
+                            false).then();
+            return;
+        }
+
+        let impuestosRetenciones_array = []; 
+
+        for (let item of $scope.factura.impuestosRetenciones) { 
+
+            let impuestoRetencion = { 
+                id: item.id, 
+                fechaRecepcionPlanilla: item.fechaRecepcionPlanilla, 
+            }
+
+            impuestosRetenciones_array.push(impuestoRetencion); 
+        }
+
+        $scope.showProgress = true; 
+
+        Meteor.call('facturasSave_fechasPlanillasRetencionImpuestos', impuestosRetenciones_array, (err, result) => {
+
+            if (err) {
+                let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: errorMessage
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+
+                return;
+            }
+
+            if (result.error) {
+                // el método que intenta grabar los cambis puede regresar un error cuando,
+                // por ejemplo, la fecha corresponde a un mes ya cerrado en Bancos ...
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: result.message
+                });
+
+                $scope.showProgress = false;
+                $scope.$apply();
+            } else {
+                DialogModal($modal, "<em>Facturas</em>", result.message, false).then();
+
+                $scope.showProgress = false;
+                $scope.$apply();
             }
         })
     }

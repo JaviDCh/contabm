@@ -9,7 +9,7 @@ Meteor.methods(
 
         new SimpleSchema({
             pk: { type: SimpleSchema.Integer, }
-          }).validate({ pk });
+        }).validate({ pk });
 
         let response = null;
         response = Async.runSync(function(done) {
@@ -21,15 +21,16 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
 
         // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
         if (!response.result.length) {
             return null;
-        };
+        }
 
         let factura = response.result[0];
 
@@ -45,10 +46,11 @@ Meteor.methods(
                 .then(function(result) { done(null, result); })
                 .catch(function (err) { done(err, null); })
                 .done();
-        });
+        })
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
 
         factura.impuestosRetenciones = [];
 
