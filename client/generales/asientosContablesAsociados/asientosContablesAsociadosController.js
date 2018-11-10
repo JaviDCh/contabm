@@ -4,7 +4,7 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller('AsientosContablesAsociados_Controller',
-['$scope', '$modalInstance', '$modal', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState',
+['$scope', '$modalInstance', '$modal', '$state', 'provieneDe', 'entidadID', 'ciaSeleccionada', 'origen', 'docState', 
 function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSeleccionada, origen, docState) {
 
     // abrimos un modal para mostrar los asientos contables asociados a alguna entidad; ejemplos de
@@ -108,7 +108,7 @@ function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSele
                 _id: result.asientoContableMongoID
             };
 
-            // nótese como angular nos permite abrir un route desde el code y, con window.open, en otro Tab ...
+            // nótese como angular nos permite abrir un route desde el code y, con window.open, en otro Tab! ...
             var url2 = $state.href('contab.asientosContables.asientoContable',
                                    {
                                        origen: origen,

@@ -51,7 +51,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, leerTablasImpuestosRete
       Meteor.subscribe('bancosCollectionsFacturacion', () => {
 
           proveedores_subscriptionHandle =
-          $scope.subscribe('proveedores', proveedorID, () => {
+          Meteor.subscribe('proveedores', proveedorID, () => {
 
                   let ciaContabSeleccionada = CompaniaSeleccionada.findOne({ userID: Meteor.userId() });
 

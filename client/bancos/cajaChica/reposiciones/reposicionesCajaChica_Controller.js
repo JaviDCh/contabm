@@ -1209,7 +1209,7 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
                 },
                 docState: () => {
                     return $scope.reposicion.docState ? $scope.reposicion.docState : "";
-                },
+                }
             },
         }).result.then(
               function (resolve) {

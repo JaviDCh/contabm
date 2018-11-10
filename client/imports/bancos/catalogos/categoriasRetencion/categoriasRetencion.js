@@ -199,6 +199,21 @@ export default angular.module("categoriasRetencion", [ angularMeteor ])
             type: 'boolean'
         },
         {
+            name: 'minimo',
+            field: 'minimo',
+            displayName: 'Mínimo',
+            width: 100,
+            enableFiltering: true,
+            headerCellClass: 'ui-grid-rightCell',
+            cellClass: 'ui-grid-rightCell',
+            cellFilter: 'currencyFilterAndNull',
+            enableColumnMenu: false,
+            enableCellEdit: true,
+            enableSorting: true,
+            enableFiltering: false, 
+            type: 'number'
+        },
+        {
             name: 'delButton',
             displayName: '',
             cellTemplate: '<span ng-click="grid.appScope.deleteItem(row.entity)" class="fa fa-close redOnHover" style="padding-top: 8px; "></span>',
@@ -368,10 +383,9 @@ export default angular.module("categoriasRetencion", [ angularMeteor ])
     }
 ])
 
-// nótese que esta es una versión simplificada de esta función, pues siempre existirá *un solo* registro para cada compañía Contab
+
 function inicializarItem() {
     return new Promise(function (resolve, reject) {
-        // leemos el registro desde sql server; nótese que el pk del registro es la cia contab a la cual corresponde
         Meteor.call('bancos.categoriasRetencion.leerDesdeSqlServer', (err, result) => {
 
              if (err) {

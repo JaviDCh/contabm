@@ -11,6 +11,7 @@ export const CategoriasRetencion_sql = sequelize.define('categoriasRetencion_sql
     codigoIslr: { type: Sequelize.STRING, field: 'CodigoIslr', allowNull: true, validate: { len: { args: [0, 6], msg: 'El código debe tener hasta 6 chars.' }}, },
     porcentajeRetencion: { type: Sequelize.DECIMAL(10, 2), field: 'PorcentajeRetencion', allowNull: true, },
     aplicaSustraendo: { type: Sequelize.BOOLEAN, field: 'AplicaSustraendo', allowNull: true, },
+    minimo: { type: Sequelize.DECIMAL(12, 2), field: 'Minimo', allowNull: true, },
 }, {
      tableName: 'CategoriasRetencion'
 })

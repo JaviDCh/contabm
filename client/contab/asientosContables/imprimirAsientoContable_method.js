@@ -254,22 +254,24 @@ function prepararDocDefinition_asientoContable(asientosContables, parametrosRepo
                 // you can declare how many rows should be treated as headers
 
                 // headerRows: 0,
-                widths: [ '10%', '12%', '48%', '10%', '10%', '10%', ],
+                widths: [ '6%', '10%', '52%', '6%', '6%', '10%', '10%'],
 
                 body: [
                     [ { text: '#', alignment: 'center', bold: true, fillColor: fillColor, },
                       { text: 'Fecha', alignment: 'center', bold: true, fillColor: fillColor, },
                       { text: 'Descripción', alignment: 'left', bold: true, fillColor: fillColor, },
-                      { text: 'Moneda', alignment: 'center', bold: true, fillColor: fillColor, },
+                      { text: 'Mon', alignment: 'center', bold: true, fillColor: fillColor, },
                       { text: 'Tipo', alignment: 'center', bold: true, fillColor: fillColor, },
                       { text: 'Origen', alignment: 'left', bold: true, fillColor: fillColor, },
+                      { text: 'Factor', alignment: 'right', bold: true, fillColor: fillColor, },
                     ],
                     [ { text: asientoContable.numero.toString(), alignment: 'center', bold: false, },
-                      { text: moment(asientoContable.fecha).format('DD-MMM-YYYY'), alignment: 'center', bold: false, noWrap: true, },
+                      { text: moment(asientoContable.fecha).format('DD-MM-YY'), alignment: 'center', bold: false, noWrap: true, },
                       { text: asientoContable.descripcion ? asientoContable.descripcion : '', alignment: 'left', bold: false, },
                       { text: moneda.simbolo, alignment: 'center', bold: false, },
                       { text: asientoContable.tipo, alignment: 'center', bold: true, },
                       { text: asientoContable.provieneDe ? asientoContable.provieneDe : '', alignment: 'left', bold: false, },
+                      { text: numeral(asientoContable.factorDeCambio).format('0,0.00'), alignment: 'right', bold: false, },
                     ],
                 ]
             },

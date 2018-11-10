@@ -338,7 +338,63 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 },
                 docState: () => {
                     return $scope.factura.docState ? $scope.factura.docState : "";
+                }
+            },
+        }).result.then(
+            function (resolve) {
+                return true;
+            },
+            function (cancel) {
+                return true;
+            });
+    }
+
+    $scope.generarAsientoContableRetencionesImpuesto = function() { 
+
+        if ($scope.factura.docState) {
+            DialogModal($modal, "<em>Bancos - Facturas - Asientos contables de reteciones de impuesto</em>",
+                                "Aparentemente, <em>se han efectuado cambios</em> en el registro. <br />" +
+                                "Ud. debe guardar los cambios antes de intentar continuar con esta función.",
+                                false).then();
+            return;
+        }
+    
+        if (!impuestoRetencionSeleccionado || lodash.isEmpty(impuestoRetencionSeleccionado)) {
+            DialogModal($modal, "<em>Bancos - Facturas - Asientos contables de reteciones de impuesto</em>",
+                                "Por favor seleccione en la lista la retención para la cual desea obtener el asiento contable.",
+                                false).then();
+            return;
+        }
+    
+        if (!impuestoRetencionSeleccionado.fechaRecepcionPlanilla) {
+            DialogModal($modal, "<em>Bancos - Facturas - Asientos contables de reteciones de impuesto</em>",
+                                "La retención de impuestos que se ha seleccionado no tiene una <em>fecha de recepción de planilla</em>.<br />" + 
+                                "Debe tenerla, pues el asiento será generado, justamente, para esa fecha.",
+                                false).then();
+            return;
+        }
+
+        // abrimos el modal que permite obtener el asiento contable 
+        $modal.open({
+            templateUrl: 'client/generales/asientosContablesAsociados/asientosContablesAsociadosModal.html',
+            controller: 'AsientosContablesAsociados_Controller',
+            size: 'lg',
+            resolve: {
+                provieneDe: () => {
+                    return "Facturas - Retenciones de impuesto";
                 },
+                entidadID: () => {
+                    return impuestoRetencionSeleccionado.id;
+                },
+                ciaSeleccionada: () => {
+                    return $scope.companiaSeleccionada;
+                },
+                origen: () => {
+                    return $scope.origen;
+                },
+                docState: () => {
+                    return $scope.factura.docState ? $scope.factura.docState : "";
+                }
             },
         }).result.then(
             function (resolve) {
@@ -504,7 +560,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
 
     let impuestosRetenciones_ui_grid_api = null;
-    let impuestoRetencionSeleccionado = [];
+    let impuestoRetencionSeleccionado = {}; 
 
     $scope.impuestosRetenciones_ui_grid = {
 
@@ -514,10 +570,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
         enableCellEdit: false,
         enableCellEditOnFocus: false,           // or true
         enableRowSelection: true,
-        enableRowHeaderSelection: false,
+        enableRowHeaderSelection: true,
         multiSelect: false,
         enableSelectAll: false,
-        selectionRowHeaderWidth: 0,
+        selectionRowHeaderWidth: 25,
         rowHeight: 25,
 
         onRegisterApi: function (gridApi) {
@@ -846,7 +902,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 }
             case 2: {
                     // cuentas por cobrar (factura a un cliente)
-                    if ($scope.proveedor.contribuyenteEspecialFlag) {
+                    if (contribuyenteEspecialFlag) {
                         if ($scope.proveedor.retencionSobreIvaPorc) { 
                             retencionIvaPorc = $scope.proveedor.retencionSobreIvaPorc;
                         } 
@@ -865,7 +921,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             // en la tabla ImpuestosRetenciones_Definicion, para el valor predefinido 1 ...
             // nótese que esta tabla la leimos en el parent state y está en $scope.$parent ...
 
-            let definicionItem = _.find($scope.impuestosRetencionesDefinicion, (x) => {
+            let definicionItem = lodash.find($scope.impuestosRetencionesDefinicion, (x) => {
                 return x.Predefinido === 1;
             });
 
@@ -885,47 +941,53 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 return;
             }
 
-            // con esta función, determinamos el tipo de alícuota que corresonde al porcentaje de
-            // impuesto usado ...
-            let tipoAlicuotaImpuestosIva = determinarTipoAlicuotaImpuestosIva($scope.tiposAlicuotaIva,
-                                                                                $scope.factura.fechaEmision,
-                                                                                ivaPorc);
+            // determinamos si ya existe un registro en la factura para este tipo de imp/ret (en este caso impuesto Iva) 
+            // la idea es agregarlo *solo* si no existe ... 
+            let yaRegistradoAntes = $scope.factura.impuestosRetenciones.find(f => f.impRetID === definicionItem.ID); 
 
-            if (tipoAlicuotaImpuestosIva.error) {
-                let message = `Error: hemos obtenido un error al intentar determinar el tipo
-                        (reducida, general, adicional) de alícuota para el porcentaje de
-                        impuesto Iva indicado.<br />
-                        Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
-                        e intentar corregir esta situación.`;
+            if (!yaRegistradoAntes) { 
+                // con esta función, determinamos el tipo de alícuota que corresonde al porcentaje de
+                // impuesto usado ...
+                let tipoAlicuotaImpuestosIva = determinarTipoAlicuotaImpuestosIva($scope.tiposAlicuotaIva,
+                                                                                    $scope.factura.fechaEmision,
+                                                                                    ivaPorc);
 
-                $scope.alerts.length = 0;
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: tipoAlicuotaImpuestosIva.message
-                });
+                if (tipoAlicuotaImpuestosIva.error) {
+                    let message = `Error: hemos obtenido un error al intentar determinar el tipo
+                            (reducida, general, adicional) de alícuota para el porcentaje de
+                            impuesto Iva indicado.<br />
+                            Ud. debe revisar la tabla <em>Tipos de Alicuota Iva (Bancos / Maestras / Catálogos)</em>
+                            e intentar corregir esta situación.`;
 
-                return;
-            }
+                    $scope.alerts.length = 0;
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: tipoAlicuotaImpuestosIva.message
+                    });
 
-            // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación del impuesto Iva
-            if (!_.isArray($scope.factura.impuestosRetenciones)) {
-                $scope.factura.impuestosRetenciones = [];
-            }
+                    return;
+                }
 
-            let impuestoRetencionItem = {
-                    _id: new Mongo.ObjectID()._str,
-                    id: 0,
-                    facturaID: $scope.factura.claveUnica,
-                    impRetID: definicionItem.ID,
-                    montoBase: $scope.factura.montoFacturaConIva,
-                    porcentaje: ivaPorc,
-                    tipoAlicuota: tipoAlicuotaImpuestosIva.tipoAlicuotaImpuestosIva,
-            };
+                // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación del impuesto Iva
+                if (!Array.isArray($scope.factura.impuestosRetenciones)) {
+                    $scope.factura.impuestosRetenciones = [];
+                }
 
-            $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
+                let impuestoRetencionItem = {
+                        _id: new Mongo.ObjectID()._str,
+                        id: 0,
+                        facturaID: $scope.factura.claveUnica,
+                        impRetID: definicionItem.ID,
+                        montoBase: $scope.factura.montoFacturaConIva,
+                        porcentaje: ivaPorc,
+                        tipoAlicuota: tipoAlicuotaImpuestosIva.tipoAlicuotaImpuestosIva,
+                };
 
-            if (!$scope.factura.docState) {
-                $scope.factura.docState = 2;
+                $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
+
+                if (!$scope.factura.docState) {
+                    $scope.factura.docState = 2;
+                }
             }
         }
 
@@ -933,39 +995,44 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
         // 2) agregamos un registro a Facturas_Impuestos para la retención Iva
         if ($scope.factura.montoFacturaConIva && ivaPorc && retencionIvaPorc) {
             // nótese que el montoIva lo calculamos justo antes; para que haya una retención Iva deben haber un monto Iva ...
-                // la compañía indica que se debe aplicar un impuesto Iva; Nota: debemos buscar una definición en la tabla
-                // ImpuestosRetenciones_Definicion, para el valor predefinido 2 ...
-                let definicionItem = _.find($scope.impuestosRetencionesDefinicion, (x) => {
-                    return x.Predefinido === 2;
+            // la compañía indica que se debe aplicar un impuesto Iva; Nota: debemos buscar una definición en la tabla
+            // ImpuestosRetenciones_Definicion, para el valor predefinido 2 ...
+            let definicionItem = _.find($scope.impuestosRetencionesDefinicion, (x) => {
+                return x.Predefinido === 2;
+            });
+
+            if (!definicionItem) {
+                let message = `Error: aunque en el registro de la compañía se inidica que se debe aplicar <em>retención para el impuesto Iva</em>,
+                        no existe una definción para este rubro en la tabla que corresponde.
+                        Ud. debe registrar una definición para este rubro usando la opción:
+                        <em>Bancos / Catálogos / Definición de impuestos y retenciones</em>.`;
+
+                $scope.alerts.length = 0;
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: message
                 });
 
-                if (!definicionItem) {
-                    let message = `Error: aunque en el registro de la compañía se inidica que se debe aplicar <em>retención para el impuesto Iva</em>,
-                            no existe una definción para este rubro en la tabla que corresponde.
-                            Ud. debe registrar una definición para este rubro usando la opción:
-                            <em>Bancos / Catálogos / Definición de impuestos y retenciones</em>.`;
+                return;
+            }
 
-                    $scope.alerts.length = 0;
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: message
-                    });
+            // determinamos si ya existe un registro en la factura para este tipo de imp/ret (en este caso impuesto Iva) 
+            // la idea es agregarlo *solo* si no existe ... 
+            let yaRegistradoAntes = $scope.factura.impuestosRetenciones.find(f => f.impRetID === definicionItem.ID); 
 
-                    return;
-                }
-
+            if (!yaRegistradoAntes) { 
                 // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Iva
-                if (!_.isArray($scope.factura.impuestosRetenciones)) {
+                if (!Array.isArray($scope.factura.impuestosRetenciones)) {
                     $scope.factura.impuestosRetenciones = [];
                 };
 
                 let impuestoRetencionItem = {
-                        _id: new Mongo.ObjectID()._str,
-                        id: 0,
-                        facturaID: $scope.factura.claveUnica,
-                        impRetID: definicionItem.ID,
-                        montoBase: lodash.round($scope.factura.montoFacturaConIva * ivaPorc / 100, 4),
-                        porcentaje: retencionIvaPorc,
+                    _id: new Mongo.ObjectID()._str,
+                    id: 0,
+                    facturaID: $scope.factura.claveUnica,
+                    impRetID: definicionItem.ID,
+                    montoBase: lodash.round($scope.factura.montoFacturaConIva * ivaPorc / 100, 4),
+                    porcentaje: retencionIvaPorc,
                 }
 
                 $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
@@ -973,6 +1040,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                 if (!$scope.factura.docState) {
                     $scope.factura.docState = 2;
                 }
+            }
         }
 
 
@@ -1001,111 +1069,125 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     return;
                 }
 
-                // el método recibe el proveedor, para leer su categoría de retención y su tipo de persona ... 
-                if (!$scope.factura.fechaRecepcion || !$scope.factura.proveedor) { 
-                    let message = `Error: parece que la factura no ha sido completada aún, al menos no los datos necesarios para 
-                                    determinar su retención de Islr.<br /> 
-                                    Por favor indique la compañía y la fecha de recepción de la factura. 
-                                    `;
+                // determinamos si ya existe un registro en la factura para este tipo de imp/ret (en este caso impuesto Iva) 
+                // la idea es agregarlo *solo* si no existe ... 
+                let yaRegistradoAntes = $scope.factura.impuestosRetenciones.find(f => f.impRetID === definicionItem.ID); 
 
-                    $scope.alerts.length = 0;
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: message
-                    });
-
-                    return;
-                }
-
-                $scope.showProgress = true; 
-
-                Meteor.call('bancos.facturas.leerRetencionIslr', $scope.factura.fechaRecepcion, $scope.factura.proveedor, (err, result) => {
-
-                    if (err) {
-                        let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+                if (!yaRegistradoAntes) { 
+                    // el método recibe el proveedor, para leer su categoría de retención y su tipo de persona ... 
+                    if (!$scope.factura.fechaRecepcion || !$scope.factura.proveedor) { 
+                        let message = `Error: parece que la factura no ha sido completada aún, al menos no los datos necesarios para 
+                                        determinar su retención de Islr.<br /> 
+                                        Por favor indique la compañía y la fecha de recepción de la factura. 
+                                        `;
 
                         $scope.alerts.length = 0;
                         $scope.alerts.push({
                             type: 'danger',
-                            msg: errorMessage
+                            msg: message
                         });
-
-                        $scope.showProgress = false;
-                        $scope.$apply();
-
-                        DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
-                                `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
-                                false).then();
 
                         return;
                     }
 
-                    if (result.error) {
-                        let errorMessage = result.message;
+                    $scope.showProgress = true; 
 
-                        $scope.alerts.length = 0;
-                        $scope.alerts.push({
-                            type: 'danger',
-                            msg: errorMessage
-                        });
+                    Meteor.call('bancos.facturas.leerRetencionIslr', $scope.factura.fechaRecepcion, $scope.factura.proveedor, (err, result) => {
+
+                        if (err) {
+                            let errorMessage = mensajeErrorDesdeMethod_preparar(err);
+
+                            $scope.alerts.length = 0;
+                            $scope.alerts.push({
+                                type: 'danger',
+                                msg: errorMessage
+                            });
+
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
+                                    `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
+                                    false).then();
+
+                            return;
+                        }
+
+                        if (result.error) {
+                            let errorMessage = result.message;
+
+                            $scope.alerts.length = 0;
+                            $scope.alerts.push({
+                                type: 'danger',
+                                msg: errorMessage
+                            });
+
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
+                                    `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
+                                    false).then();
+
+                            return;
+                        }
+
+                        // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
+                        let aPartirDe = 0; 
+
+                        // si el mínimo viene en nulls, usamos la UT para determinarlo; si viene un valor en mínimo, lo usamos 
+                        if (result.categoriaRetencion &&  "minimo" in result.categoriaRetencion && typeof result.categoriaRetencion.minimo === 'number') {
+                            // viene un mínimo; lo usamos; nota: puede ser 0 ... 
+                            aPartirDe = result.categoriaRetencion.minimo;  
+                        } else {
+                            // no viene un mínimo; lo determinamos en base a la UT 
+                            aPartirDe = 1000 * result.unidadTributaria.monto / 12;  
+                        }
+
+                        // el sustraendo puede o no aplicarse. Se determina en la tabla de categorías de retención 
+                        let sustraendo = 0; 
+                        if (result.categoriaRetencion && result.categoriaRetencion.aplicaSustraendo) { 
+                            sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
+                                            result.unidadTributaria.factor;      
+                        }
+                        
+                        // determinamos el monto 'base' para el cálculo del la retención del Islr 
+                        let baseRetIslr = 0; 
+                        baseRetIslr += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0; 
+                        baseRetIslr += $scope.factura.montoFacturaConIva ? $scope.factura.montoFacturaConIva : 0; 
+
+                        if (baseRetIslr < aPartirDe) { 
+                            $scope.showProgress = false;
+                            $scope.$apply();
+
+                            return; 
+                        }
+                        
+                        // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Islr
+                        if (!Array.isArray($scope.factura.impuestosRetenciones)) {
+                            $scope.factura.impuestosRetenciones = [];
+                        }
+
+                        let impuestoRetencionItem = {
+                            _id: new Mongo.ObjectID()._str,
+                            id: 0,
+                            facturaID: $scope.factura.claveUnica,
+                            impRetID: definicionItem.ID,
+                            codigo: result.categoriaRetencion.codigoIslr,              
+                            montoBase: baseRetIslr,                             
+                            porcentaje: result.categoriaRetencion.porcentajeRetencion,
+                            sustraendo: sustraendo,
+                        };
+
+                        $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
 
                         $scope.showProgress = false;
                         $scope.$apply();
+                    })
 
-                        DialogModal($modal, "<em>Bancos - Facturas</em> - Determinación de la retención del Islr",
-                                `Aparentemente, se ha obtenido un error. Por favor revise el mensaje arriba en esta página.`,
-                                false).then();
-
-                        return;
+                    if (!$scope.factura.docState) {
+                        $scope.factura.docState = 2;
                     }
-
-                    // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
-                    let aPartirDe = 1000 * result.unidadTributaria.monto / 12;      
-                    
-                    // el sustraendo puede o no aplicarse. Se determina en la tabla de categorías de retención 
-                    let sustraendo = 0; 
-                    if (result.categoriaRetencion && result.categoriaRetencion.aplicaSustraendo) { 
-                        sustraendo = result.unidadTributaria.monto * (result.categoriaRetencion.porcentajeRetencion / 100) * 
-                                        result.unidadTributaria.factor;      
-                    }
-                    
-                    // determinamos el monto 'base' para el cálculo del la retención del Islr 
-                    let baseRetIslr = 0; 
-                    baseRetIslr += $scope.factura.montoFacturaSinIva ? $scope.factura.montoFacturaSinIva : 0; 
-                    baseRetIslr += $scope.factura.montoFacturaConIva ? $scope.factura.montoFacturaConIva : 0; 
-
-                    
-                    if (baseRetIslr < aPartirDe) { 
-                        $scope.showProgress = false;
-                        $scope.$apply();
-
-                        return; 
-                    }
-                    
-                    // grabamos un registro a la tabla Facturas_Impuestos, para la aplicación de la ret/Islr
-                    if (!Array.isArray($scope.factura.impuestosRetenciones)) {
-                        $scope.factura.impuestosRetenciones = [];
-                    }
-
-                    let impuestoRetencionItem = {
-                        _id: new Mongo.ObjectID()._str,
-                        id: 0,
-                        facturaID: $scope.factura.claveUnica,
-                        impRetID: definicionItem.ID,
-                        codigo: result.categoriaRetencion.codigoIslr,              
-                        montoBase: baseRetIslr,                             
-                        porcentaje: result.categoriaRetencion.porcentajeRetencion,
-                        sustraendo: sustraendo,
-                    };
-
-                    $scope.factura.impuestosRetenciones.push(impuestoRetencionItem);
-
-                    $scope.showProgress = false;
-                    $scope.$apply();
-                })
-
-                if (!$scope.factura.docState) {
-                    $scope.factura.docState = 2;
                 }
             }
         }
@@ -1622,8 +1704,6 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
             $scope.alerts.length = 0;               // pueden haber algún 'alert' en la página ...
             $scope.showProgress = false;
         } else {
-            $scope.showProgress = true;
-
             // mantenemos las fechas de la factura, pues puede ser necesario validar los valores originales
             factura_leerByID_desdeSql($scope.id);
         }
@@ -1723,7 +1803,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     $scope.showProgress = false;
                     $scope.$apply();
                 } else {
-                    $scope.proveedor = JSON.parse(result);;
+                    $scope.proveedor = JSON.parse(result);
 
                     $scope.showProgress = false;
                     $scope.$apply();

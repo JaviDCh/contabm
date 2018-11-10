@@ -225,7 +225,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.imprimir = () => {
 
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'client/contab/asientosContables/imprimirAsientosContables_Opciones_Modal.html',
             controller: 'ImprimirAsientosContables_Opciones_Modal_Controller',
             size: 'md',

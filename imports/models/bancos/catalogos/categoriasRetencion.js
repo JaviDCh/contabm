@@ -11,6 +11,7 @@ let simpleSchema = new SimpleSchema({
     codigoIslr: { type: String, label: "Código de retención Islr", optional: true, min: 1, max: 6, },
     porcentajeRetencion: { type: Number, label: "Porcentaje de retención", optional: true, },
     aplicaSustraendo: { type: Boolean, label: "Aplica sustraendo?", optional: true, },
+    minimo: { type: Number, label: "Mínimo para aplicar retención de Islr", optional: true, },
 
     docState: { type: Number, optional: true },
 });

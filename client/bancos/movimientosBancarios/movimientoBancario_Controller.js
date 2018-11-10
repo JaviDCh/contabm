@@ -308,7 +308,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     },
                     docState: () => {
                         return $scope.movimientoBancario.docState ? $scope.movimientoBancario.docState : "";
-                    },
+                    }
                 },
             }).result.then(
                   function (resolve) {

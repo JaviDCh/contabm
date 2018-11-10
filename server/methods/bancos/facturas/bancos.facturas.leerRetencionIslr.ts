@@ -64,7 +64,7 @@ Meteor.methods(
             // ahora leemos el registro para la categoría de retención ... 
             // TODO: falta usar el tipo de persona y la categoría en el query ... 
             let query = `Select Top 1 CodigoIslr as codigoIslr, PorcentajeRetencion as porcentajeRetencion, 
-                         AplicaSustraendo as aplicaSustraendo   
+                         AplicaSustraendo as aplicaSustraendo, Minimo as minimo    
                          From CategoriasRetencion 
                          Where Categoria = ? And TipoPersona = ? And FechaAplicacion <= ? 
                          Order By FechaAplicacion Desc
@@ -108,7 +108,6 @@ Meteor.methods(
                 }; 
             }
         
-            // lo primero que hacemos es determinar si el número se genera de acuerdo al tipo del asiento
             let categoriaRetencion = response.result[0];
 
             if (!unidadTributaria.monto || !unidadTributaria.factor || !categoriaRetencion.porcentajeRetencion || !categoriaRetencion.codigoIslr) { 

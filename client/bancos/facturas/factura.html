@@ -334,6 +334,9 @@
 
                                                 <li ng-if="origen == 'edicion'" class="divider-vertical-small"></li>
                                                 <li ng-if="origen == 'edicion'"><a href="#" class="navbar_custom_small_node_withBackground" ng-click="grabarFechasRecepcionPlanillasRetencionImpuesto()" popover="Click para grabar (solo!) las fechas de recepción de planillas de retención de impuestos." popover-trigger="mouseenter">Grabar <span class="fa fa-save"></span></a></li>
+
+                                                <li ng-if="origen == 'edicion'" class="divider-vertical-small"></li>
+                                                <li ng-if="origen == 'edicion'"><a href="#" class="navbar_custom_small_node_withBackground" ng-click="generarAsientoContableRetencionesImpuesto()" popover="Click para generar asientos contables para retenciones de impuesto (Iva/Islr)." popover-trigger="mouseenter">Asientos contables de retenciones <span class="fa fa-gears"></span></a></li>
                                             </ul>
                                         </div>
                                     </div>

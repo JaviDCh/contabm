@@ -118,8 +118,23 @@ function ($scope, $modalInstance, $modal, companiaContabSeleccionada, factura) {
         $scope.categoriaRetencion = result.categoriaRetencion; 
 
         // nótese como el 'minimo' y el sustraendo se determinan ambos en base al factor, el %, y la UT ...  
-        $scope.aPartirDe = 1000 * result.unidadTributaria.monto / 12;      
-        
+        let aPartirDe = 0; 
+        let mensajeAPartirDe = ""; 
+
+        // si el mínimo viene en nulls, usamos la UT para determinarlo; si viene un valor en mínimo, lo usamos 
+        if (result.categoriaRetencion &&  "minimo" in result.categoriaRetencion && typeof result.categoriaRetencion.minimo === 'number') {
+            // viene un mínimo; lo usamos; nota: puede ser 0 ... 
+            aPartirDe = result.categoriaRetencion.minimo;  
+            mensajeAPartirDe = "Monto mínimo indicado por el usuario"; 
+        } else {
+            // no viene un mínimo; lo determinamos en base a la UT 
+            aPartirDe = 1000 * result.unidadTributaria.monto / 12;  
+            mensajeAPartirDe = "1.000 x U.T. / 12"; 
+        }
+
+        $scope.aPartirDe = aPartirDe; 
+        $scope.mensajeAPartirDe = mensajeAPartirDe; 
+
         $scope.sustraendo = 0; 
         $scope.sustraendoAplica = false; 
 

@@ -2,8 +2,8 @@
 import moment from 'moment';
 
 angular.module("contabm").controller('ImprimirAsientosContables_Opciones_Modal_Controller',
-['$scope', '$modalInstance', '$modal', 'companiaSeleccionadaDoc',
-function ($scope, $modalInstance, $modal, companiaSeleccionadaDoc) {
+['$scope', '$modalInstance', 'companiaSeleccionadaDoc',
+function ($scope, $modalInstance, companiaSeleccionadaDoc) {
 
     $scope.alerts = [];
 
