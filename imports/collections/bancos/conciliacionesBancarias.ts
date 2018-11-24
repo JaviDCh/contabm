@@ -2,8 +2,6 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-ConciliacionesBancarias = new Mongo.Collection("conciliacionesBancarias");
-
 let schema = new SimpleSchema({
     _id: { type: String, optional: false, },
     desde: { type: Date, label: 'Desde', optional: false, },
@@ -22,11 +20,11 @@ let schema = new SimpleSchema({
     ultMod: { type: Date, label: 'Fecha de última modificación', optional: false, },
 });
 
+export const ConciliacionesBancarias: any = new Mongo.Collection("conciliacionesBancarias");
 ConciliacionesBancarias.attachSchema(schema);
 
-// -------------------------------------------------------------------------------------------------------------
-ConciliacionesBancarias_movimientosPropios = new Mongo.Collection("conciliacionesBancarias_movimientosPropios");
 
+// -------------------------------------------------------------------------------------------------------------
 let schemaMovimientosPropios = new SimpleSchema({
     _id: { type: String, optional: false, },
     conciliacionID: { type: String, optional: false, },
@@ -42,11 +40,11 @@ let schemaMovimientosPropios = new SimpleSchema({
     consecutivoMovBanco: { type: Number, label: 'Número consecutivo mov banco', optional: true, },
 });
 
+export const ConciliacionesBancarias_movimientosPropios: any = new Mongo.Collection("conciliacionesBancarias_movimientosPropios");
 ConciliacionesBancarias_movimientosPropios.attachSchema(schemaMovimientosPropios);
 
-// -------------------------------------------------------------------------------------------------------------
-ConciliacionesBancarias_movimientosCuentaContable = new Mongo.Collection("conciliacionesBancarias_movimientosCuentaContable");
 
+// -------------------------------------------------------------------------------------------------------------
 let schemaMovimientosCuentaContable = new SimpleSchema({
     _id: { type: String, optional: false, },
     conciliacionID: { type: String, optional: false, },
@@ -63,11 +61,11 @@ let schemaMovimientosCuentaContable = new SimpleSchema({
     consecutivoMovBanco: { type: Number, label: 'Número consecutivo mov banco', optional: true, },
 });
 
+export const ConciliacionesBancarias_movimientosCuentaContable: any = new Mongo.Collection("conciliacionesBancarias_movimientosCuentaContable");
 ConciliacionesBancarias_movimientosCuentaContable.attachSchema(schemaMovimientosCuentaContable);
 
-// ---------------------------------------------------------------------------------------------
-ConciliacionesBancarias_movimientosBanco = new Mongo.Collection("conciliacionesBancarias_movimientosBanco");
 
+// ---------------------------------------------------------------------------------------------
 let schemaMovimientosBanco = new SimpleSchema({
     _id: { type: String, optional: false, },
     conciliacionID: { type: String, optional: false, },
@@ -88,4 +86,5 @@ let schemaMovimientosBanco = new SimpleSchema({
     consecutivoMovContab: { type: Number, label: 'Número consecutivo mov propio', optional: true, },
 });
 
+export const ConciliacionesBancarias_movimientosBanco: any = new Mongo.Collection("conciliacionesBancarias_movimientosBanco");
 ConciliacionesBancarias_movimientosBanco.attachSchema(schemaMovimientosBanco);

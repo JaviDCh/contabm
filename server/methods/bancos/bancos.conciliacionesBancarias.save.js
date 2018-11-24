@@ -1,4 +1,10 @@
 
+
+import { ConciliacionesBancarias, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosPropios, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosCuentaContable, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosBanco } from '/imports/collections/bancos/conciliacionesBancarias'; 
+
 Meteor.methods(
 {
     "bancos.conciliacionesBancarias.save": function (item) {

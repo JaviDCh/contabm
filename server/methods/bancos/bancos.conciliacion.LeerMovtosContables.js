@@ -6,6 +6,11 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+
+import { ConciliacionesBancarias, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosCuentaContable, } from '/imports/collections/bancos/conciliacionesBancarias';
+
+
 Meteor.methods(
 {
     "bancos.conciliacion.LeerMovtosContables": function (conciliacionID) {

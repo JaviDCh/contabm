@@ -3,6 +3,10 @@ import numeral from 'numeral';
 import lodash from 'lodash';
 import SimpleSchema from 'simpl-schema';
 
+import { ConciliacionesBancarias_movimientosPropios, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosCuentaContable, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosBanco } from '/imports/collections/bancos/conciliacionesBancarias'; 
+
 Meteor.methods(
 {
     "bancos.conciliacion.compararMovimientos": function (conciliacion_ID,

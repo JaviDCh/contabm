@@ -3,6 +3,11 @@
 import lodash from 'lodash';
 import { DialogModal } from '/client/generales/angularGenericModal'; 
 
+import { ConciliacionesBancarias, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosPropios, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosCuentaContable, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosBanco } from '/imports/collections/bancos/conciliacionesBancarias'; 
+
 import { FlattenBancos } from '/imports/general/bancos/flattenBancos'; 
 
 angular.module("contabm").controller("Bancos_ConciliacionesBancarias_ConciliacionBancaria_Controller",

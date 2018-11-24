@@ -5,6 +5,8 @@ import SimpleSchema from 'simpl-schema';
 
 import { FlattenBancos } from '/imports/general/bancos/flattenBancos'; 
 
+import { ConciliacionesBancarias, } from '/imports/collections/bancos/conciliacionesBancarias';
+
 Meteor.methods(
 {
     conciliacionBancariaPrepararLista: function (filtro, ciaContab) {

@@ -5,6 +5,9 @@ import { sequelize } from '/server/sqlModels/_globals/_loadThisFirst/_globals';
 import SimpleSchema from 'simpl-schema';
 import { TimeOffset } from '/globals/globals'; 
 
+import { ConciliacionesBancarias, } from '/imports/collections/bancos/conciliacionesBancarias';
+import { ConciliacionesBancarias_movimientosPropios, } from '/imports/collections/bancos/conciliacionesBancarias';
+
 Meteor.methods(
 {
     bancos_conciliacion_LeerMovtosPropios: function (conciliacionID) {

@@ -87,6 +87,19 @@ export function mostrarHelp(currentStateName) {
           window.open('https://smrsoftware.wordpress.com/2014/04/08/bancosregistro-de-movimientos/', '_blank');
           break;
         }
+
+
+
+        case 'bancos.CopiarCatalogos':
+        case 'contab.CopiarCatalogos':
+        case 'nomina.CopiarCatalogos': {
+          window.open('https://smrsoftware.wordpress.com/2018/11/24/copiar-catalogos/', '_blank');
+          break;
+        }
+
+
+
+
         default:
     }
 }
