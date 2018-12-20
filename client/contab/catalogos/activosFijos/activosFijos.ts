@@ -80,13 +80,16 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
     $scope.refresh0 = function () {
         if ($scope.activoFijo && $scope.activoFijo.docState && $scope.activoFijo.docState === 1) { 
-            DialogModal($modal, "<em>Contab - Activos fijos</em>",
-                                `Ud. está ahora agregando un registro nuevo, no hay nada que refrescar.<br />
-                                 Ud. puede deshacer los cambios y, nuevamente, intentar agregar un nuevo registro, si hace un  
-                                 <em>click</em> en <em>Nuevo, e indica que desea perder los cambios. <br /><br />
-                                 También puede hacer un <em>click</em> en <em>Regresar</em>, para deshacer los cambios y regresar a la lista. 
-                                 `,
-                                false); 
+            let message = `Ud. está ahora agregando un registro nuevo, no hay nada que refrescar.<br />
+                           Ud. puede deshacer los cambios y, nuevamente, intentar agregar un nuevo registro, si hace un  
+                           <em>click</em> en <em>Nuevo, e indica que desea perder los cambios. <br /><br />
+                           También puede hacer un <em>click</em> en <em>Regresar</em>, para deshacer los cambios y regresar a la lista. 
+                           `; 
+
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+            message = message.replace(/\/\//gi, "");
+
+            DialogModal($modal, "<em>Contab - Activos fijos</em>", message, false); 
             return; 
         }
 
@@ -425,13 +428,16 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     $scope.eliminar = function () {
 
         if ($scope.reposicion && $scope.reposicion.docState && $scope.reposicion.docState === 1) {
-            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>",
-                                `La reposición de caja chica que Ud. intenta eliminar es <em>nueva</em>. No hay nada que 
-                                 eliminar (pues no se ha grabado aún).<br />
-                                 Ud. puede <em>revertir</em> la creación del registro si ejecuta cualquier otra acción e indica que desea 
-                                 <em>perder los cambios</em> que ha registrado hasta ahora, para el registro nuevo. 
-                                `,
-                                false).then();
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+            let message = `La reposición de caja chica que Ud. intenta eliminar es <em>nueva</em>. No hay nada que 
+                           eliminar (pues no se ha grabado aún).<br />
+                           Ud. puede <em>revertir</em> la creación del registro si ejecuta cualquier otra acción e indica que desea 
+                           <em>perder los cambios</em> que ha registrado hasta ahora, para el registro nuevo.`;  
+            
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ...                `
+            message = message.replace(/\/\//gi, "");
+
+            DialogModal($modal, "<em>Bancos - Caja chica - Reposiciones</em>", message, false).then();
             return;
         }
 
@@ -471,11 +477,14 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
     $scope.grabarEliminaciones = () => {
 
         if (!$scope.activosFijos.find((x: any) => x.docState && x.docState === 3)) {
-            DialogModal($modal, "<em>Contab - Activos fijos - Eliminar desde la lista</em>",
-                                `Aparentemente, <em>Ud. no ha marcado</em> registros en la lista para ser eliminados.<br />.<br />
-                                 Recuerde que mediante esta función Ud. puede eliminar los registros que se hayan <em>marcado</em> (
-                                 haciendo un <em>click</em> en la x roja al final de cada registro) para ello en la lista.`,
-                                false).then();
+            let message = `Aparentemente, <em>Ud. no ha marcado</em> registros en la lista para ser eliminados.<br />.<br />
+                           Recuerde que mediante esta función Ud. puede eliminar los registros que se hayan <em>marcado</em> (
+                           haciendo un <em>click</em> en la x roja al final de cada registro) para ello en la lista.`; 
+
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+            message = message.replace(/\/\//gi, "");
+
+            DialogModal($modal, "<em>Contab - Activos fijos - Eliminar desde la lista</em>", message, false).then();
             return;
         }
 
@@ -648,11 +657,16 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
             $scope.activosFijos_ui_grid.data = $scope.activosFijos;
 
             if (mostrarPropioMensaje) { 
+
+                // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+                let message = `${numeral($scope.activosFijos.length).format('0,0')} registros
+                               (de ${numeral(recordCount).format('0,0')}) han sido seleccionados ...`; 
+                message = message.replace(/\/\//gi, "");
+
                 $scope.alerts.length = 0;
                 $scope.alerts.push({
                     type: 'info',
-                    msg: `${numeral($scope.activosFijos.length).format('0,0')} registros
-                        (de ${numeral(recordCount).format('0,0')}) han sido seleccionados ...`
+                    msg: message, 
                 });
             }
             
@@ -712,17 +726,23 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
 
         if (errores && errores.length) {
             $scope.alerts.length = 0;
+
+            let message = "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
+                            errores.reduce(function (previous, current) {
+
+                                if (previous == "")
+                                    // first value
+                                    return current;
+                                else
+                                    return previous + "<br />" + current;
+                            }, ""); 
+
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+            message = message.replace(/\/\//gi, "");
+
             $scope.alerts.push({
                 type: 'danger',
-                msg: "Se han encontrado errores al intentar guardar las modificaciones efectuadas en la base de datos:<br /><br />" +
-                    errores.reduce(function (previous, current) {
-
-                        if (previous == "")
-                            // first value
-                            return current;
-                        else
-                            return previous + "<br />" + current;
-                    }, "")
+                msg: message, 
             });
 
             $scope.showProgress = false;
@@ -781,10 +801,15 @@ function ($stateParams, $state, $scope,  $modal, uiGridConstants, $interval) {
         let result: any = calcularDepreciacion($scope.activoFijo); 
 
         if (result.error) { 
+
+            // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+            let message = result.message; 
+            message = message.replace(/\/\//gi, "");
+
             $scope.alerts.length = 0;
             $scope.alerts.push({
                 type: 'danger',
-                msg: result.message
+                msg: message
             });
         } else { 
             $scope.activoFijo.depreciarDesdeMes = result.activoFijo.depreciarDesdeMes; 

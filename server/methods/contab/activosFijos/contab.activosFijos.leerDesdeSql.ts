@@ -124,8 +124,7 @@ Meteor.methods(
         where += `(af.Cia = ${ciaContab.toString()})`;
 
         // ---------------------------------------------------------------------------------------------------
-        // leemos los pagos desde sql server, que cumplan el criterio indicado
-
+        // leemos los activos fijos, desde sql server, que cumplan el criterio indicado
         let query = `Select af.ClaveUnica as claveUnica, af.Descripcion as descripcion, 
                      d.Descripcion as departamento, tp.Descripcion as tipoProducto, 
                      pr.Abreviatura as proveedor, af.FechaCompra as fechaCompra, af.Serial as serial, 
@@ -138,6 +137,9 @@ Meteor.methods(
                      Left Outer Join TiposDeProducto tp On af.Tipo = tp.Tipo 
                      Where ${where} 
                     `;
+
+        // eliminamos '//'; parece que ts lo agrega cuando encuentra un string con algunos caracteres especiales, como new line ... 
+        query = query.replace(/\/\//gi, "");
 
         let response: any = null;
         response = Async.runSync(function(done) {
