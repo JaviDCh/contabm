@@ -90,7 +90,7 @@ Meteor.methods(
             // ----------------------------------------------------------------------------------------------------------------
             // sequelize siempre convierte las fechas a utc; nuestro offset en ccs es -4.30; sequelize va a sumar
             // 4.30 para llevar a utc; restamos 4.30 para eliminar este efecto ...
-            let asientoContable_sql = _.cloneDeep(asientoContable);
+            let asientoContable_sql = lodash.cloneDeep(asientoContable);
 
             asientoContable_sql.fecha = moment(asientoContable.fecha).subtract(TimeOffset, 'hours').toDate();
             asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'hours').toDate();
@@ -140,7 +140,7 @@ Meteor.methods(
         if (asientoContable.docState == 2) {
             delete asientoContable.docState;
 
-            _.remove(asientoContable.partidas, (p) => { return p.docState == 3; });
+            lodash.remove(asientoContable.partidas, (p) => { return p.docState == 3; });
             asientoContable.partidas.forEach((partida) => { delete partida.docState; });
 
             asientoContable.ultAct = new Date();
@@ -158,7 +158,7 @@ Meteor.methods(
 
             // ----------------------------------------------------------------------------------------------------------------
             // para compensar la conversión que ocurre en las fechas al grabar a sql server, restamos 4.3 horas a cada una ...
-            let asientoContable_sql = _.cloneDeep(asientoContable);
+            let asientoContable_sql = lodash.cloneDeep(asientoContable);
             asientoContable_sql.fecha = moment(asientoContable.fecha).subtract(TimeOffset, 'hours').toDate();
             asientoContable_sql.ingreso = moment(asientoContable.ingreso).subtract(TimeOffset, 'hours').toDate();
             asientoContable_sql.ultAct = moment(asientoContable.ultAct).subtract(TimeOffset, 'hours').toDate();
@@ -233,7 +233,7 @@ Meteor.methods(
             provieneDe: asientoContable.provieneDe,
             asientoTipoCierreAnualFlag: asientoContable.asientoTipoCierreAnualFlag,
             factorDeCambio: asientoContable.factorDeCambio,
-            cantidadPartidas: _.isArray(asientoContable.partidas) ? asientoContable.partidas.length : 0,
+            cantidadPartidas: Array.isArray(asientoContable.partidas) ? asientoContable.partidas.length : 0,
             totalDebe: lodash.sumBy(asientoContable.partidas, 'debe'),
             totalHaber: lodash.sumBy(asientoContable.partidas, 'haber'),
             ingreso: asientoContable.ingreso,
