@@ -93,9 +93,9 @@ function ($scope, $modalInstance, $modal, $meteor, cuentasContables, cuentasCont
                     let item = {
                         _id: new Mongo.ObjectID()._str,
                         id: 0,
-                        cuentaEditada: cuentaContable,
-                        descripcion: descripcion,
-                        totDet: totDet,
+                        cuentaEditada: cuentaContable.toString().trim(),
+                        descripcion: descripcion.toString().trim(),
+                        totDet: totDet.toString().trim(),
                         actSusp: "A",
                         grupo: grupoItem ? grupoItem.grupo : null,
                         cia: ciaSeleccionada.numero,

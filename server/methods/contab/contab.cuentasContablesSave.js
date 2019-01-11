@@ -29,8 +29,11 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
+                console.log("Error al intentar grabar a sql la cuenta: ", item_sql); 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            }
+                
 
             // el registro, luego de ser grabado en sql, es regresado en response.result.dataValues ...
             let savedItem = response.result.dataValues;
@@ -39,8 +42,10 @@ Meteor.methods(
 
             // actualizamos el collection en mongo ...
             CuentasContables.insert(item, function (error, result) {
-                if (error)
+                if (error) { 
+                    console.log("Error al intentar grabar a mongo la cuenta: ", item); 
                     throw new Meteor.Error("validationErrors", error.invalidKeys.toString());
+                } 
             });
         });
 
