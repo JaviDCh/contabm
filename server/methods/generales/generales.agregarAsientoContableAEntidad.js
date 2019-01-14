@@ -316,18 +316,20 @@ function leerMovimientoBancarioDesdeSqlServer(pk) {
            .done();
     });
 
-    if (response.error)
-       throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-       // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
-       if (!response.result.length)
-           return {
-               error: true,
-               message: `Error inesperado: no pudimos leer el <em>movimiento bancario</em> original
-                         (pk: ${provieneDe_ID.toString()}) desde la base de datos.`
-           };
+    if (response.error) {
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
 
 
+    // cuando el registro es eliminado, simplemente no existe. Regresamos de inmediato ...
+    if (!response.result.length) {
+        return {
+            error: true,
+            message: `Error inesperado: no pudimos leer el <em>movimiento bancario</em> original
+                      (pk: ${provieneDe_ID.toString()}) desde la base de datos.`
+        }
+    }
+           
 
     let movimientoBancario = response.result[0];
     // -------------------------------------------------------------------------------------------------
@@ -336,12 +338,12 @@ function leerMovimientoBancarioDesdeSqlServer(pk) {
 
     // primero nos aseguramos que el valor no es un número, pero es un string que contiene un número ...
     if (!lodash.isFinite(movimientoBancario.transaccion) && !isNaN(movimientoBancario.transaccion)) {
-       // ahora convertimos el valor a numérico, y luego nos aseguramos que sea un entero ...
-       let transaccion =  +movimientoBancario.transaccion;             // convierte el string a Number
-       if (lodash.isInteger(transaccion)) {
-           movimientoBancario.transaccion = transaccion;
-       };
-    };
+        // ahora convertimos el valor a numérico, y luego nos aseguramos que sea un entero ...
+        let transaccion = +movimientoBancario.transaccion;             // convierte el string a Number
+        if (lodash.isInteger(transaccion)) {
+            movimientoBancario.transaccion = transaccion;
+        }
+    }
     // -------------------------------------------------------------------------------------------------
 
 
@@ -529,7 +531,7 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             error: true,
             message: leerChequeraDesdeSqlServer.message
         };
-    };
+    }
 
     let chequera = leerChequeraDesdeSqlServer.chequera;
 
@@ -547,7 +549,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             ejecutar la opción <em>Copiar catálogos</em> en el menú <em>Generales</em>.`
         };
     };
-
     let cuentaBancaria = {};
 
     lodash.forEach(banco.agencias, (agencia) => {
@@ -882,7 +883,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             switch (impuestoRetencion.predefinido) {
                 case 1: {
                     // imp iva
-                    let cuentaContableDefinidaID = 0;
                     let conceptoDefinicionCuentaContable = 0;
 
                     if (impuestoRetencion.cxCCxPFlag == 1)
@@ -959,7 +959,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                 }
                 case 2:  {
                     // ret iva
-                    let cuentaContableDefinidaID = 0;
                     let conceptoDefinicionCuentaContable = 0;
 
                     if (impuestoRetencion.cxCCxPFlag == 1)
@@ -1039,7 +1038,6 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
                 }
                 case 3: {
                     // ret islr
-                    let cuentaContableDefinidaID = 0;
                     let conceptoDefinicionCuentaContable = 0;
 
                     if (impuestoRetencion.cxCCxPFlag == 1)
@@ -1123,54 +1121,132 @@ function agregarAsientoContable_MovimientoBancario(entidadOriginal, tipoAsientoD
             partidasAsientoContable.push(partidaAsiento);
       })
 
-      // agregamos la partida que corresponde a la compañía (proveedor o cliente - cxp o cxc)
-      // agregamos esta partida (cxp o cxc) al final, pues antes debemos ajustar su monto con retenciones que deban ser contabilizadas
-      // en el momento del pago (en vez del momento de la factura) ...
-      if (entidadOriginal.provClte) {
-          numeroPartida += 10;
+    // agregamos la partida que corresponde a la compañía (proveedor o cliente - cxp o cxc)
+    // agregamos esta partida (cxp o cxc) al final, pues antes debemos ajustar su monto con retenciones que deban ser contabilizadas
+    // en el momento del pago (en vez del momento de la factura) ...
 
-            partidaAsiento = {};
+    let pagoAnticipo = false; 
+    let cuentaContableAnticipoEncontrada = true; 
+    let cuentaContableAnticipos = null; 
 
-            partidaAsiento = {
-                numeroAutomatico: asientoAgregado.numeroAutomatico,
-                partida: numeroPartida,
-                cuentaContableID: cuentaContableCompaniaID,
-                descripcion: entidadOriginal.concepto.length > 75 ?
-                             entidadOriginal.concepto.substr(0, 75) :
-                             entidadOriginal.concepto,
-                referencia: entidadOriginal.transaccion,
-                debe: montoCxCCxP < 0 ? Math.abs(montoCxCCxP) : 0,
-                haber: montoCxCCxP >= 0 ? montoCxCCxP : 0,
-            };
+    if (entidadOriginal.provClte) {
 
-            // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
-            partidasAsientoContable.push(partidaAsiento);
-      }
+        // si el movimiento bancario proviene de un pago (el usuario registra un pago y luego asocia un mov bancario), su ID viene 
+        // en pagoID. Leemos el pago para determinar si el pago corresponde a un anticipo. De ser así, intentamos leer una cuenta 
+        // contable del tipo anticipo ... 
+        if (entidadOriginal.pagoID) { 
+            // Ok, el movimiento corresponde a un pago; determinamos si el pago corresponde a un anticipo. Debemos leer el pago 
+            // y ver si es así ... 
 
-      // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
-      // que las de mayor monto vayan primero
-      numeroPartida = 0;
-      lodash(partidasAsientoContable).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
+            // esta funcion lee el pago y regresa true solo si el pago corresponde a un anticipo 
+            if (determinarPagoAnticipo(entidadOriginal.pagoID)) { 
 
-          // renumeramos la partida ...
-          numeroPartida += 10;
-          partida.partida = numeroPartida;
+                pagoAnticipo = true; 
 
-          response = Async.runSync(function(done) {
-              dAsientosContables_sql.create(partida)
-                  .then(function(result) { done(null, result); })
-                  .catch(function (err) { done(err, null); })
-                  .done();
-          })
+                // intentamos leer una cuenta contable de anticipo 
+                let leerCuentaContableDefinida = ContabFunctions.leerCuentaContableDefinida(
+                    12,
+                    entidadOriginal.provClte,
+                    0,
+                    cuentaBancaria.moneda,
+                    companiaContab.numero,
+                    null);
 
-          if (response.error) {
-              throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-          }
-      })
+                if (leerCuentaContableDefinida.error) {
+                    cuentaContableAnticipoEncontrada = false; 
+                } else { 
+                    cuentaContableAnticipos = leerCuentaContableDefinida.cuentaContableID;   
+                }
+            }
+        }
 
-      return {
-          asientoContableAgregadoID: asientoAgregado.numeroAutomatico
-      };
+
+        numeroPartida += 10;
+
+        partidaAsiento = {};
+
+        partidaAsiento = {
+            numeroAutomatico: asientoAgregado.numeroAutomatico,
+            partida: numeroPartida,
+            cuentaContableID: (pagoAnticipo && cuentaContableAnticipoEncontrada) ? cuentaContableAnticipos : cuentaContableCompaniaID,
+            descripcion: entidadOriginal.concepto.length > 75 ?
+                entidadOriginal.concepto.substr(0, 75) :
+                entidadOriginal.concepto,
+            referencia: entidadOriginal.transaccion,
+            debe: montoCxCCxP < 0 ? Math.abs(montoCxCCxP) : 0,
+            haber: montoCxCCxP >= 0 ? montoCxCCxP : 0,
+        };
+
+        // agregamos la partida a un array; cada item en el array será luego agregado a dAsientos en sql server
+        partidasAsientoContable.push(partidaAsiento);
+    }
+
+    // ahora recorremos el array de partidas y agregamos cada una a dAsientos en sql server; nótese que la idea es
+    // que las de mayor monto vayan primero
+    numeroPartida = 0;
+    lodash(partidasAsientoContable).orderBy(['debe', 'haber'], ['desc', 'desc']).forEach((partida) => {
+
+        // renumeramos la partida ...
+        numeroPartida += 10;
+        partida.partida = numeroPartida;
+
+        response = Async.runSync(function (done) {
+            dAsientosContables_sql.create(partida)
+                .then(function (result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        })
+
+        if (response.error) {
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+    })
+
+    let message = "";
+
+    if (pagoAnticipo && !cuentaContableAnticipoEncontrada) {
+        message = "El movimiento bancario <em>corresponde a un pago de anticipos</em>. Sin embargo, no pudimos leer una cuenta contable " +
+            "de este tipo (anticipos), para la compañía indicada para el movimiento bancario. <br /><br />" +
+            "Aunque el asiento contable ha sido generado en forma adecuada, " +
+            "hemos usado la cuenta contable de compañía (CxP/CxC) en vez de una de anticipos. "
+
+        return {
+            error: true,
+            message: message,
+            asientoContableAgregadoID: asientoAgregado.numeroAutomatico
+        };
+    }
+
+    return {
+        error: false,
+        message: message,
+        asientoContableAgregadoID: asientoAgregado.numeroAutomatico
+    };
+}
+
+function determinarPagoAnticipo(pagoID) { 
+
+    let query = `Select Top 1 AnticipoFlag as anticipoFlag From Pagos Where ClaveUnica = ?`;
+
+    response = null;
+    response = Async.runSync(function(done) {
+        sequelize.query(query, {
+            replacements: [ pagoID, ], type: sequelize.QueryTypes.SELECT })
+            .then(function(result) { done(null, result); })
+            .catch(function (err) { done(err, null); })
+            .done();
+    })
+
+    if (response.error) { 
+        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+    }
+
+    if (!response.result.length) { 
+        // esto no debe ocurrir; es como si no leyeramos el pago (???) 
+        return false; 
+    }
+
+    return response.result[0].anticipoFlag ? true : false; 
 }
 
 

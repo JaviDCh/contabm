@@ -20,7 +20,7 @@ Meteor.methods({
        let query = null;
        let response = null;
 
-       // leemos el pago y, de pago, el beneficiario en el proveedor
+       // leemos el pago y, de paso, el beneficiario en el proveedor
        query = `Select pag.Fecha as fecha, pag.Concepto as concepto,
                 pag.Monto as monto, prv.Beneficiario as beneficiario,
                 pag.Proveedor as proveedor, pag.MiSuFlag as miSuFlag, pag.Cia as cia
@@ -82,7 +82,7 @@ Meteor.methods({
        })
 
        if (response.error) {
-         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
        }
 
        if (response.result.length == 0) {
@@ -128,7 +128,7 @@ Meteor.methods({
        })
 
        if (response.error) {
-         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
        }
 
        // el registro, luego de ser grabado en sql, es regresado en response.result.dataValues ...

@@ -26,18 +26,19 @@ Meteor.methods(
 
             if (validarMesCerradoEnBancos.error)
                 return { error: true, message: validarMesCerradoEnBancos.errMessage };
-        };
+        }
 
 
         // ---------------------------------------------------------------------------------------------
         // validamos que la fecha no corresponda a un mes ya cerrado en Bancos ...
         if (!movimientoBancario.fecha) {
             return { error: true, message: 'Error: El movimiento bancario debe tener una fecha.' };
-        };
+        }
 
         let validarMesCerradoEnBancos = BancosFunctions.validarMesCerradoEnBancos(movimientoBancario.fecha, ciaContab);
-        if (validarMesCerradoEnBancos.error)
+        if (validarMesCerradoEnBancos.error) { 
             return { error: true, message: validarMesCerradoEnBancos.errMessage };
+        }
         // ---------------------------------------------------------------------------------------------
 
 
@@ -65,19 +66,21 @@ Meteor.methods(
                     .done();
             });
 
-            if (response.error)
+            if (response.error) { 
                 throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
+            }
+                
             let cantidadChequesUsados = response.result[0].contaCheques;
 
-            if (cantidadChequesUsados)
+            if (cantidadChequesUsados) { 
                 return {
                     error: true,
                     message: `Error: ya existe un movimiento bancario con ese número y para esa chequera.
                               Por favor revise.`
                 };
+            }
+                
             // ----------------------------------------------------------------------------------------
-
             let movimientoBancario_sql = _.clone(movimientoBancario);
 
             // ------------------------------------------------------------------------------------------

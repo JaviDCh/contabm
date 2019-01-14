@@ -168,22 +168,8 @@ function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSele
                 return;
             }
 
-            if (result.error) {
-                // se produjo un error al intentar construir y grabar el asiento contable asociado
-                $scope.alerts.length = 0;
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: result.message,
-                });
-
-                $scope.showProgress = false;
-                $scope.$apply();
-
-                return;
-            }
-
             // luego de agregado el asiento para la entidad, leemos y mostramos en la lista ...
-            Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result) => {
+            Meteor.call('leerAsientosContablesAsociados', provieneDe, entidadID, ciaSeleccionada.numero, (err, result2) => {
 
                 if (err) {
                     let errorMessage = mensajeErrorDesdeMethod_preparar(err);
@@ -197,7 +183,7 @@ function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSele
                     return;
                 }
 
-                let asientosContablesAsociadosList = JSON.parse(result);
+                let asientosContablesAsociadosList = JSON.parse(result2);
 
                 // las fechas siempre quedan como strings luego de serializadas
                 asientosContablesAsociadosList.forEach((x) => {
@@ -207,12 +193,21 @@ function ($scope, $modalInstance, $modal, $state, provieneDe, entidadID, ciaSele
                 $scope.asientosContablesAsociadosList = asientosContablesAsociadosList;
 
                 $scope.alerts.length = 0;
-                $scope.alerts.push({
-                    type: 'info',
-                    msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido leídos para
+
+                if (result.error) {
+                    // se produjo un error al intentar construir y grabar el asiento contable asociado
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: result.message,
+                    });
+                } else {
+                    $scope.alerts.push({
+                        type: 'info',
+                        msg: `Ok, <b>${asientosContablesAsociadosList.length}</b> asientos contables han sido leídos para
                           esta entidad.<br />
                           Haga un <em>click</em> en alguno de ellos para mostrarlo en forma separada.`,
-                })
+                    })
+                }
 
                 $scope.showProgress = false;
                 $scope.$apply();

@@ -10,8 +10,8 @@ import { Chequeras } from '/imports/collections/bancos/chequeras';
 import { mensajeErrorDesdeMethod_preparar } from '/client/imports/clientGlobalMethods/mensajeErrorDesdeMethod_preparar'; 
 
 angular.module("contabm").controller("Bancos_MovimientosBancarios_MovimientoBancario_Controller",
-['$scope', '$stateParams', '$state', '$meteor', '$modal', 'uiGridConstants',
-function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
+['$scope', '$stateParams', '$state', '$meteor', '$modal',
+function ($scope, $stateParams, $state, $meteor, $modal) {
 
       $scope.showProgress = false;
 
