@@ -76,7 +76,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
         // cuando el usuario indica la compañía (prov o cliente), leemos sus datos en sql ...
         if (value === 'compania' && $scope.factura.proveedor) {
 
-            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
+            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, $scope.companiaSeleccionada.numero, (err, result) => {
 
                 if (err) {
                     let errorMessage = mensajeErrorDesdeMethod_preparar(err);
@@ -107,7 +107,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     // leemos desde sql una buena cantidad de datos que permiten emitir la factura para el
                     // proveedor o cliente; ejemplo: AplicaIvaFlag, ContribuyenteEspecialFlag,
                     // BaseRetencionISLR, etc
-                    $scope.proveedor = JSON.parse(result);;
+
+                    let infoProveedor = JSON.parse(result);
+
+                    $scope.proveedor = infoProveedor.datosProveedor; 
 
                     // leemos el proveedor en mongo para inicializar algunos 'defaults'
                     let proveedorCliente = Proveedores.findOne({ proveedor: $scope.factura.proveedor });
@@ -125,10 +128,55 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                         }
                     }
 
-                    $scope.alerts.length = 0;
+                    if (infoProveedor.pagosAnticipo && infoProveedor.pagosAnticipo.length) { 
+                        // normalmente las fechas vienen como strings luego que las deserializamos 
+                        for (let pago of infoProveedor.pagosAnticipo) { 
+                            pago.fecha = pago.fecha ? moment(pago.fecha).toDate() : null;
+                        }
+                    }
 
+                    $scope.alerts.length = 0;
                     $scope.showProgress = false;
                     $scope.$apply();
+
+                    // TODO: vamos a regresar un array de pagos de anticipo. De exisitir alguno (s) lo mostraremos en una lista, 
+                    // para que el usuario pueda, si es adecuado, selecciionar uno (o no!) ... 
+
+                    if (infoProveedor.pagosAnticipo && infoProveedor.pagosAnticipo.length) { 
+                        // el proveedor tiene pagos de anticipo sin facturas asociadas; los mostramos y permitimos al usuario
+                        // seleccionar uno para poner el monto en el monto de anticipo ... 
+                        $modal.open({
+                            templateUrl: 'client/bancos/facturas/listaPagosAnticipoModal.html',
+                            controller: 'ListaPagosAnticipoModal_Controller',
+                            size: 'lg',
+                            resolve: {
+                                pagosAnticipoArray: () => {
+                                    return infoProveedor.pagosAnticipo;
+                                },
+                                ciaSeleccionada: function () {
+                                    return $scope.companiaSeleccionada;
+                                },
+                            },
+                        }).result.then(
+                            function (pagoAnticipoSeleccionado) {
+
+                                $scope.factura.anticipo = pagoAnticipoSeleccionado.monto; 
+
+                                let message = `Ok, el monto de anticipo en la factura ha sido actualizado usando el monto del 
+                                               pago que se ha seleccionado en la lista.<br /><br />
+                                               Luego de grabar la factura, no olvide abrir el pago y asociarla. De esta forma, 
+                                               el monto del pago de anticipo será restado del saldo pendiente de la factura.  
+                                              `; 
+                                message = message.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
+
+                                DialogModal($modal, "<em>Bancos - Facturas</em>", message, false).then();
+
+                                return true;
+                            },
+                            function (cancel) {
+                                return true;
+                            });
+                    }
                 }
             })
         }
