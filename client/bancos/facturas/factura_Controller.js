@@ -1851,7 +1851,10 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                     $scope.showProgress = false;
                     $scope.$apply();
                 } else {
-                    $scope.proveedor = JSON.parse(result);
+                    // en result puede venir también un array de pagos de anticipo pendientes por aplicar para el proveedor. 
+                    // pero lo usamos solo cuando se ingresa la factura ... 
+                    let infoCompania = JSON.parse(result);
+                    $scope.proveedor = infoCompania.datosProveedor; 
 
                     $scope.showProgress = false;
                     $scope.$apply();
