@@ -1824,7 +1824,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
 
             // finalmente, leemos lo datos importantes del proveedor para tenerlos para cuando sea
             // necesario (al calcular, determinar impuestos y retenciones, etc.)
-            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, (err, result) => {
+            Meteor.call('leerDatosCompaniaParaFactura', $scope.factura.proveedor, $scope.companiaSeleccionada.numero, (err, result) => {
 
                 if (err) {
                     let errorMessage = mensajeErrorDesdeMethod_preparar(err);
