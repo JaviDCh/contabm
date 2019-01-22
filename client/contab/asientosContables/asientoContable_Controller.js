@@ -248,6 +248,8 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
     $scope.exportarAsientoContable = () => {
 
+        let message = ""; 
+
         // permitimos grabar el asiento contable, como un json, a un archivo en la máquina. Luego, este archivo podrá
         // ser importado como un asiento nuevo ...
         try {
@@ -324,7 +326,14 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
                     $scope.asientoContable.tipo = asientoContable.tipo;
                 }
                 
-                $scope.asientoContable.descripcion = asientoContable.descripcion ? asientoContable.descripcion : "";
+                $scope.asientoContable.descripcion = "";
+
+                if (asientoContable.descripcion) { 
+                    $scope.asientoContable.descripcion = asientoContable.descripcion > 250 ?
+                                                     asientoContable.descripcion.substr(0, 250) :
+                                                     asientoContable.descripcion; 
+                }
+                
                 $scope.asientoContable.moneda = asientoContable.moneda ? asientoContable.moneda : 0;
                 $scope.asientoContable.monedaOriginal = asientoContable.monedaOriginal ? asientoContable.monedaOriginal : 0;
                 $scope.asientoContable.factorDeCambio = asientoContable.factorDeCambio ? asientoContable.factorDeCambio : 0;
@@ -377,10 +386,26 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
 
                         // la idea es resolver: el asiento que viene desde scrwebm no trae una cuentaContableID (ej: 2500) sino,
                         // más bien, la cuenta contable (ej: cuentaContable: '1 001 001 01')
-
                         partida.cuentaContableID = p.cuentaContableID ? p.cuentaContableID : null;
-                        partida.descripcion = p.descripcion ? p.descripcion : "";
-                        partida.referencia = p.referencia ? p.referencia : "";
+
+                        // la descripción en la partida no debe ser mayor a 75 chars 
+                        partida.descripcion = "";
+
+                        if (p.descripcion) { 
+                            partida.descripcion = p.descripcion > 75 ?
+                                                  p.descripcion.substr(0, 75) :
+                                                  p.descripcion; 
+                        }
+
+                        // la referencia en la partida no debe ser mayor a 20 chars ... 
+                        partida.referencia = "";
+
+                        if (p.referencia) { 
+                            partida.referencia = p.referencia > 20 ?
+                                                  p.referencia.substr(0, 20) :
+                                                  p.referencia; 
+                        }
+
                         partida.debe = p.debe ? p.debe : 0;
                         partida.haber = p.haber ? p.haber : 0;
                         partida.centroCosto = p.centroCosto ? p.centroCosto : null;
