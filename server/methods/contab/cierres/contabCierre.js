@@ -139,11 +139,6 @@ Meteor.methods(
 
             agregarRegistrosNoEnSaldosSiEnAsientos(primerDiaMes, ultimoDiaMes, anoFiscal, ciaContab);
             // -------------------------------------------------------------------------------------------------------------
-
-
-
-
-            // -------------------------------------------------------------------------------------------------------------
             // paso # 2) update en SaldosContables para poner el saldo del mes tal como el saldo del mes anterior
             // -------------------------------------------------------------------------------------------------------------
             numberOfItems = 1;
@@ -485,8 +480,9 @@ function agregarRegistrosNoEnSaldosSiEnAsientos(primerDiaMes, ultimoDiaMes, anoF
                 .done();
         });
 
-        if (response.error)
+        if (response.error) { 
             throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
 
         if (response.result[0].count === 0) {
             // Ok, no encontramos un registro de saldos; lo agregamos ...
@@ -504,8 +500,60 @@ function agregarRegistrosNoEnSaldosSiEnAsientos(primerDiaMes, ultimoDiaMes, anoF
                     .done();
             });
 
-            if (response.error)
-                throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            if (response.error) {
+                // la cuenta puede existir en saldos, pero para *otra* compañía. Esto es un error de integridad referencial. 
+                // Pero, para ayudar a corregir el problema, podemos indicar estos datos de la cuenta que existe: 
+                // CuentaContableID, Cuenta, año, moneda, monedaOriginal y cia. 
+                // Esto permitirá buscar el registro en la tabla de SaldosContables y, probablemente, eliminarla ... 
+
+                // leemos la cuenta que existe, para mostrarla al usuario 
+                query = `Select s.CuentaContableID as cuentaID, c.Cuenta as cuentaContable, s.Ano as ano, 
+                        mon.Simbolo as simboloMoneda, monOrig.Simbolo as simboloMonedaOriginal, 
+                        cias.NombreCorto as nombreCia 
+                        From 
+                        SaldosContables s Inner Join CuentasContables c on s.CuentaContableID = c.ID 
+                        Inner Join Companias cias on cias.Numero = s.Cia 
+                        Inner Join Monedas mon on mon.Moneda = s.Moneda 
+                        Inner Join Monedas monOrig on monOrig.Moneda = s.MonedaOriginal 
+                        Where CuentaContableID = ? and Ano = ? and s.Moneda = ? And s.MonedaOriginal = ?`;
+
+                response = null;
+                response = Async.runSync(function (done) {
+                    sequelize.query(query, {
+                        replacements: [
+                            asiento.cuentaContableID,
+                            anoFiscal,
+                            asiento.moneda,
+                            asiento.monedaOriginal,
+                        ],
+                        type: sequelize.QueryTypes.SELECT
+                    })
+                        .then(function (result) { done(null, result); })
+                        .catch(function (err) { done(err, null); })
+                        .done();
+                });
+
+                if (response.error) { 
+                    throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+                }
+                    
+
+                if (response.result.length > 0) {
+                    // Ok, la cuenta ya existía en saldos. Por alguna razón, existe para otra cia Contab. Informamos al usuario y 
+                    // mostramos la cuenta para que intente resolver ... 
+                    const cuentaQueExisteEnSaldos = response.result[0]; 
+
+                    throw new Meteor.Error("saldos-intentoAgregarCuentaQueExiste",
+                    `Se ha intentado agregar una cuenta contable a la tabla de saldos, pues existe en un asiento pero no en saldos.<br /> 
+                    Sin embargo, la cuenta contable ya existe, pero para otra compañía contab.<br />
+                    Por favor revise y determine por que existe esta situación; corríjala y vuelva a correr el cierre contable.<br /> 
+                    Los datos de la cuenta contable que <b>ya existe</b> en saldos son los siguientes: 
+                    cuenta-id: ${cuentaQueExisteEnSaldos.cuentaID} - cuenta: ${cuentaQueExisteEnSaldos.cuentaContable} -  
+                    año: ${cuentaQueExisteEnSaldos.ano} - moneda: ${cuentaQueExisteEnSaldos.simboloMoneda} - 
+                    moneda original: ${cuentaQueExisteEnSaldos.simboloMonedaOriginal} - cia contab: ${cuentaQueExisteEnSaldos.nombreCia}.
+                    `);
+                }
+            }    
         };
     });
 };
