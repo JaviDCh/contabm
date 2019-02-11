@@ -453,10 +453,10 @@ function agregarRegistrosNoEnSaldosSiEnAsientos(primerDiaMes, ultimoDiaMes, anoF
             .done();
     });
 
-    if (response.error)
+    if (response.error) { 
         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
-
-
+    }
+        
     response.result.forEach((asiento) => {
         // para cada registro leído desde asientos, intentamos leer un registro de saldos; lo agregamos si no existe
         query = `Select Count(*) as count
@@ -543,15 +543,48 @@ function agregarRegistrosNoEnSaldosSiEnAsientos(primerDiaMes, ultimoDiaMes, anoF
                     // mostramos la cuenta para que intente resolver ... 
                     const cuentaQueExisteEnSaldos = response.result[0]; 
 
-                    throw new Meteor.Error("saldos-intentoAgregarCuentaQueExiste",
-                    `Se ha intentado agregar una cuenta contable a la tabla de saldos, pues existe en un asiento pero no en saldos.<br /> 
+                    let errorMessage = `Se ha intentado agregar una cuenta contable a la tabla de saldos, pues existe en un asiento 
+                    pero no en saldos.<br /> 
                     Sin embargo, la cuenta contable ya existe, pero para otra compañía contab.<br />
                     Por favor revise y determine por que existe esta situación; corríjala y vuelva a correr el cierre contable.<br /> 
                     Los datos de la cuenta contable que <b>ya existe</b> en saldos son los siguientes: 
                     cuenta-id: ${cuentaQueExisteEnSaldos.cuentaID} - cuenta: ${cuentaQueExisteEnSaldos.cuentaContable} -  
                     año: ${cuentaQueExisteEnSaldos.ano} - moneda: ${cuentaQueExisteEnSaldos.simboloMoneda} - 
                     moneda original: ${cuentaQueExisteEnSaldos.simboloMonedaOriginal} - cia contab: ${cuentaQueExisteEnSaldos.nombreCia}.
-                    `);
+                    `; 
+
+                    // para mejorar aún más el mensaje de error, buscamos un asiento en el cual exista la cuenta contable 
+                    query = `Select a.Numero as numero From Asientos a Inner Join dAsientos d on a.NumeroAutomatico = d.NumeroAutomatico 
+                             Where d.CuentaContableID = ? And a.Fecha Between ? And ? And a.Cia = ?
+                             `;
+
+                    response = null;
+                    response = Async.runSync(function (done) {
+                        sequelize.query(query, {
+                            replacements: [
+                                asiento.cuentaContableID,
+                                moment(primerDiaMes).format('YYYY-MM-DD'),
+                                moment(ultimoDiaMes).format('YYYY-MM-DD'),
+                                ciaContab.numero,
+                            ],
+                            type: sequelize.QueryTypes.SELECT
+                        })
+                            .then(function (result) { done(null, result); })
+                            .catch(function (err) { done(err, null); })
+                            .done();
+                    });
+
+                    if (response.error) { 
+                        throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+                    }
+
+                    if (response.result.length > 0) {
+                        let asientoContableConError = response.result[0]; 
+                        errorMessage += `<br />Por ejemplo, revise el asiento contable número <b>${asientoContableConError.numero.toString()}</b>  
+                                         en la compañía contab y el mes para el cual está ahora efectuando el cierre contable.`
+                    }
+
+                    throw new Meteor.Error("saldos-intentoAgregarCuentaQueNoExiste", errorMessage);
                 }
             }    
         };
