@@ -95,7 +95,8 @@ Meteor.methods(
             bancoNombreCompleto = banco.nombre; 
         }
 
-        // ahora leemos el asiento contable asociado al movimiento bancario
+        // ahora leemos el asiento contable asociado al movimiento bancario; nótese que puede haber más de uno, cuando el 
+        // asiento contable es convertido a otra moneda ... 
         response = null;
         response = Async.runSync(function(done) {
             AsientosContables_sql.findAll({
@@ -116,44 +117,51 @@ Meteor.methods(
                                     `Error inesperado: no pudimos leer un asiento contable para el movimiento bancario indicado.<br />
                                     El movimiento bancario debe tener un asiento contable asociado.`);
         }
-        
 
-        let asientoContable = response.result[0];
+        let asientosContables = []; 
 
-        // ahora que tenemos el asiento, leemos sus partidas
-        response = null;
-        response = Async.runSync(function(done) {
-            dAsientosContables_sql.findAll({
-                where: { numeroAutomatico: asientoContable.numeroAutomatico, },
-                raw: true })
-                .then(function(result) { done(null, result); })
-                .catch(function (err) { done(err, null); })
-                .done();
-        })
+        for (let asientoContable of response.result) {
 
-        if (response.error) { 
-            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+            // ahora que tenemos el asiento, leemos sus partidas
+            let response2 = null;
+            response2 = Async.runSync(function (done) {
+                dAsientosContables_sql.findAll({
+                    where: { numeroAutomatico: asientoContable.numeroAutomatico, },
+                    raw: true
+                })
+                    .then(function (result) { done(null, result); })
+                    .catch(function (err) { done(err, null); })
+                    .done();
+            })
+
+            if (response2.error) {
+                throw new Meteor.Error(response2.error && response2.error.message ? response2.error.message : response2.error.toString());
+            }
+
+            let partidasAsientoContable = response2.result;
+
+            // preparamos un array que debemos pasar para combinar con Word ...
+            let partidas = [];
+
+            partidasAsientoContable.forEach((x) => {
+                // buscamos la cuenta contable; debe existir en mongo ...
+                let cuentaContable = CuentasContables.findOne({ id: x.cuentaContableID });
+
+                let p = {
+                    cuentaContable: cuentaContable ? cuentaContable.cuentaEditada : 'Indefinida',
+                    descripcionPartida: x.descripcion,
+                    montoPartida: numeral(x.haber != 0 ? (x.haber * -1) : x.debe).format("(0,0.00)"),
+                    montoPartidaDebe: numeral(x.haber != 0 ? 0 : x.debe).format("0,0.00"),
+                    montoPartidaHaber: numeral(x.haber != 0 ? Math.abs(x.haber) : 0).format("0,0.00"),
+                };
+
+                partidas.push(p);
+            })
+
+            asientoContable.partidas = partidas; 
+            asientosContables.push(asientoContable); 
         }
-            
-        let partidasAsientoContable = response.result;
 
-        // preparamos un array que debemos pasar para combinar con Word ...
-        let partidas = [];
-
-        partidasAsientoContable.forEach((x) => {
-            // buscamos la cuenta contable; debe existir en mongo ...
-            let cuentaContable = CuentasContables.findOne({ id: x.cuentaContableID });
-
-            let p = {
-                cuentaContable: cuentaContable ? cuentaContable.cuentaEditada : 'Indefinida',
-                descripcionPartida: x.descripcion,
-                montoPartida: numeral(x.haber != 0 ? (x.haber * -1) : x.debe).format("(0,0.00)"),
-                montoPartidaDebe: numeral(x.haber != 0 ? 0 : x.debe).format("0,0.00"),
-                montoPartidaHaber: numeral(x.haber != 0 ? Math.abs(x.haber) : 0).format("0,0.00"), 
-            };
-
-            partidas.push(p);  
-        })
 
         // leemos el proveedor para obener algunos datos más 
         let proveedorNombreContacto1 = ""; 
@@ -223,53 +231,65 @@ Meteor.methods(
         let impuestos = movimientoBancario.impuestos ? Math.abs(movimientoBancario.impuestos) : 0; 
         let monto = movimientoBancario.monto ? Math.abs(movimientoBancario.monto) : 0; 
 
+        // preparamos el array que vamos a pasar a setData; agregamos un movimiento (el mismo) para cada asiento contable. 
+        // la idea es poder mostrar una página en Word para cada asiento contable. Normalmente, habrá solo un asiento, pero 
+        // puede haber más de uno para asientos convertidos a otras monedas 
+        let items = []; 
+
+        for (let asientoContable of asientosContables) { 
+            let item = { 
+                // nótese como permitimos agregar a la plantilla todos los montos (com, imp, ...); además, también 
+                // agregamos montoEscrito para cada uno de ellos 
+
+                montoBase: numeral(montoBase).format("0,0.00"),
+                montoBase_enLetras: montoEscrito(montoBase), 
+
+                comision: numeral(comision).format("0,0.00"),
+                comision_enLetras: montoEscrito(comision), 
+
+                impuestos: numeral(impuestos).format("0,0.00"),
+                impuestos_enLetras: montoEscrito(impuestos), 
+
+                monto: numeral(monto).format("0,0.00"),
+                monto_enLetras: montoEscrito(monto), 
+
+                beneficiario: movimientoBancario.beneficiario,
+                fechaEscrita: moment(movimientoBancario.fecha).format("DD [de] MMMM"),
+                año: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0,0"),
+                añoSinFormato: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0"),
+
+                concepto: movimientoBancario.concepto,
+                numeroComprobante: asientoContable ? asientoContable.numero : '',
+
+                numeroCheque: movimientoBancario.transaccion,
+
+                cuentaBancaria: cuentaBancaria,
+                banco: nombreBanco,
+                bancoNombreCompleto: bancoNombreCompleto, 
+
+                proveedorNombreContacto1: proveedorNombreContacto1, 
+                proveedorNombreContacto2: proveedorNombreContacto2, 
+                proveedorRif: proveedorRif, 
+                proveedorNit: proveedorNit, 
+
+                p: asientoContable.partidas,
+
+                totalMonto: numeral(lodash.sumBy(asientoContable.partidas, "debe") - lodash.sumBy(asientoContable.partidas, "haber")).format("0,0.00"), 
+                totalDebe: numeral(lodash.sumBy(asientoContable.partidas, "debe")).format("0,0.00"),  
+                totalHaber: numeral(lodash.sumBy(asientoContable.partidas, "haber")).format("0,0.00"),  
+
+                elaboradoPor: configuracionChequeImpreso && configuracionChequeImpreso.elaboradoPor ? configuracionChequeImpreso.elaboradoPor : ' ',
+                revisadoPor: configuracionChequeImpreso && configuracionChequeImpreso.revisadoPor ? configuracionChequeImpreso.revisadoPor : ' ',
+                aprobadoPor: configuracionChequeImpreso && configuracionChequeImpreso.aprobadoPor ? configuracionChequeImpreso.aprobadoPor : ' ',
+                contabilizadoPor: configuracionChequeImpreso && configuracionChequeImpreso.contabilizadoPor ? configuracionChequeImpreso.contabilizadoPor : ' ',
+                nombreCompania: ciaSeleccionada.nombre,
+            }
+
+            items.push(item); 
+        }
+
         doc.setData({
-
-            // nótese como permitimos agregar a la plantilla todos los montos (com, imp, ...); además, también 
-            // agregamos montoEscrito para cada uno de ellos 
-
-            montoBase: numeral(montoBase).format("0,0.00"),
-            montoBase_enLetras: montoEscrito(montoBase), 
-
-            comision: numeral(comision).format("0,0.00"),
-            comision_enLetras: montoEscrito(comision), 
-
-            impuestos: numeral(impuestos).format("0,0.00"),
-            impuestos_enLetras: montoEscrito(impuestos), 
-
-            monto: numeral(monto).format("0,0.00"),
-            monto_enLetras: montoEscrito(monto), 
-
-            beneficiario: movimientoBancario.beneficiario,
-            fechaEscrita: moment(movimientoBancario.fecha).format("DD [de] MMMM"),
-            año: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0,0"),
-            añoSinFormato: numeral(parseInt(moment(movimientoBancario.fecha).format("YYYY"))).format("0"),
-
-            concepto: movimientoBancario.concepto,
-            numeroComprobante: asientoContable ? asientoContable.numero : '',
-
-            numeroCheque: movimientoBancario.transaccion,
-
-            cuentaBancaria: cuentaBancaria,
-            banco: nombreBanco,
-            bancoNombreCompleto: bancoNombreCompleto, 
-
-            proveedorNombreContacto1: proveedorNombreContacto1, 
-            proveedorNombreContacto2: proveedorNombreContacto2, 
-            proveedorRif: proveedorRif, 
-            proveedorNit: proveedorNit, 
-
-            p: partidas,
-
-            totalMonto: numeral(lodash.sumBy(partidasAsientoContable, "debe") - lodash.sumBy(partidasAsientoContable, "haber")).format("0,0.00"), 
-            totalDebe: numeral(lodash.sumBy(partidasAsientoContable, "debe")).format("0,0.00"),  
-            totalHaber: numeral(lodash.sumBy(partidasAsientoContable, "haber")).format("0,0.00"),  
-
-            elaboradoPor: configuracionChequeImpreso && configuracionChequeImpreso.elaboradoPor ? configuracionChequeImpreso.elaboradoPor : ' ',
-            revisadoPor: configuracionChequeImpreso && configuracionChequeImpreso.revisadoPor ? configuracionChequeImpreso.revisadoPor : ' ',
-            aprobadoPor: configuracionChequeImpreso && configuracionChequeImpreso.aprobadoPor ? configuracionChequeImpreso.aprobadoPor : ' ',
-            contabilizadoPor: configuracionChequeImpreso && configuracionChequeImpreso.contabilizadoPor ? configuracionChequeImpreso.contabilizadoPor : ' ',
-            nombreCompania: ciaSeleccionada.nombre,
+            items: items, 
         })
 
         try {
