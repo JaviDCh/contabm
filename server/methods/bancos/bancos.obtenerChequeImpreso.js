@@ -14,6 +14,7 @@ import { CuentasBancarias_sql } from '/server/imports/sqlModels/bancos/movimient
 import { MovimientosBancarios_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
 import { Bancos } from '/imports/collections/bancos/bancos';
 import { Chequeras_sql } from '/server/imports/sqlModels/bancos/movimientosBancarios'; 
+import { Monedas_sql } from '/server/imports/sqlModels/monedas'; 
 
 // para grabar el contenido (doc word creado en base al template) a un file (collectionFS) y regresar el url
 // para poder hacer un download (usando el url) desde el client ...
@@ -68,10 +69,8 @@ Meteor.methods(
                                    'Error inesperado: no pudimos leer el movimiento bancario en la base de datos.');
         }
             
-
-
         let movimientoBancario = response.result[0].dataValues;
-
+        
         movimientoBancario.fecha = movimientoBancario.fecha ? moment(movimientoBancario.fecha).add(TimeOffset, 'hours').toDate() : null;
         movimientoBancario.fechaEntregado = movimientoBancario.fechaEntregado ? moment(movimientoBancario.fechaEntregado).add(TimeOffset, 'hours').toDate() : null;
         movimientoBancario.ingreso = movimientoBancario.ingreso ? moment(movimientoBancario.ingreso).add(TimeOffset, 'hours').toDate() : null;
@@ -82,11 +81,10 @@ Meteor.methods(
                              response.result[0] &&
                              response.result[0].chequera &&
                              response.result[0].chequera.cuentaBancaria &&
-                             response.result[0].chequera.cuentaBancaria.dataValues &&
-                             response.result[0].chequera.cuentaBancaria.dataValues.cuentaBancaria ?
-                             response.result[0].chequera.cuentaBancaria.dataValues.cuentaBancaria : 'Indefinida';
+                             response.result[0].chequera.cuentaBancaria.dataValues;
 
-        let banco = Bancos.findOne({ 'agencias.cuentasBancarias.cuentaBancaria': cuentaBancaria });
+        let banco = Bancos.findOne({ 'agencias.cuentasBancarias.cuentaBancaria': 
+                                     (cuentaBancaria.cuentaBancaria ? cuentaBancaria.cuentaBancaria : 'Indefinida') });
 
         let nombreBanco = "Indefinido";
         let bancoNombreCompleto = "Indefinido"; 
@@ -153,6 +151,8 @@ Meteor.methods(
                     montoPartida: numeral(x.haber != 0 ? (x.haber * -1) : x.debe).format("(0,0.00)"),
                     montoPartidaDebe: numeral(x.haber != 0 ? 0 : x.debe).format("0,0.00"),
                     montoPartidaHaber: numeral(x.haber != 0 ? Math.abs(x.haber) : 0).format("0,0.00"),
+                    debe: x.debe, 
+                    haber: x.haber, 
                 };
 
                 partidas.push(p);
@@ -163,6 +163,29 @@ Meteor.methods(
         }
 
 
+        // ------------------------------------------------------------------------------------------------------
+        // con la cuenta bancaria, obtenemos la moneda; la idea es saber si la moneda es nacional o extranjera 
+        response = null;
+        response = Async.runSync(function(done) {
+            Monedas_sql.findAll({ where: { moneda: cuentaBancaria.moneda }, raw: true, })
+                .then(function(result) { done(null, result); })
+                .catch(function (err) { done(err, null); })
+                .done();
+        })
+
+        if (response.error) { 
+            throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
+        }
+            
+        if (!response.result.length) { 
+            throw new Meteor.Error('db-registro-no-encontrado',  
+                                   'Error inesperado: no pudimos leer el la moneda, que corresponde a la cuenta bancaria, en la base de datos.');
+        }
+
+        let moneda = response.result[0]; 
+
+
+        // ------------------------------------------------------------------------------------------------------
         // leemos el proveedor para obener algunos datos más 
         let proveedorNombreContacto1 = ""; 
         let proveedorNombreContacto2 = ""; 
@@ -238,6 +261,8 @@ Meteor.methods(
 
         for (let asientoContable of asientosContables) { 
             let item = { 
+                monedaNombre: moneda.descripcion, 
+                monedaSimbolo: moneda.simbolo, 
                 // nótese como permitimos agregar a la plantilla todos los montos (com, imp, ...); además, también 
                 // agregamos montoEscrito para cada uno de ellos 
 
@@ -263,7 +288,7 @@ Meteor.methods(
 
                 numeroCheque: movimientoBancario.transaccion,
 
-                cuentaBancaria: cuentaBancaria,
+                cuentaBancaria: cuentaBancaria.cuentaBancaria,
                 banco: nombreBanco,
                 bancoNombreCompleto: bancoNombreCompleto, 
 
@@ -283,6 +308,14 @@ Meteor.methods(
                 aprobadoPor: configuracionChequeImpreso && configuracionChequeImpreso.aprobadoPor ? configuracionChequeImpreso.aprobadoPor : ' ',
                 contabilizadoPor: configuracionChequeImpreso && configuracionChequeImpreso.contabilizadoPor ? configuracionChequeImpreso.contabilizadoPor : ' ',
                 nombreCompania: ciaSeleccionada.nombre,
+            }
+
+            if (!moneda.nacionalFlag) { 
+                // si la moneda no es nacional, cambiamos la palabra 'céntimo' por 'centavo' en la descripción de los montos 
+                item.montoBase_enLetras = item.montoBase_enLetras.replace("céntimo", "centavo"); 
+                item.comision_enLetras = item.comision_enLetras.replace("céntimo", "centavo"); 
+                item.impuestos_enLetras = item.impuestos_enLetras.replace("céntimo", "centavo"); 
+                item.monto_enLetras = item.monto_enLetras.replace("céntimo", "centavo"); 
             }
 
             items.push(item); 
