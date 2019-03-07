@@ -270,7 +270,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants) {
               return;
           };
 
-          var modalInstance = $modal.open({
+          $modal.open({
               templateUrl: 'client/bancos/pagos/asociarFacturasModal.html',
               controller: 'AsociarFacturasModal_Controller',
               size: 'lg',

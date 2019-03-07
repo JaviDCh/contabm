@@ -52,14 +52,29 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
                 facturaSeleccionada = null;
                 if (row.isSelected) {
                     facturaSeleccionada = row.entity;
-                    facturaSeleccionada.montoAPagar = facturaSeleccionada.saldoCuota;
+
+                    // algunas veces el pago viene con un monto; casi siempre cuando es un pago de anticipo. 
+                    // cuando no lo es, normalmente el usuario deja el monto en blanco para que se actualice con 
+                    // el monto de las facturas pagadas 
+
+                    // si el pago viene con un monto, intentamos usarlo 
+
+                    if (pago.monto && pago.monto <= facturaSeleccionada.saldoCuota) { 
+                        // el monto pagado con la factura no debe exceder su propio monto 
+                        facturaSeleccionada.montoAPagar = pago.monto;
+                    } else { 
+                        // la factura tiene un monto mayor al del pago; tomamos el monto del pago como monto a pagar 
+                        // normalmente, ésto ocurre con pagos de anticipo 
+                        facturaSeleccionada.montoAPagar = facturaSeleccionada.saldoCuota;
+                    }
+                    
                     facturas_ui_grid_api.core.refresh();
                 }
                 else {
                     row.entity.montoAPagar = 0;
                     facturas_ui_grid_api.core.refresh();
-                };
-            });
+                }
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         // nótese que usamos 'id', y no '_id', pues estos registros vienen de sql con un id único
@@ -71,7 +86,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
         getRowIdentity: function (row) {
             return row._id;
         }
-    };
+    }
 
     $scope.facturas_ui_grid.columnDefs = [
         {
@@ -317,7 +332,7 @@ function ($scope, $modalInstance, $modal, $meteor, uiGridConstants, companiaCont
 
             type: 'number'
         },
-    ];
+    ]
 
     let facturasPendientesArray = [];
     $scope.facturas_ui_grid.data = [];
