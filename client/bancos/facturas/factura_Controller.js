@@ -148,7 +148,7 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                         $modal.open({
                             templateUrl: 'client/bancos/facturas/listaPagosAnticipoModal.html',
                             controller: 'ListaPagosAnticipoModal_Controller',
-                            size: 'lg',
+                            size: 'md',
                             resolve: {
                                 pagosAnticipoArray: () => {
                                     return infoProveedor.pagosAnticipo;
@@ -158,24 +158,26 @@ function ($scope, $stateParams, $state, $meteor, $modal, uiGridConstants, leerTa
                                 },
                             },
                         }).result.then(
-                            function (pagoAnticipoSeleccionado) {
+                            function (ok) {
+                                return true;
+                            },
+                            function (pagosAnticipoSeleccionados) {
 
-                                $scope.factura.anticipo = pagoAnticipoSeleccionado.monto; 
+                                if (pagosAnticipoSeleccionados && Array.isArray(pagosAnticipoSeleccionados) && pagosAnticipoSeleccionados.length) { 
+                                    $scope.factura.anticipo = lodash.sumBy(pagosAnticipoSeleccionados, "monto"); 
 
-                                let message = `Ok, el monto de anticipo en la factura ha sido actualizado usando el monto del 
+                                    let message = `Ok, el monto de anticipo en la factura ha sido actualizado usando el monto del 
                                                pago que se ha seleccionado en la lista.<br /><br />
                                                Luego de grabar la factura, no olvide abrir el pago y asociarla. De esta forma, 
                                                el monto del pago de anticipo será restado del saldo pendiente de la factura.  
                                               `; 
-                                message = message.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
+                                    message = message.replace(/\/\//g, '');     // quitamos '//' del query; typescript agrega estos caracteres??? 
 
-                                DialogModal($modal, "<em>Bancos - Facturas</em>", message, false).then();
+                                    DialogModal($modal, "<em>Bancos - Facturas</em>", message, false).then();
+                                }
 
                                 return true;
-                            },
-                            function (cancel) {
-                                return true;
-                            });
+                            })
                     }
                 }
             })

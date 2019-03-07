@@ -60,7 +60,7 @@ Meteor.methods(
         }
 
         // leemos los pagos de anticipo *sin facturas asociadas* (sin registros en dPagos) que pueda tener el proveedor 
-        query = `Select NumeroPago as numeroPago, Fecha as fecha, Monto as monto, Concepto as concepto, 
+        query = `Select Pagos.ClaveUnica as _id, NumeroPago as numeroPago, Fecha as fecha, Monto as monto, Concepto as concepto, 
                  dPagos.MontoPagado as montoPagado 
                  From Pagos Left Outer Join dPagos On Pagos.ClaveUnica = dPagos.ClaveUnicaPago 
                  Where Proveedor = ? And AnticipoFlag = 1 And Cia = ? and montoPagado Is Null`;

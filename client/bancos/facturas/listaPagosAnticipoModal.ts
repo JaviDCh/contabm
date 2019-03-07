@@ -1,7 +1,7 @@
 
 
 import * as angular from 'angular'; 
-import * as moment from 'moment';
+import * as lodash from 'lodash';
 
 angular.module("contabm").controller('ListaPagosAnticipoModal_Controller',
 ['$scope', '$modalInstance', 'pagosAnticipoArray', 'ciaSeleccionada', 
@@ -11,22 +11,23 @@ function ($scope, $modalInstance, pagosAnticipoArray, ciaSeleccionada) {
 
     $scope.closeAlert = function (index: any) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.companiaSeleccionada = ciaSeleccionada;
 
-    $scope.ok = function (itemSeleccionado: any) {
-        $modalInstance.close(itemSeleccionado);
-    };
+    let itemsSeleccionadosEnLaLista = [];
+
+    $scope.ok = function () {
+        $modalInstance.close("Ok");
+    }
 
     $scope.cancel = function () {
-        $modalInstance.dismiss("Cancel");
-    };
+        $modalInstance.dismiss(itemsSeleccionadosEnLaLista);
+    }
 
     $scope.showProgress = true;
 
     let list_ui_grid_api = null;
-    let itemSeleccionadoEnLaLista = {};
 
     $scope.list_ui_grid = {
 
@@ -36,7 +37,7 @@ function ($scope, $modalInstance, pagosAnticipoArray, ciaSeleccionada) {
         enableRowSelection: true,
         enableFiltering: false,
         enableRowHeaderSelection: false,
-        multiSelect: false,
+        multiSelect: true,
         enableSelectAll: false,
         selectionRowHeaderWidth: 0,
         rowHeight: 25,
@@ -45,17 +46,17 @@ function ($scope, $modalInstance, pagosAnticipoArray, ciaSeleccionada) {
 
             list_ui_grid_api = gridApi;
 
-            gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                itemSeleccionadoEnLaLista = {};
+            gridApi.selection.on.rowSelectionChanged($scope, function (row: any) {
 
                 if (row.isSelected) {
-                    itemSeleccionadoEnLaLista = row.entity;
-                    $scope.ok(itemSeleccionadoEnLaLista); 
+                    // el item no existía en la lista y fue seleccionado; lo agregamos 
+                    itemsSeleccionadosEnLaLista.push(row.entity as never); 
                 }
                 else { 
-                    return;
+                    // el item existía en la lista y fue deseleccionado 
+                    lodash.remove(itemsSeleccionadosEnLaLista, (x: any) => x._id === row.entity._id); 
                 }
-            });
+            })
         },
         // para reemplazar el field '$$hashKey' con nuestro propio field, que existe para cada row ...
         rowIdentity: function (row: any) {

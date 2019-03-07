@@ -6,32 +6,31 @@ import { DialogModal } from '/client/generales/angularGenericModal';
 import { GruposContables } from '/imports/collections/contab/gruposContables'; 
 
 angular.module("contabm.contab.catalogos").controller('ContabCatalogosCuentasContablesImportarDesdeExcel_Controller',
-['$scope', '$modalInstance', '$modal', '$meteor', 'cuentasContables', 'cuentasContables_ui_grid', 'ciaSeleccionada',
-function ($scope, $modalInstance, $modal, $meteor, cuentasContables, cuentasContables_ui_grid, ciaSeleccionada) {
+['$scope', '$modalInstance', '$modal', 'cuentasContables', 'cuentasContables_ui_grid', 'ciaSeleccionada',
+function ($scope, $modalInstance, $modal, cuentasContables, cuentasContables_ui_grid, ciaSeleccionada) {
 
-    // debugger;
     // ui-bootstrap alerts ...
     $scope.alerts = [];
 
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
-    };
+    }
 
     $scope.companiaSeleccionada = ciaSeleccionada;
 
     $scope.ok = function () {
         $modalInstance.close("Ok");
-    };
+    }
 
     $scope.cancel = function () {
         $modalInstance.dismiss("Cancel");
-    };
+    }
 
     // para leer el archivo seleccionado mediante el Input ...
     let userSelectedFile = null;
     $scope.uploadFile = function(files) {
       userSelectedFile = files[0];
-    };
+    }
 
 
     let cuentasContablesAgregadas = 0;
@@ -49,10 +48,10 @@ function ($scope, $modalInstance, $modal, $meteor, cuentasContables, cuentasCont
                   msg: `Aparentemente, Ud. no ha seleccionado un archivo (Excel) desde su PC aún.<br />
                         Ud. debe seleccionar un archivo (Excel) antes de intentar importar
                         las cuentas contables desde el mismo.`
-              });
+              })
 
               return;
-          };
+          }
 
           if ($scope.tratarFilesForm.$valid) {
               $scope.submitted = false;
@@ -130,12 +129,12 @@ function ($scope, $modalInstance, $modal, $meteor, cuentasContables, cuentasCont
               };
 
               reader.readAsBinaryString(f);
-        };
-    };
+        }
+    }
 
 
 
-    $modalInstance.rendered.then(function(){
+    $modalInstance.rendered.then(function() {
         // para mejorar el style al input-file ...
         // nótese que, en caso de bootstrap modals, ponemos en 'rendered'; de otra forma, los estilos no se aplican
         // correctamente al input ...
@@ -147,6 +146,4 @@ function ($scope, $modalInstance, $modal, $meteor, cuentasContables, cuentasCont
         $(":file").filestyle('size', 'sm');
         // $(":file").filestyle({input: false});
     });
-
-}
-]);
+}])
