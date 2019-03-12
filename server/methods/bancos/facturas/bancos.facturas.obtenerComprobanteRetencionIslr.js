@@ -144,7 +144,7 @@ Meteor.methods(
                              From Pagos p Inner Join dPagos d On p.ClaveUnica = d.ClaveUnicaPago
                              Inner Join CuotasFactura c On d.ClaveUnicaCuotaFactura = c.ClaveUnica
                              Inner Join Facturas f On c.ClaveUnicaFactura = f.ClaveUnica
-                             Where f.ClaveUnica = ?`;
+                             Where f.ClaveUnica = ? Order by p.Fecha Desc`;
 
                     response = null;
                     response = Async.runSync(function(done) {

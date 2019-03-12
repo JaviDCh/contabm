@@ -61,9 +61,13 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
         { tipo: "IN", descripcion: "Inactiva"}, 
     ]
 
-    let bancos_ui_grid_api = null;
     let bancoSeleccionado = {};
+    let agenciaSeleccionada = {};
+    let cuentaBancariaSeleccionada = {};
+    let chequeraSeleccionada = {};
 
+    let bancos_ui_grid_api = null;
+    
     $scope.bancos_ui_grid = {
 
         enableSorting: true,
@@ -82,7 +86,11 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
             bancos_ui_grid_api = gridApi;
 
             gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+
                 bancoSeleccionado = {};
+                agenciaSeleccionada = {};
+                cuentaBancariaSeleccionada = {};
+                chequeraSeleccionada = {};
 
                 $scope.agencias_ui_grid.data = [];
                 $scope.cuentasBancarias_ui_grid.data = [];
@@ -219,8 +227,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
     }
 
     let agencias_ui_grid_api = null;
-    let agenciaSeleccionada = {};
-
+    
     $scope.agencias_ui_grid = {
 
         enableSorting: true,
@@ -239,8 +246,11 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
             agencias_ui_grid_api = gridApi;
 
             gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                //debugger;
+
                 agenciaSeleccionada = {};
+                cuentaBancariaSeleccionada = {};
+                chequeraSeleccionada = {};
+
                 $scope.cuentasBancarias_ui_grid.data = [];
 
                 if (row.isSelected) {
@@ -423,8 +433,7 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
 
 
     let cuentasBancarias_ui_grid_api = null;
-    let cuentaBancariaSeleccionada = {};
-
+     
     $scope.cuentaBancaria_ChequeraSeleccionada = "";          // para mostrar el nombre de la cuenta sobre el grid de chequeras
 
     let chequerasSubscriptionHandle = null;
@@ -447,7 +456,9 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
             cuentasBancarias_ui_grid_api = gridApi;
 
             gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+
                 cuentaBancariaSeleccionada = {};
+                chequeraSeleccionada = {};
 
                 $scope.chequeras_ui_grid.data = [];
                 $scope.cuentaBancaria_ChequeraSeleccionada = "";
@@ -857,6 +868,9 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
 
                     $scope.bancos_ui_grid.data = $scope.bancos;
 
+                    cuentaBancariaSeleccionada = {};
+                    chequeraSeleccionada = {};
+
                     $scope.showProgress = false;
                     $scope.$apply();
                 },
@@ -864,11 +878,8 @@ angular.module("contabm.bancos.catalogos").controller("Catalogos_CuentasBancaria
         })
     }
 
-    
-
     let chequeras_ui_grid_api = null;
-    let chequeraSeleccionada = {};
-
+    
     $scope.chequeras_ui_grid = {
 
         enableSorting: true,
