@@ -6,10 +6,8 @@ import moment from 'moment';
 let verificarAsientosConMas2DecimalesEnPeriodo = (desde, hasta, ciaContab) => {
 
     let whereMontosConMasDeDosDecimales = `
-        (
-            (((abs(d.debe)*100) - CONVERT(bigint,(abs(d.debe)*100))) <> 0) Or
-            (((abs(d.haber)*100) - CONVERT(bigint,(abs(d.haber)*100))) <> 0)
-        )`;
+        ( (LEN(SUBSTRING(cast(d.debe as varchar), CHARINDEX('.',d.debe ) + 1, 1000)) > 2) Or 
+	      (LEN(SUBSTRING(cast(d.haber as varchar), CHARINDEX('.',d.haber ) + 1, 1000)) > 2) )`;
 
 
     query = `Select Count(*) As cantOfAsientos
@@ -34,7 +32,6 @@ let verificarAsientosConMas2DecimalesEnPeriodo = (desde, hasta, ciaContab) => {
     if (response.error) {
         throw new Meteor.Error(response.error && response.error.message ? response.error.message : response.error.toString());
     }
-
 
     if (response.result[0].cantOfAsientos > 0) {
         return { error: true };
