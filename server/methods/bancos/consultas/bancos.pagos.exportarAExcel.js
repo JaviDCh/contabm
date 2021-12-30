@@ -143,7 +143,7 @@ Meteor.methods(
             nombreCiaContabSeleccionada: ciaSeleccionada.nombre,
             pagos: pagosArray,
             facturas: facturasArray,
-        };
+        }
 
         // Open a workbook
         let workbook = new XlsxInjector(templatePath);
@@ -171,12 +171,14 @@ Meteor.methods(
             let data2 = new Buffer(content);
 
             newFile.attachData( data2, {type: 'xlsx'}, Meteor.bindEnvironment(function( err ) {
-                if(err)
+                if(err) { 
                     throw new Meteor.Error('error-grabar-archivo-collectionFS',
                         `Error: se ha producido un error al intentar grabar el archivo a un directorio en el servidor.
                          El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
                          El mensaje de error recibido es: ${err.toString()}.
-                        `);
+                        `); 
+                }
+                    
 
                 newFile.name(outputFileName);
                 // Collections.Builds.insert( file );
@@ -187,7 +189,7 @@ Meteor.methods(
                     nombreArchivo: outputFileName,
                     aplicacion: 'bancos',
                     cia: ciaSeleccionada._id,
-                };
+                }
 
                 // intentamos eliminar el archivo antes de agregarlo nuevamente ...
                 Files_CollectionFS_tempFiles.remove({ 'metadata.nombreArchivo': outputFileName });
@@ -201,7 +203,7 @@ Meteor.methods(
                              El nombre del directorio en el servidor es: ${Meteor.settings.public.collectionFS_path_tempFiles}.
                              El mensaje de error recibido es: ${err.toString()}.
                             `);
-                    };
+                    }
 
                     // tenemos que esperar que el file efectivamente se guarde, para poder acceder su url ...
                     // nótese como Meteor indica que debemos agregar un 'fiber' para correr el callback, pues
@@ -212,11 +214,11 @@ Meteor.methods(
                             linkToFile: url
                         };
                         future['return'](result);
-                    }));
-                }));
-            }));
-        }));
+                    }))
+                }))
+            }))
+        }))
 
         return future.wait();
     }
-});
+})

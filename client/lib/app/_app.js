@@ -6,7 +6,8 @@
   // y esté disponible a lo largo de cualquier código en la aplicación
   import angular from 'angular';
   import angularMeteor from 'angular-meteor';
-  import uiRouter from 'angular-ui-router';
+  // import uiRouter from 'angular-ui-router';
+  import uiRouter from '@uirouter/angularjs';
 
   import 'angular-ui-grid';
 

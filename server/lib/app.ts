@@ -1,8 +1,6 @@
 ﻿
 import * as lodash from 'lodash';
 
-// _ = lodash               // this couldn't longer be done in ts 
-
 import { Monedas } from 'imports/collections/monedas';
 import { Companias } from 'imports/collections/companias';
 import { Proveedores } from 'imports/collections/bancos/proveedoresClientes'; 
@@ -36,7 +34,6 @@ Meteor.startup(function() {
     FS.TempStore.setMaxListeners(0);
 
     // usamos este espacio para agregar indeces, cuando no existen, en collecions en mongodb 
-
     Companias._ensureIndex({ numero: 1 });
     Monedas._ensureIndex({ moneda: 1 });
     Bancos._ensureIndex({ banco: 1 });
