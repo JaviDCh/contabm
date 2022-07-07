@@ -23,7 +23,7 @@
     "jszip": "2.0.0",
     "lodash": "4.17.21",
     "meteor-node-stubs": "0.2.4",
-    "moment": "2.19.3",
+    "moment": "2.29.4",
     "numeral": "2.0.4",
     "papaparse": "4.1.1",
     "save-as": "0.1.8",
